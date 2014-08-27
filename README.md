@@ -23,7 +23,7 @@ does not contain an example, and you can't write version 1 LAZ files,
 while reading version 1 is still possible.
 
 
-==  LICENSE AGREEMENT (for LASzip.Net LiDAR compression) ==
+**LICENSE AGREEMENT (for LASzip.Net LiDAR compression)**
 
   LASzip.Net is open-source and is licensed with the standard LGPL version 2.1
   (see COPYING.txt).
@@ -32,14 +32,14 @@ while reading version 1 is still possible.
   implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   
-== PROGRAMMERS ==
+**PROGRAMMERS**
   
   martin@rapidlasso.com
   
   shintadono@googlemail.com
   
   
-== COPYRIGHT ==
+**COPYRIGHT**
   
   (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
   (c) of C# port 2014 by Shinta <shintadono@googlemail.com>
