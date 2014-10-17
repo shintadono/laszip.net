@@ -42,4 +42,6 @@ while reading version 1 is still possible.
 **COPYRIGHT**
   
   (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+  
   (c) of C# port 2014 by Shinta <shintadono@googlemail.com>
+  
