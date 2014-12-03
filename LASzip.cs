@@ -37,7 +37,7 @@ namespace laszip.net
 		public const int VERSION_MAJOR=2;
 		public const int VERSION_MINOR=2;
 		public const int VERSION_REVISION=0;
-		public const int VERSION_BUILD_DATE=130917;
+		public const int VERSION_BUILD_DATE=140907;
 
 		public const int COMPRESSOR_NONE=0;
 		public const int COMPRESSOR_POINTWISE=1;

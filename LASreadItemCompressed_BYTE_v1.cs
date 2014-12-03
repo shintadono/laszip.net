@@ -33,7 +33,7 @@ namespace laszip.net
 {
 	class LASreadItemCompressed_BYTE_v1 : LASreadItemCompressed
 	{
-		public LASreadItemCompressed_BYTE_v1(IEntropyDecoder dec, uint number)
+		public LASreadItemCompressed_BYTE_v1(ArithmeticDecoder dec, uint number)
 		{
 			// set decoder
 			Debug.Assert(dec!=null);
@@ -69,7 +69,7 @@ namespace laszip.net
 			}
 		}
 
-		IEntropyDecoder dec;
+		ArithmeticDecoder dec;
 		uint number;
 		byte[] last_item;
 

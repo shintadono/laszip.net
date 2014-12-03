@@ -33,18 +33,7 @@ namespace laszip.net
 {
 	class LASwriteItemCompressed_WAVEPACKET13_v1 : LASwriteItemCompressed
 	{
-		[StructLayout(LayoutKind.Sequential, Pack=1)]
-		struct LASwavepacket13
-		{
-			public ulong offset;
-			public uint packet_size;
-			public U32I32F32 return_point;
-			public U32I32F32 x;
-			public U32I32F32 y;
-			public U32I32F32 z;
-		}
-
-		public LASwriteItemCompressed_WAVEPACKET13_v1(IEntropyEncoder enc)
+		public LASwriteItemCompressed_WAVEPACKET13_v1(ArithmeticEncoder enc)
 		{
 			// set encoder
 			Debug.Assert(enc!=null);
@@ -140,13 +129,13 @@ namespace laszip.net
 			return true;
 		}
 
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 		LASwavepacket13 last_item;
 
 		int last_diff_32;
 		uint sym_last_offset_diff;
-		IEntropyModel m_packet_index;
-		IEntropyModel[] m_offset_diff=new IEntropyModel[4];
+		ArithmeticModel m_packet_index;
+		ArithmeticModel[] m_offset_diff=new ArithmeticModel[4];
 		IntegerCompressor ic_offset_diff;
 		IntegerCompressor ic_packet_size;
 		IntegerCompressor ic_return_point;

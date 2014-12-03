@@ -24,7 +24,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
+//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
 //    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
@@ -45,7 +45,7 @@ namespace laszip.net
 	class IntegerCompressor
 	{
 		// Constructor & Deconstructor
-		public IntegerCompressor(IEntropyEncoder enc, uint bits=16, uint contexts=1, uint bits_high=8, uint range=0)
+		public IntegerCompressor(ArithmeticEncoder enc, uint bits=16, uint contexts=1, uint bits_high=8, uint range=0)
 		{
 			Debug.Assert(enc!=null);
 			this.enc=enc;
@@ -54,7 +54,7 @@ namespace laszip.net
 			Init(bits, contexts, bits_high, range);
 		}
 
-		public IntegerCompressor(IEntropyDecoder dec, uint bits=16, uint contexts=1, uint bits_high=8, uint range=0)
+		public IntegerCompressor(ArithmeticDecoder dec, uint bits=16, uint contexts=1, uint bits_high=8, uint range=0)
 		{
 			Debug.Assert(dec!=null);
 			this.enc=null;
@@ -118,14 +118,14 @@ namespace laszip.net
 			// maybe create the models
 			if(mBits==null)
 			{
-				mBits=new IEntropyModel[contexts];
+				mBits=new ArithmeticModel[contexts];
 				for(uint i=0; i<contexts; i++)
 				{
 					mBits[i]=enc.createSymbolModel(corr_bits+1);
 				}
 #if !COMPRESS_ONLY_K
-				mCorrector=new IEntropyModel[corr_bits+1];
-				mCorrector[0]=enc.createBitModel();
+				mCorrector=new ArithmeticModel[corr_bits+1];
+				mCorrectorBit=enc.createBitModel();
 				for(uint i=1; i<=corr_bits; i++)
 				{
 					if(i<=bits_high)
@@ -147,7 +147,7 @@ namespace laszip.net
 			}
 
 #if !COMPRESS_ONLY_K
-			enc.initBitModel(mCorrector[0]);
+			enc.initBitModel(mCorrectorBit);
 			for(uint i=1; i<=corr_bits; i++)
 			{
 				enc.initSymbolModel(mCorrector[i]);
@@ -176,15 +176,15 @@ namespace laszip.net
 			// maybe create the models
 			if(mBits==null)
 			{
-				mBits=new IEntropyModel[contexts];
+				mBits=new ArithmeticModel[contexts];
 				for(uint i=0; i<contexts; i++)
 				{
 					mBits[i]=dec.createSymbolModel(corr_bits+1);
 				}
 
 #if !COMPRESS_ONLY_K
-				mCorrector=new IEntropyModel[corr_bits+1];
-				mCorrector[0]=dec.createBitModel();
+				mCorrector=new ArithmeticModel[corr_bits+1];
+				mCorrectorBit=dec.createBitModel();
 				for(uint i=1; i<=corr_bits; i++)
 				{
 					if(i<=bits_high)
@@ -206,7 +206,7 @@ namespace laszip.net
 			}
 
 #if !COMPRESS_ONLY_K
-			dec.initBitModel(mCorrector[0]);
+			dec.initBitModel(mCorrectorBit);
 			for(uint i=1; i<=corr_bits; i++)
 			{
 				dec.initSymbolModel(mCorrector[i]);
@@ -227,7 +227,7 @@ namespace laszip.net
 		// Get the k corrector bits from the last compress/decompress call
 		public uint getK() { return k; }
 
-		void writeCorrector(int c, IEntropyModel model)
+		void writeCorrector(int c, ArithmeticModel model)
 		{
 			// find the tighest interval [ - (2^k - 1)  ...  + (2^k) ] that contains c
 			k=0;
@@ -310,12 +310,12 @@ namespace laszip.net
 			else // then c is 0 or 1
 			{
 				Debug.Assert((c==0)||(c==1));
-				enc.encodeBit(mCorrector[0], (uint)c);
+				enc.encodeBit(mCorrectorBit, (uint)c);
 			}
 #endif // COMPRESS_ONLY_K
 		}
 
-		int readCorrector(IEntropyModel model)
+		int readCorrector(ArithmeticModel model)
 		{
 			int c;
 
@@ -391,7 +391,7 @@ namespace laszip.net
 			}
 			else // then c is either 0 or 1
 			{
-				c=(int)dec.decodeBit(mCorrector[0]);
+				c=(int)dec.decodeBit(mCorrectorBit);
 			}
 #endif // COMPRESS_ONLY_K
 
@@ -411,10 +411,11 @@ namespace laszip.net
 		int corr_min;
 		int corr_max;
 
-		IEntropyEncoder enc;
-		IEntropyDecoder dec;
+		ArithmeticEncoder enc;
+		ArithmeticDecoder dec;
 
-		IEntropyModel[] mBits;
-		IEntropyModel[] mCorrector;
+		ArithmeticModel[] mBits;
+		ArithmeticModel[] mCorrector; // mCorrector[0] will always be null
+		ArithmeticBitModel mCorrectorBit;
 	}
 }

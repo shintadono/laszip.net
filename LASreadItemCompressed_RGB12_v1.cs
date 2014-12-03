@@ -32,7 +32,7 @@ namespace laszip.net
 {
 	class LASreadItemCompressed_RGB12_v1 : LASreadItemCompressed
 	{
-		public LASreadItemCompressed_RGB12_v1(IEntropyDecoder dec)
+		public LASreadItemCompressed_RGB12_v1(ArithmeticDecoder dec)
 		{
 			// set decoder
 			Debug.Assert(dec!=null);
@@ -88,10 +88,10 @@ namespace laszip.net
 			g=item16[2];
 		}
 
-		IEntropyDecoder dec;
+		ArithmeticDecoder dec;
 		ushort r, g, b;
 
-		IEntropyModel m_byte_used;
+		ArithmeticModel m_byte_used;
 		IntegerCompressor ic_rgb;
 	}
 }

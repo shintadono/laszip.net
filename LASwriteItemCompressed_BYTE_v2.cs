@@ -33,7 +33,7 @@ namespace laszip.net
 {
 	class LASwriteItemCompressed_BYTE_v2 : LASwriteItemCompressed
 	{
-		public LASwriteItemCompressed_BYTE_v2(IEntropyEncoder enc, uint number)
+		public LASwriteItemCompressed_BYTE_v2(ArithmeticEncoder enc, uint number)
 		{
 			// set encoder
 			Debug.Assert(enc!=null);
@@ -42,7 +42,7 @@ namespace laszip.net
 			this.number=number;
 
 			// create models and integer compressors
-			m_byte=new IEntropyModel[number];
+			m_byte=new ArithmeticModel[number];
 			for(uint i=0; i<number; i++)
 			{
 				m_byte[i]=enc.createSymbolModel(256);
@@ -80,10 +80,10 @@ namespace laszip.net
 			return true;
 		}
 
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 		uint number;
 		byte[] last_item;
 
-		IEntropyModel[] m_byte;
+		ArithmeticModel[] m_byte;
 	}
 }

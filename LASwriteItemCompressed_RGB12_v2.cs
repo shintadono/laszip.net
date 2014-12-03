@@ -33,7 +33,7 @@ namespace laszip.net
 {
 	class LASwriteItemCompressed_RGB12_v2 : LASwriteItemCompressed
 	{
-		public LASwriteItemCompressed_RGB12_v2(IEntropyEncoder enc)
+		public LASwriteItemCompressed_RGB12_v2(ArithmeticEncoder enc)
 		{
 			// set encoder
 			Debug.Assert(enc!=null);
@@ -130,15 +130,15 @@ namespace laszip.net
 			return true;
 		}
 
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 		ushort[] last_item=new ushort[3];
 
-		IEntropyModel m_byte_used;
-		IEntropyModel m_rgb_diff_0;
-		IEntropyModel m_rgb_diff_1;
-		IEntropyModel m_rgb_diff_2;
-		IEntropyModel m_rgb_diff_3;
-		IEntropyModel m_rgb_diff_4;
-		IEntropyModel m_rgb_diff_5;
+		ArithmeticModel m_byte_used;
+		ArithmeticModel m_rgb_diff_0;
+		ArithmeticModel m_rgb_diff_1;
+		ArithmeticModel m_rgb_diff_2;
+		ArithmeticModel m_rgb_diff_3;
+		ArithmeticModel m_rgb_diff_4;
+		ArithmeticModel m_rgb_diff_5;
 	}
 }

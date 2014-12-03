@@ -13,7 +13,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
+//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
 //    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
@@ -69,7 +69,7 @@ using System.IO;
 
 namespace laszip.net
 {
-	class ArithmeticEncoder : IEntropyEncoder
+	class ArithmeticEncoder
 	{
 		// Constructor & Destructor
 		public ArithmeticEncoder()
@@ -127,33 +127,32 @@ namespace laszip.net
 		}
 
 		// Manage an entropy model for a single bit
-		public IEntropyModel createBitModel()
+		public ArithmeticBitModel createBitModel()
 		{
 			return new ArithmeticBitModel();
 		}
 
-		public void initBitModel(IEntropyModel model)
+		public void initBitModel(ArithmeticBitModel m)
 		{
-			model.init();
+			m.init();
 		}
 
 		// Manage an entropy model for n symbols (table optional)
-		public IEntropyModel createSymbolModel(uint n)
+		public ArithmeticModel createSymbolModel(uint n)
 		{
 			return new ArithmeticModel(n, true);
 		}
 
-		public void initSymbolModel(IEntropyModel model, uint[] table=null)
+		public void initSymbolModel(ArithmeticModel m, uint[] table=null)
 		{
-			model.init(table);
+			m.init(table);
 		}
 
 		// Encode a bit with modelling
-		public void encodeBit(IEntropyModel model, uint bit)
+		public void encodeBit(ArithmeticBitModel m, uint bit)
 		{
-			Debug.Assert(model!=null&&(bit<=1));
+			Debug.Assert(m!=null&&(bit<=1));
 
-			ArithmeticBitModel m=(ArithmeticBitModel)model;
 			uint x=m.bit_0_prob*(length>>BM.LengthShift); // product l x p0
 			// update interval
 			if(bit==0)
@@ -174,11 +173,10 @@ namespace laszip.net
 		}
 
 		// Encode a symbol with modelling
-		public void encodeSymbol(IEntropyModel model, uint sym)
+		public void encodeSymbol(ArithmeticModel m, uint sym)
 		{
-			Debug.Assert(model!=null);
+			Debug.Assert(m!=null);
 
-			ArithmeticModel m=(ArithmeticModel)model;
 			Debug.Assert(sym<=m.last_symbol);
 			uint x, init_interval_base=interval_base;
 

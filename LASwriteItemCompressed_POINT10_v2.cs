@@ -54,7 +54,7 @@ namespace laszip.net
 			public ushort point_source_ID;
 		}
 
-		public LASwriteItemCompressed_POINT10_v2(IEntropyEncoder enc)
+		public LASwriteItemCompressed_POINT10_v2(ArithmeticEncoder enc)
 		{
 			// set encoder
 			Debug.Assert(enc!=null);
@@ -221,7 +221,7 @@ namespace laszip.net
 			return true;
 		}
 
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 		LASpoint10 last=new LASpoint10();
 
 		ushort[] last_intensity=new ushort[16];
@@ -234,10 +234,10 @@ namespace laszip.net
 		IntegerCompressor ic_z;
 		IntegerCompressor ic_intensity;
 		IntegerCompressor ic_point_source_ID;
-		IEntropyModel m_changed_values;
-		IEntropyModel[] m_scan_angle_rank=new IEntropyModel[2];
-		IEntropyModel[] m_bit_byte=new IEntropyModel[256];
-		IEntropyModel[] m_classification=new IEntropyModel[256];
-		IEntropyModel[] m_user_data=new IEntropyModel[256];
+		ArithmeticModel m_changed_values;
+		ArithmeticModel[] m_scan_angle_rank=new ArithmeticModel[2];
+		ArithmeticModel[] m_bit_byte=new ArithmeticModel[256];
+		ArithmeticModel[] m_classification=new ArithmeticModel[256];
+		ArithmeticModel[] m_user_data=new ArithmeticModel[256];
 	}
 }

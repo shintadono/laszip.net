@@ -54,9 +54,6 @@
     <Compile Include="ArithmeticEncoder.cs" />
     <Compile Include="ArithmeticModel.cs" />
     <Compile Include="Consts.cs" />
-    <Compile Include="IEntropyDecoder.cs" />
-    <Compile Include="IEntropyEncoder.cs" />
-    <Compile Include="IEntropyModel.cs" />
     <Compile Include="IntegerCompressor.cs" />
     <Compile Include="LASitem.cs" />
     <Compile Include="LASreadItem.cs" />
@@ -96,6 +93,7 @@
     <Compile Include="LASwriteItemRaw_WAVEPACKET13.cs" />
     <Compile Include="LASwritePoint.cs" />
     <Compile Include="LASzip.cs" />
+    <Compile Include="Laszip_Common_v1.cs" />
     <Compile Include="Laszip_Common_v2.cs" />
     <Compile Include="laszip_dll.cs" />
     <Compile Include="laszip_geokey.cs" />

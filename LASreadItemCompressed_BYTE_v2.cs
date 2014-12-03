@@ -33,7 +33,7 @@ namespace laszip.net
 {
 	class LASreadItemCompressed_BYTE_v2 : LASreadItemCompressed
 	{
-		public LASreadItemCompressed_BYTE_v2(IEntropyDecoder dec, uint number)
+		public LASreadItemCompressed_BYTE_v2(ArithmeticDecoder dec, uint number)
 		{
 			// set decoder
 			Debug.Assert(dec!=null);
@@ -42,7 +42,7 @@ namespace laszip.net
 			this.number=number;
 
 			// create models and integer compressors
-			m_byte=new IEntropyModel[number];
+			m_byte=new ArithmeticModel[number];
 			for(uint i=0; i<number; i++)
 			{
 				m_byte[i]=dec.createSymbolModel(256);
@@ -79,10 +79,10 @@ namespace laszip.net
 			Buffer.BlockCopy(item.extra_bytes, 0, last_item, 0, (int)number);
 		}
 
-		IEntropyDecoder dec;
+		ArithmeticDecoder dec;
 		uint number;
 		byte[] last_item;
 
-		IEntropyModel[] m_byte;
+		ArithmeticModel[] m_byte;
 	}
 }

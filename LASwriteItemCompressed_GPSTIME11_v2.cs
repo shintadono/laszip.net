@@ -39,7 +39,7 @@ namespace laszip.net
 
 		const int LASZIP_GPSTIME_MULTI_TOTAL=(LASZIP_GPSTIME_MULTI-LASZIP_GPSTIME_MULTI_MINUS+6);
 
-		public LASwriteItemCompressed_GPSTIME11_v2(IEntropyEncoder enc)
+		public LASwriteItemCompressed_GPSTIME11_v2(ArithmeticEncoder enc)
 		{
 			// set encoder
 			Debug.Assert(enc!=null);
@@ -238,14 +238,14 @@ namespace laszip.net
 			return true;
 		}
 
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 		uint last, next;
 		U64I64F64[] last_gpstime=new U64I64F64[4];
 		int[] last_gpstime_diff=new int[4];
 		int[] multi_extreme_counter=new int[4];
 
-		IEntropyModel m_gpstime_multi;
-		IEntropyModel m_gpstime_0diff;
+		ArithmeticModel m_gpstime_multi;
+		ArithmeticModel m_gpstime_0diff;
 		IntegerCompressor ic_gpstime;
 	}
 }

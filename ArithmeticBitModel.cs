@@ -13,7 +13,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
+//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
 //    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
@@ -66,14 +66,14 @@
 
 namespace laszip.net
 {
-	class ArithmeticBitModel : IEntropyModel
+	class ArithmeticBitModel
 	{
 		public ArithmeticBitModel()
 		{
 			init();
 		}
 
-		public int init(uint[] dummy=null)
+		public int init()
 		{
 			// initialization to equiprobable model
 			bit_0_count=1;

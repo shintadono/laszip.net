@@ -13,7 +13,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
+//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
 //    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
@@ -64,12 +64,13 @@
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+using System;
 using System.Diagnostics;
 using System.IO;
 
 namespace laszip.net
 {
-	class ArithmeticDecoder : IEntropyDecoder
+	class ArithmeticDecoder
 	{
 		// Constructor & Destructor
 		public ArithmeticDecoder()
@@ -98,32 +99,32 @@ namespace laszip.net
 		}
 
 		// Manage an entropy model for a single bit
-		public IEntropyModel createBitModel()
+		public ArithmeticBitModel createBitModel()
 		{
 			return new ArithmeticBitModel();
 		}
 
-		public void initBitModel(IEntropyModel model)
+		public void initBitModel(ArithmeticBitModel m)
 		{
-			model.init();
+			m.init();
 		}
 
 		// Manage an entropy model for n symbols (table optional)
-		public IEntropyModel createSymbolModel(uint n)
+		public ArithmeticModel createSymbolModel(uint n)
 		{
 			return new ArithmeticModel(n, false);
 		}
 
-		public void initSymbolModel(IEntropyModel model, uint[] table=null)
+		public void initSymbolModel(ArithmeticModel m, uint[] table=null)
 		{
-			model.init(table);
+			m.init(table);
 		}
 
 		// Decode a bit with modelling
-		public uint decodeBit(IEntropyModel model)
+		public uint decodeBit(ArithmeticBitModel m)
 		{
-			ArithmeticBitModel m=(ArithmeticBitModel)model;
-			
+			Debug.Assert(m!=null);
+
 			uint x=m.bit_0_prob*(length>>BM.LengthShift); // product l x p0
 			uint sym=(value>=x)?1u:0u; // decision
 
@@ -146,9 +147,8 @@ namespace laszip.net
 		}
 
 		// Decode a symbol with modelling
-		public uint decodeSymbol(IEntropyModel model)
+		public uint decodeSymbol(ArithmeticModel m)
 		{
-			ArithmeticModel m=(ArithmeticModel)model;
 			uint n, sym, x, y=length;
 
 			if(m.decoder_table!=null)
@@ -201,6 +201,8 @@ namespace laszip.net
 			++m.symbol_count[sym];
 			if(--m.symbols_until_update==0) m.update(); // periodic model update
 
+			Debug.Assert(sym<m.symbols);
+
 			return sym;
 		}
 
@@ -211,6 +213,8 @@ namespace laszip.net
 			value-=length*sym; // update interval
 
 			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+
+			Debug.Assert(sym<2);
 
 			return sym;
 		}
@@ -233,6 +237,10 @@ namespace laszip.net
 
 			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
 
+			Debug.Assert(sym<(1u<<(int)bits));
+
+			if(sym>=(1u<<(int)bits)) throw new Exception("4711");
+
 			return sym;
 		}
 
@@ -244,7 +252,9 @@ namespace laszip.net
 
 			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<(1<<8));
+			Debug.Assert(sym<(1u<<8));
+
+			if(sym>=(1u<<8)) throw new Exception("4711");
 
 			return (byte)sym;
 		}
@@ -257,7 +267,9 @@ namespace laszip.net
 
 			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<(1<<16));
+			Debug.Assert(sym<(1u<<16));
+
+			if(sym>=(1u<<16)) throw new Exception("4711");
 
 			return (ushort)sym;
 		}

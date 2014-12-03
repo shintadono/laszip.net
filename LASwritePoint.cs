@@ -245,7 +245,7 @@ namespace laszip.net
 		LASwriteItem[] writers;
 		LASwriteItem[] writers_raw;
 		LASwriteItem[] writers_compressed;
-		IEntropyEncoder enc;
+		ArithmeticEncoder enc;
 
 		// used for chunking
 		bool init_chunking;

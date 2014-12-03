@@ -55,6 +55,9 @@ namespace laszip.net
 
 			// used for seeking
 			point_start=0;
+
+			// used for error reporting
+			last_error=null;
 		}
 
 		// should only be called *once*
@@ -156,26 +159,22 @@ namespace laszip.net
 			if(instream==null) return false;
 			this.instream=instream;
 
-			// on very first init with chunking enabled
-			if(number_chunks==uint.MaxValue)
-			{
-				if(!read_chunk_table())
-				{
-					return false;
-				}
-				current_chunk=0;
-				if(chunk_totals!=null) chunk_size=chunk_totals[1];
-			}
-
-			point_start=instream.Position;
-
 			for(int i=0; i<num_readers; i++)
 			{
 				((LASreadItemRaw)(readers_raw[i])).init(instream);
 			}
 
-			if(dec!=null) readers=null;
-			else readers=readers_raw;
+			if(dec!=null)
+			{
+				chunk_count=chunk_size;
+				point_start=0;
+				readers=null;
+			}
+			else
+			{
+				point_start=instream.Position;
+				readers=readers_raw;
+			}
 
 			return true;
 		}
@@ -187,6 +186,12 @@ namespace laszip.net
 			uint delta=0;
 			if(dec!=null)
 			{
+				if(point_start==0)
+				{
+					init_dec();
+					chunk_count=0;
+				}
+
 				if(chunk_starts!=null)
 				{
 					uint target_chunk;
@@ -208,7 +213,7 @@ namespace laszip.net
 							dec.done();
 							current_chunk=(tabled_chunks-1);
 							instream.Seek(chunk_starts[(int)current_chunk], SeekOrigin.Begin);
-							init(instream);
+							init_dec();
 							chunk_count=0;
 						}
 						delta+=(chunk_size*(target_chunk-current_chunk)-chunk_count);
@@ -218,7 +223,7 @@ namespace laszip.net
 						dec.done();
 						current_chunk=target_chunk;
 						instream.Seek(chunk_starts[(int)current_chunk], SeekOrigin.Begin);
-						init(instream);
+						init_dec();
 						chunk_count=0;
 					}
 					else
@@ -230,7 +235,7 @@ namespace laszip.net
 				{
 					dec.done();
 					instream.Seek(point_start, SeekOrigin.Begin);
-					init(instream);
+					init_dec();
 					delta=target;
 				}
 				else if(current<target)
@@ -262,15 +267,29 @@ namespace laszip.net
 				{
 					if(chunk_count==chunk_size)
 					{
-						current_chunk++;
-						dec.done();
-						init(instream);
+						if(point_start!=0)
+						{
+							dec.done();
+							current_chunk++;
+							// check integrity
+							if(current_chunk<tabled_chunks)
+							{
+								long here=instream.Position;
+								if(chunk_starts[(int)current_chunk]!=here)
+								{
+									// previous chunk was corrupt
+									current_chunk--;
+									throw new Exception("4711");
+								}
+							}
+						}
+						init_dec();
 						if(tabled_chunks==current_chunk) // no or incomplete chunk table?
 						{
 							//if(current_chunk==number_chunks)
 							//{
 							//    number_chunks+=256;
-							//    chunk_starts=(I64*)realloc(chunk_starts, sizeof(I64)*number_chunks);
+							//    chunk_starts=(I64*)realloc(chunk_starts, sizeof(I64)*(number_chunks+1));
 							//}
 							//chunk_starts[tabled_chunks]=point_start; // needs fixing
 
@@ -312,8 +331,26 @@ namespace laszip.net
 					}
 				}
 			}
+			catch(EndOfStreamException)
+			{
+				// end-of-file
+				if(dec!=null) last_error="end-of-file during chunk "+current_chunk;
+				else last_error="end-of-file";
+				return false;
+			}
 			catch
 			{
+				// decompression error
+				last_error=string.Format("chunk {0} of {1} is corrupt", current_chunk, tabled_chunks);
+				// if we know where the next chunk starts ...
+				if((current_chunk+1)<tabled_chunks)
+				{
+					// ... try to seek to the next chunk
+					instream.Seek(chunk_starts[(int)current_chunk+1], SeekOrigin.Begin);
+					// ... ready for next LASreadPoint::read()
+					chunk_count=chunk_size;
+				}
+
 				return false;
 			}
 			return true;
@@ -325,6 +362,28 @@ namespace laszip.net
 			{
 				if(dec!=null) dec.done();
 			}
+
+			instream=null;
+
+			return true;
+		}
+
+		public string error() { return last_error; }
+
+		bool init_dec()
+		{
+			// maybe read chunk table (only if chunking enabled)
+			if(number_chunks==uint.MaxValue)
+			{
+				if(!read_chunk_table()) return false;
+
+				current_chunk=0;
+				if(chunk_totals!=null) chunk_size=chunk_totals[1];
+			}
+
+			point_start=instream.Position;
+			readers=null;
+
 			return true;
 		}
 
@@ -333,7 +392,7 @@ namespace laszip.net
 		LASreadItem[] readers;
 		LASreadItem[] readers_raw;
 		LASreadItem[] readers_compressed;
-		IEntropyDecoder dec;
+		ArithmeticDecoder dec;
 
 		// used for chunking
 		uint chunk_size;
@@ -365,7 +424,13 @@ namespace laszip.net
 
 			if((chunk_table_start_position+8)==chunks_start)
 			{
-				// then compressor was interrupted before getting a chance to write the chunk table
+				// no choice but to fail if adaptive chunking was used
+				if(chunk_size==uint.MaxValue)
+				{
+					return false;
+				}
+
+				// otherwise we build the chunk table as we read the file
 				number_chunks=0;
 				chunk_starts=new List<long>();
 				chunk_starts.Add(chunks_start);
@@ -376,6 +441,12 @@ namespace laszip.net
 
 			if(!instream.CanSeek)
 			{
+				// no choice but to fail if adaptive chunking was used
+				if(chunk_size==uint.MaxValue)
+				{
+					return false;
+				}
+
 				// if the stream is not seekable we cannot seek to the chunk table but won't need it anyways
 				number_chunks=uint.MaxValue-1;
 				tabled_chunks=0;
@@ -445,6 +516,13 @@ namespace laszip.net
 			{
 				// something went wrong while reading the chunk table
 				chunk_totals=null;
+
+				// no choice but to fail if adaptive chunking was used
+				if(chunk_size==uint.MaxValue)
+				{
+					return false;
+				}
+
 				// did we not even read the number of chunks
 				if(number_chunks==uint.MaxValue)
 				{
@@ -486,5 +564,6 @@ namespace laszip.net
 		long point_start;
 		uint point_size;
 		laszip_point seek_point=new laszip_point();
+		string last_error;
 	}
 }
