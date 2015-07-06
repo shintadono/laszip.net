@@ -53,8 +53,8 @@ namespace laszip.net
 
 			// init last item
 			r=item.rgb[0];
-			b=item.rgb[1];
-			g=item.rgb[2];
+			g=item.rgb[1];
+			b=item.rgb[2];
 
 			return true;
 		}
@@ -84,8 +84,8 @@ namespace laszip.net
 			else item16[2]|=(ushort)(b&0xFF00);
 
 			r=item16[0];
-			b=item16[1];
-			g=item16[2];
+			g=item16[1];
+			b=item16[2];
 		}
 
 		ArithmeticDecoder dec;
