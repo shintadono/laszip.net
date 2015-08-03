@@ -293,6 +293,9 @@ namespace laszip.net
 							//}
 							//chunk_starts[tabled_chunks]=point_start; // needs fixing
 
+							// If there was no(!) chunk table, we haven't had the chance to create the chunk_starts list.
+							if(tabled_chunks==0&&chunk_starts==null) chunk_starts=new List<long>();
+
 							chunk_starts.Add(point_start);
 							number_chunks++;
 							tabled_chunks++;
