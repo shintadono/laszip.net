@@ -173,7 +173,8 @@ namespace laszip.net
 				warning=null;
 
 				// create default header
-				Array.Copy(Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE)), header.generating_software, 32);
+				byte[] generatingSoftware=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
 				header.version_major=1;
 				header.version_minor=2;
 				header.header_size=227;
@@ -680,11 +681,14 @@ namespace laszip.net
 				// fill a VLR
 				laszip_vlr vlr=new laszip_vlr();
 				vlr.reserved=0xAABB;
-				Array.Copy(Encoding.ASCII.GetBytes("LASF_Projection"), vlr.user_id, 16);
+				byte[] user_id=Encoding.ASCII.GetBytes("LASF_Projection");
+				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
 				vlr.record_id=34735;
 				vlr.record_length_after_header=(ushort)(8+number*8);
+
+				// description field must be a null-terminate string, so we don't copy more than 31 characters
 				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(v, vlr.description, Math.Min(v.Length, 32));
+				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
 
 				vlr.data=buffer;
 
@@ -736,11 +740,15 @@ namespace laszip.net
 				// fill a VLR
 				laszip_vlr vlr=new laszip_vlr();
 				vlr.reserved=0xAABB;
-				Array.Copy(Encoding.ASCII.GetBytes("LASF_Projection"), vlr.user_id, 16);
+				byte[] user_id=Encoding.ASCII.GetBytes("LASF_Projection");
+				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
 				vlr.record_id=34736;
 				vlr.record_length_after_header=(ushort)(number*8);
+
+				// description field must be a null-terminate string, so we don't copy more than 31 characters
 				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(v, vlr.description, Math.Min(v.Length, 32));
+				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
+
 				byte[] buffer=new byte[number*8];
 				Buffer.BlockCopy(geodouble_params, 0, buffer, 0, number*8);
 				vlr.data=buffer;
@@ -793,11 +801,15 @@ namespace laszip.net
 				// fill a VLR
 				laszip_vlr vlr=new laszip_vlr();
 				vlr.reserved=0xAABB;
-				Array.Copy(Encoding.ASCII.GetBytes("LASF_Projection"), vlr.user_id, 16);
+				byte[] user_id=Encoding.ASCII.GetBytes("LASF_Projection");
+				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
 				vlr.record_id=34737;
 				vlr.record_length_after_header=number;
+
+				// description field must be a null-terminate string, so we don't copy more than 31 characters
 				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(v, vlr.description, Math.Min(v.Length, 32));
+				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
+
 				vlr.data=geoascii_params;
 
 				// add the VLR
@@ -1261,8 +1273,10 @@ namespace laszip.net
 					try { streamout.Write(BitConverter.GetBytes(record_length_after_header), 0, 2); }
 					catch { error=string.Format("writing header.vlrs[{0}].record_length_after_header", i); return 1; }
 
+					// description field must be a null-terminate string, so we don't copy more than 31 characters
 					byte[] description1=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 					byte[] description=new byte[32];
+					Array.Copy(description1, description, Math.Min(31, description1.Length));
 
 					try { streamout.Write(description, 0, 32); }
 					catch { error=string.Format("writing header.vlrs[{0}].description", i); return 1; }
