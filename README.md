@@ -18,9 +18,9 @@ of the popular LAStools software and some small example LAZ files.
 To get the newest version of the C# port of the LASzip library, goto:
 https://github.com/shintadono/laszip.net
 
-ATTENTION: This port is not a complete port of the LASzip library. It
-does not contain an example, and you can't write version 1 LAZ files,
-while reading version 1 is still possible.
+ATTENTION: This port is not a complete port of the LASzip library. It does not
+contain the example provided in it (but has some examples off it's own), and
+you can't create version 1 LAZ files, while reading version 1 is still possible.
 
 
 **LICENSE AGREEMENT (for LASzip.Net LiDAR compression)**
@@ -31,17 +31,18 @@ while reading version 1 is still possible.
   This software is distributed WITHOUT ANY WARRANTY and without even the
   implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-  
+
 **PROGRAMMERS**
-  
-  martin@rapidlasso.com
-  
-  shintadono@googlemail.com
-  
-  
+
+  martin@rapidlasso.com (https://github.com/rapidlasso)
+
+  shintadono@googlemail.com (https://github.com/shintadono)
+
+  twdotson (https://github.com/twdotson)
+
 **COPYRIGHT**
-  
+
   (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
-  
+
   (c) of C# port 2014-2017 by Shinta <shintadono@googlemail.com>
-  
+

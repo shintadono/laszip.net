@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "laszip.net", "..\laszip.net.csproj", "{0A6D6401-4779-4517-967E-969020D68742}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLasZipVB", "TestLasZipVB\TestLasZipVB.vbproj", "{167F036E-3F3F-4FF5-9E59-0B816F219B70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLasZipCS", "TestLasZipCS\TestLasZipCS.csproj", "{FEB0BC3D-F0EC-4F1F-84B8-6A0CA6519B01}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A6D6401-4779-4517-967E-969020D68742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A6D6401-4779-4517-967E-969020D68742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A6D6401-4779-4517-967E-969020D68742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A6D6401-4779-4517-967E-969020D68742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{167F036E-3F3F-4FF5-9E59-0B816F219B70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{167F036E-3F3F-4FF5-9E59-0B816F219B70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{167F036E-3F3F-4FF5-9E59-0B816F219B70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{167F036E-3F3F-4FF5-9E59-0B816F219B70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB0BC3D-F0EC-4F1F-84B8-6A0CA6519B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB0BC3D-F0EC-4F1F-84B8-6A0CA6519B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB0BC3D-F0EC-4F1F-84B8-6A0CA6519B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB0BC3D-F0EC-4F1F-84B8-6A0CA6519B01}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
