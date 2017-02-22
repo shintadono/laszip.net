@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -98,11 +98,11 @@ namespace laszip.net
 				header.project_ID_GUID_data_1=0;
 				header.project_ID_GUID_data_2=0;
 				header.project_ID_GUID_data_3=0;
-				header.project_ID_GUID_data_4=new byte[8];
+				Array.Clear(header.project_ID_GUID_data_4, 0, header.project_ID_GUID_data_4.Length);
 				header.version_major=0;
 				header.version_minor=0;
-				header.system_identifier=new byte[32];
-				header.generating_software=new byte[32];
+				Array.Clear(header.system_identifier, 0, header.system_identifier.Length);
+				Array.Clear(header.generating_software, 0, header.generating_software.Length);
 				header.file_creation_day=0;
 				header.file_creation_year=0;
 				header.header_size=0;
@@ -111,7 +111,7 @@ namespace laszip.net
 				header.point_data_format=0;
 				header.point_data_record_length=0;
 				header.number_of_point_records=0;
-				header.number_of_points_by_return=new uint[5];
+				Array.Clear(header.number_of_points_by_return, 0, header.number_of_points_by_return.Length);
 				header.x_scale_factor=0;
 				header.y_scale_factor=0;
 				header.z_scale_factor=0;
@@ -128,7 +128,7 @@ namespace laszip.net
 				header.start_of_first_extended_variable_length_record=0;
 				header.number_of_extended_variable_length_records=0;
 				header.extended_number_of_point_records=0;
-				header.extended_number_of_points_by_return=new ulong[15];
+				Array.Clear(header.extended_number_of_points_by_return, 0, header.extended_number_of_points_by_return.Length);
 				header.user_data_in_header_size=0;
 				header.user_data_in_header=null;
 				header.vlrs=null;
@@ -173,7 +173,7 @@ namespace laszip.net
 				warning=null;
 
 				// create default header
-				byte[] generatingSoftware=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+				byte[] generatingSoftware=Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
 				header.version_major=1;
 				header.version_minor=2;
@@ -687,7 +687,7 @@ namespace laszip.net
 				vlr.record_length_after_header=(ushort)(8+number*8);
 
 				// description field must be a null-terminate string, so we don't copy more than 31 characters
-				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
 
 				vlr.data=buffer;
@@ -746,7 +746,7 @@ namespace laszip.net
 				vlr.record_length_after_header=(ushort)(number*8);
 
 				// description field must be a null-terminate string, so we don't copy more than 31 characters
-				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
 
 				byte[] buffer=new byte[number*8];
@@ -807,7 +807,7 @@ namespace laszip.net
 				vlr.record_length_after_header=number;
 
 				// description field must be a null-terminate string, so we don't copy more than 31 characters
-				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+				byte[] v=Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 				Array.Copy(v, vlr.description, Math.Min(v.Length, 31));
 
 				vlr.data=geoascii_params;
@@ -1080,8 +1080,12 @@ namespace laszip.net
 				try { streamout.Write(header.system_identifier, 0, 32); }
 				catch { error="writing header.system_identifier"; return 1; }
 
-				byte[] generatingSoftware=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
+				if (header.generating_software == null || header.generating_software.Length != 32)
+				{
+					byte[] generatingSoftware = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+					Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
+				}
+
 				try { streamout.Write(header.generating_software, 0, 32); }
 				catch { error="writing header.generating_software"; return 1; }
 
@@ -1274,7 +1278,7 @@ namespace laszip.net
 					catch { error=string.Format("writing header.vlrs[{0}].record_length_after_header", i); return 1; }
 
 					// description field must be a null-terminate string, so we don't copy more than 31 characters
-					byte[] description1=Encoding.ASCII.GetBytes(string.Format("LASzip DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+					byte[] description1=Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
 					byte[] description=new byte[32];
 					Array.Copy(description1, description, Math.Min(31, description1.Length));
 

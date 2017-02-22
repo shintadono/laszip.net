@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -37,11 +37,11 @@ namespace laszip.net
 		public uint project_ID_GUID_data_1;
 		public ushort project_ID_GUID_data_2;
 		public ushort project_ID_GUID_data_3;
-		public byte[] project_ID_GUID_data_4=new byte[8];
+		public readonly byte[] project_ID_GUID_data_4=new byte[8];
 		public byte version_major;
 		public byte version_minor;
-		public byte[] system_identifier=new byte[32];
-		public byte[] generating_software=new byte[32];
+		public readonly byte[] system_identifier=new byte[32];
+		public readonly byte[] generating_software=new byte[32];
 		public ushort file_creation_day;
 		public ushort file_creation_year;
 		public ushort header_size;
@@ -50,7 +50,7 @@ namespace laszip.net
 		public byte point_data_format;
 		public ushort point_data_record_length;
 		public uint number_of_point_records;
-		public uint[] number_of_points_by_return=new uint[5];
+		public readonly uint[] number_of_points_by_return=new uint[5];
 		public double x_scale_factor;
 		public double y_scale_factor;
 		public double z_scale_factor;
@@ -71,7 +71,7 @@ namespace laszip.net
 		public ulong start_of_first_extended_variable_length_record;
 		public uint number_of_extended_variable_length_records;
 		public ulong extended_number_of_point_records;
-		public ulong[] extended_number_of_points_by_return=new ulong[15];
+		public readonly ulong[] extended_number_of_points_by_return=new ulong[15];
 
 		// optional
 		public uint user_data_in_header_size;
