@@ -30,7 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwritePoint
 	{
@@ -173,7 +173,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public bool write(laszip_point point)
+		public bool write(laszip.point point)
 		{
 			if(chunk_count==chunk_size)
 			{

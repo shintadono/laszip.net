@@ -28,13 +28,13 @@
 
 using System;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemRaw_GPSTIME11 : LASwriteItemRaw
 	{
 		public LASwriteItemRaw_GPSTIME11() { }
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			try
 			{

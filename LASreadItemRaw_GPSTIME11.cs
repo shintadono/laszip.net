@@ -29,13 +29,13 @@
 using System;
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_GPSTIME11 : LASreadItemRaw
 	{
 		public LASreadItemRaw_GPSTIME11() { }
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			if(instream.Read(buffer, 0, 8)!=8) throw new EndOfStreamException();
 

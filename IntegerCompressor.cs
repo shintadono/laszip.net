@@ -40,7 +40,7 @@
 
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class IntegerCompressor
 	{

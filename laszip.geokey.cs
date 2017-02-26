@@ -1,6 +1,6 @@
 ﻿//===============================================================================
 //
-//  FILE:  laszip_geokey.cs
+//  FILE:  laszip.geokey.cs
 //
 //  CONTENTS:
 //
@@ -12,8 +12,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -26,17 +26,19 @@
 //
 //===============================================================================
 
-
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
-	[StructLayout(LayoutKind.Sequential, Pack=1)]
-	public struct laszip_geokey
+	public partial class laszip
 	{
-		public ushort key_id;
-		public ushort tiff_tag_location;
-		public ushort count;
-		public ushort value_offset;
+		[StructLayout(LayoutKind.Sequential, Pack = 1)]
+		public struct geokey
+		{
+			public ushort key_id;
+			public ushort tiff_tag_location;
+			public ushort count;
+			public ushort value_offset;
+		}
 	}
 }

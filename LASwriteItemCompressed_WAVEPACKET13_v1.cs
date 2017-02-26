@@ -29,7 +29,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemCompressed_WAVEPACKET13_v1 : LASwriteItemCompressed
 	{
@@ -51,7 +51,7 @@ namespace laszip.net
 			ic_xyz=new IntegerCompressor(enc, 32, 3);
 		}
 
-		public unsafe override bool init(laszip_point item)
+		public unsafe override bool init(laszip.point item)
 		{
 			// init state
 			last_diff_32=0;
@@ -77,7 +77,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public unsafe override bool write(laszip_point item)
+		public unsafe override bool write(laszip.point item)
 		{
 			enc.encodeSymbol(m_packet_index, item.wave_packet[0]);
 

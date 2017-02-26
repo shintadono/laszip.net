@@ -29,7 +29,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_POINT10 : LASreadItemRaw
 	{
@@ -41,14 +41,14 @@ namespace laszip.net
 			public int z;
 			public ushort intensity;
 			public byte flags;
-			public byte classification;
+			public byte classification_and_classification_flags;
 			public sbyte scan_angle_rank;
 			public byte user_data;
 			public ushort point_source_ID;
 		}
 
 		public LASreadItemRaw_POINT10() { }
-		public unsafe override void read(laszip_point item)
+		public unsafe override void read(laszip.point item)
 		{
 			if(instream.Read(buffer, 0, 20)!=20) throw new EndOfStreamException();
 
@@ -60,7 +60,7 @@ namespace laszip.net
 				item.Z=p10->z;
 				item.intensity=p10->intensity;
 				item.flags=p10->flags;
-				item.classification=p10->classification;
+				item.classification_and_classification_flags = p10->classification_and_classification_flags;
 				item.scan_angle_rank=p10->scan_angle_rank;
 				item.user_data=p10->user_data;
 				item.point_source_ID=p10->point_source_ID;

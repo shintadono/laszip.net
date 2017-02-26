@@ -27,7 +27,7 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class Laszip_Common_v2
 	{

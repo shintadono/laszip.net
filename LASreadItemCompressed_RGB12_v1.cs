@@ -28,7 +28,7 @@
 
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemCompressed_RGB12_v1 : LASreadItemCompressed
 	{
@@ -43,7 +43,7 @@ namespace laszip.net
 			ic_rgb=new IntegerCompressor(dec, 8, 6);
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 
@@ -59,7 +59,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			uint sym=dec.decodeSymbol(m_byte_used);
 

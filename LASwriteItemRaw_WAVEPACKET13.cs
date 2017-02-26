@@ -26,13 +26,13 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemRaw_WAVEPACKET13 : LASwriteItemRaw
 	{
 		public LASwriteItemRaw_WAVEPACKET13() { }
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			try
 			{

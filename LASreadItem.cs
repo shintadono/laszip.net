@@ -26,10 +26,10 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	public abstract class LASreadItem
 	{
-		public abstract void read(laszip_point item);
+		public abstract void read(laszip.point item);
 	}
 }

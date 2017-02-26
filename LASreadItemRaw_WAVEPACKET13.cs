@@ -28,13 +28,13 @@
 
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_WAVEPACKET13 : LASreadItemRaw
 	{
 		public LASreadItemRaw_WAVEPACKET13() { }
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			if(instream.Read(item.wave_packet, 0, 29)!=29) throw new EndOfStreamException();
 		}

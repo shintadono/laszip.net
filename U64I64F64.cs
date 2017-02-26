@@ -28,7 +28,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	[StructLayout(LayoutKind.Explicit, Pack=1)]
 	struct U64I64F64

@@ -27,7 +27,7 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASitem
 	{

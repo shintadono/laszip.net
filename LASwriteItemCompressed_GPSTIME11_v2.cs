@@ -28,7 +28,7 @@
 
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemCompressed_GPSTIME11_v2 : LASwriteItemCompressed
 	{
@@ -51,7 +51,7 @@ namespace laszip.net
 			ic_gpstime=new IntegerCompressor(enc, 32, 9); // 32 bits, 9 contexts
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 			last=0; next=0;
@@ -77,7 +77,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			U64I64F64 this_gpstime=new U64I64F64();
 			this_gpstime.f64=item.gps_time;

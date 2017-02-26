@@ -1,6 +1,6 @@
 ﻿//===============================================================================
 //
-//  FILE:  laszip_vlr.cs
+//  FILE:  laszip.vlr.cs
 //
 //  CONTENTS:
 //
@@ -12,8 +12,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -26,15 +26,18 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
-	public class laszip_vlr
+	public partial class laszip
 	{
-		public ushort reserved;
-		public byte[] user_id=new byte[16];
-		public ushort record_id;
-		public ushort record_length_after_header;
-		public byte[] description=new byte[32];
-		public byte[] data;
+		public class vlr
+		{
+			public ushort reserved;
+			public readonly byte[] user_id = new byte[16];
+			public ushort record_id;
+			public ushort record_length_after_header;
+			public readonly byte[] description = new byte[32];
+			public byte[] data;
+		}
 	}
 }

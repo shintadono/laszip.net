@@ -26,13 +26,13 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemRaw_BYTE : LASwriteItemRaw
 	{
 		public LASwriteItemRaw_BYTE(uint number) { this.number=number; }
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			try
 			{

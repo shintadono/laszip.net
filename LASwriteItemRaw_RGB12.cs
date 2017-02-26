@@ -28,13 +28,13 @@
 
 using System;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemRaw_RGB12 : LASwriteItemRaw
 	{
 		public LASwriteItemRaw_RGB12() { }
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			try
 			{

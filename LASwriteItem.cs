@@ -26,10 +26,10 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	public abstract class LASwriteItem
 	{
-		public abstract bool write(laszip_point item);
+		public abstract bool write(laszip.point item);
 	}
 }

@@ -28,7 +28,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemRaw_POINT10 : LASwriteItemRaw
 	{
@@ -40,7 +40,7 @@ namespace laszip.net
 			public int z;
 			public ushort intensity;
 			public byte flags;
-			public byte classification;
+			public byte classification_and_classification_flags;
 			public sbyte scan_angle_rank;
 			public byte user_data;
 			public ushort point_source_ID;
@@ -48,7 +48,7 @@ namespace laszip.net
 
 		public LASwriteItemRaw_POINT10() { }
 
-		public unsafe override bool write(laszip_point item)
+		public unsafe override bool write(laszip.point item)
 		{
 			fixed(byte* pBuffer=buffer)
 			{
@@ -58,7 +58,7 @@ namespace laszip.net
 				p10->z=item.Z;
 				p10->intensity=item.intensity;
 				p10->flags=item.flags;
-				p10->classification=item.classification;
+				p10->classification_and_classification_flags = item.classification_and_classification_flags;
 				p10->scan_angle_rank=item.scan_angle_rank;
 				p10->user_data=item.user_data;
 				p10->point_source_ID=item.point_source_ID;

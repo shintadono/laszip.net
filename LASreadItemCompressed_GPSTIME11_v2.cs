@@ -28,7 +28,7 @@
 
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemCompressed_GPSTIME11_v2 : LASreadItemCompressed
 	{
@@ -51,7 +51,7 @@ namespace laszip.net
 			ic_gpstime=new IntegerCompressor(dec, 32, 9); // 32 bits, 9 contexts
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 			last=0; next=0;
@@ -77,7 +77,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			if(last_gpstime_diff[last]==0) // if the last integer difference was zero
 			{

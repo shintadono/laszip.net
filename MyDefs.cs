@@ -26,7 +26,7 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class MyDefs
 	{

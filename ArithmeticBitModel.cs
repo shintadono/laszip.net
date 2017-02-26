@@ -64,7 +64,7 @@
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class ArithmeticBitModel
 	{

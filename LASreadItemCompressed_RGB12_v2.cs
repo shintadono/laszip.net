@@ -29,7 +29,7 @@
 using System;
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemCompressed_RGB12_v2 : LASreadItemCompressed
 	{
@@ -49,7 +49,7 @@ namespace laszip.net
 			m_rgb_diff_5=dec.createSymbolModel(256);
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 
@@ -67,7 +67,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			int corr;
 			int diff=0;

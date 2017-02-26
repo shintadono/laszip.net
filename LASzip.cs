@@ -30,7 +30,7 @@
 using System;
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASzip
 	{

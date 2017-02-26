@@ -29,13 +29,13 @@
 using System;
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_RGBNIR14 : LASreadItemRaw
 	{
 		public LASreadItemRaw_RGBNIR14() { }
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			byte[] buf=new byte[8];
 			if(instream.Read(buf, 0, 8)!=8) throw new EndOfStreamException();

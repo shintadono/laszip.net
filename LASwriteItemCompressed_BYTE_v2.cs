@@ -29,7 +29,7 @@
 using System;
 using System.Diagnostics;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASwriteItemCompressed_BYTE_v2 : LASwriteItemCompressed
 	{
@@ -52,7 +52,7 @@ namespace laszip.net
 			last_item=new byte[number];
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 
@@ -68,7 +68,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override bool write(laszip_point item)
+		public override bool write(laszip.point item)
 		{
 			for(uint i=0; i<number; i++)
 			{

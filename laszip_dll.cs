@@ -31,14 +31,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace laszip.net
+namespace LASzip.Net
 {
-	public class laszip_dll
+	public partial class laszip
 	{
-		public laszip_header header = new laszip_header();
+		public header curHeader = new header();
 		long p_count;
 		long npoints;
-		public laszip_point point = new laszip_point();
+		public point curPoint = new point();
 
 		Stream streamin;
 		bool leaveStreamInOpen;
@@ -51,7 +51,7 @@ namespace laszip.net
 		string error;
 		string warning;
 
-		static int laszip_get_version(out byte version_major, out byte version_minor, out ushort version_revision, out uint version_build)
+		static int get_version(out byte version_major, out byte version_minor, out ushort version_revision, out uint version_build)
 		{
 			version_major = LASzip.VERSION_MAJOR;
 			version_minor = LASzip.VERSION_MINOR;
@@ -61,24 +61,24 @@ namespace laszip.net
 			return 0;
 		}
 
-		public string laszip_get_error()
+		public string get_error()
 		{
 			return error;
 		}
 
-		public string laszip_get_warning()
+		public string get_warning()
 		{
 			return warning;
 		}
 
-		public static laszip_dll laszip_create()
+		public static laszip create()
 		{
-			laszip_dll ret = new laszip_dll();
-			ret.laszip_clean();
+			laszip ret = new laszip();
+			ret.clean();
 			return ret;
 		}
 
-		public int laszip_clean()
+		public int clean()
 		{
 			try
 			{
@@ -95,75 +95,69 @@ namespace laszip.net
 				}
 
 				// zero everything
-				header.file_source_ID = 0;
-				header.global_encoding = 0;
-				header.project_ID_GUID_data_1 = 0;
-				header.project_ID_GUID_data_2 = 0;
-				header.project_ID_GUID_data_3 = 0;
-				Array.Clear(header.project_ID_GUID_data_4, 0, header.project_ID_GUID_data_4.Length);
-				header.version_major = 0;
-				header.version_minor = 0;
-				Array.Clear(header.system_identifier, 0, header.system_identifier.Length);
-				Array.Clear(header.generating_software, 0, header.generating_software.Length);
-				header.file_creation_day = 0;
-				header.file_creation_year = 0;
-				header.header_size = 0;
-				header.offset_to_point_data = 0;
-				header.number_of_variable_length_records = 0;
-				header.point_data_format = 0;
-				header.point_data_record_length = 0;
-				header.number_of_point_records = 0;
-				Array.Clear(header.number_of_points_by_return, 0, header.number_of_points_by_return.Length);
-				header.x_scale_factor = 0;
-				header.y_scale_factor = 0;
-				header.z_scale_factor = 0;
-				header.x_offset = 0;
-				header.y_offset = 0;
-				header.z_offset = 0;
-				header.max_x = 0;
-				header.min_x = 0;
-				header.max_y = 0;
-				header.min_y = 0;
-				header.max_z = 0;
-				header.min_z = 0;
-				header.start_of_waveform_data_packet_record = 0;
-				header.start_of_first_extended_variable_length_record = 0;
-				header.number_of_extended_variable_length_records = 0;
-				header.extended_number_of_point_records = 0;
-				Array.Clear(header.extended_number_of_points_by_return, 0, header.extended_number_of_points_by_return.Length);
-				header.user_data_in_header_size = 0;
-				header.user_data_in_header = null;
-				header.vlrs = null;
-				header.user_data_after_header_size = 0;
-				header.user_data_after_header = null;
+				curHeader.file_source_ID = 0;
+				curHeader.global_encoding = 0;
+				curHeader.project_ID_GUID_data_1 = 0;
+				curHeader.project_ID_GUID_data_2 = 0;
+				curHeader.project_ID_GUID_data_3 = 0;
+				Array.Clear(curHeader.project_ID_GUID_data_4, 0, curHeader.project_ID_GUID_data_4.Length);
+				curHeader.version_major = 0;
+				curHeader.version_minor = 0;
+				Array.Clear(curHeader.system_identifier, 0, curHeader.system_identifier.Length);
+				Array.Clear(curHeader.generating_software, 0, curHeader.generating_software.Length);
+				curHeader.file_creation_day = 0;
+				curHeader.file_creation_year = 0;
+				curHeader.header_size = 0;
+				curHeader.offset_to_point_data = 0;
+				curHeader.number_of_variable_length_records = 0;
+				curHeader.point_data_format = 0;
+				curHeader.point_data_record_length = 0;
+				curHeader.number_of_point_records = 0;
+				Array.Clear(curHeader.number_of_points_by_return, 0, curHeader.number_of_points_by_return.Length);
+				curHeader.x_scale_factor = 0;
+				curHeader.y_scale_factor = 0;
+				curHeader.z_scale_factor = 0;
+				curHeader.x_offset = 0;
+				curHeader.y_offset = 0;
+				curHeader.z_offset = 0;
+				curHeader.max_x = 0;
+				curHeader.min_x = 0;
+				curHeader.max_y = 0;
+				curHeader.min_y = 0;
+				curHeader.max_z = 0;
+				curHeader.min_z = 0;
+				curHeader.start_of_waveform_data_packet_record = 0;
+				curHeader.start_of_first_extended_variable_length_record = 0;
+				curHeader.number_of_extended_variable_length_records = 0;
+				curHeader.extended_number_of_point_records = 0;
+				Array.Clear(curHeader.extended_number_of_points_by_return, 0, curHeader.extended_number_of_points_by_return.Length);
+				curHeader.user_data_in_header_size = 0;
+				curHeader.user_data_in_header = null;
+				curHeader.vlrs = null;
+				curHeader.user_data_after_header_size = 0;
+				curHeader.user_data_after_header = null;
 
 				p_count = 0;
 				npoints = 0;
 
-				point.X = 0;
-				point.Y = 0;
-				point.Z = 0;
-				point.intensity = 0;
-				point.return_number = 0;// : 3;
-				point.number_of_returns_of_given_pulse = 0;// : 3;
-				point.scan_direction_flag = 0;// : 1;
-				point.edge_of_flight_line = 0;// : 1;
-				point.classification = 0;
-				point.scan_angle_rank = 0;
-				point.user_data = 0;
-				point.point_source_ID = 0;
-				point.gps_time = 0;
-				point.rgb = new ushort[4];
-				point.wave_packet = new byte[29];
-				point.extended_point_type = 0;// : 2;
-				point.extended_scanner_channel = 0;// : 2;
-				point.extended_classification_flags = 0;// : 4;
-				point.extended_classification = 0;
-				point.extended_return_number = 0;// : 4;
-				point.extended_number_of_returns_of_given_pulse = 0;// : 4;
-				point.extended_scan_angle = 0;
-				point.num_extra_bytes = 0;
-				point.extra_bytes = null;
+				curPoint.X = 0;
+				curPoint.Y = 0;
+				curPoint.Z = 0;
+				curPoint.intensity = 0;
+				curPoint.flags = 0; // return_number, number_of_returns, scan_direction_flag and edge_of_flight_line
+				curPoint.classification_and_classification_flags = 0; // classification, synthetic_flag, keypoint_flag and withheld_flag
+				curPoint.scan_angle_rank = 0;
+				curPoint.user_data = 0;
+				curPoint.point_source_ID = 0;
+				curPoint.extended_flags = 0; // extended_point_type, extended_scanner_channel and extended_classification_flags
+				curPoint.extended_classification = 0;
+				curPoint.extended_returns = 0; // extended_return_number and extended_number_of_returns
+				curPoint.extended_scan_angle = 0;
+				curPoint.gps_time = 0;
+				Array.Clear(curPoint.rgb, 0, 4);
+				Array.Clear(curPoint.wave_packet, 0, 29);
+				curPoint.num_extra_bytes = 0;
+				curPoint.extra_bytes = null;
 
 				streamin = null;
 				reader = null;
@@ -176,16 +170,16 @@ namespace laszip.net
 
 				// create default header
 				byte[] generatingSoftware = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
-				header.version_major = 1;
-				header.version_minor = 2;
-				header.header_size = 227;
-				header.offset_to_point_data = 227;
-				header.point_data_format = 1;
-				header.point_data_record_length = 28;
-				header.x_scale_factor = 0.01;
-				header.y_scale_factor = 0.01;
-				header.z_scale_factor = 0.01;
+				Array.Copy(generatingSoftware, curHeader.generating_software, Math.Min(generatingSoftware.Length, 32));
+				curHeader.version_major = 1;
+				curHeader.version_minor = 2;
+				curHeader.header_size = 227;
+				curHeader.offset_to_point_data = 227;
+				curHeader.point_data_format = 1;
+				curHeader.point_data_record_length = 28;
+				curHeader.x_scale_factor = 0.01;
+				curHeader.y_scale_factor = 0.01;
+				curHeader.z_scale_factor = 0.01;
 			}
 			catch
 			{
@@ -197,18 +191,18 @@ namespace laszip.net
 		}
 
 		[Obsolete]
-		public laszip_header laszip_get_header_pointer()
+		public header get_header_pointer()
 		{
-			return header;
+			return curHeader;
 		}
 
 		[Obsolete]
-		public laszip_point laszip_get_point_pointer()
+		public point get_point_pointer()
 		{
-			return point;
+			return curPoint;
 		}
 
-		public int laszip_get_point_count(out long count)
+		public int get_point_count(out long count)
 		{
 			count = 0;
 			if (reader == null && writer == null)
@@ -223,7 +217,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_get_number_of_point(out long npoints)
+		public int get_number_of_point(out long npoints)
 		{
 			npoints = 0;
 			if (reader == null && writer == null)
@@ -238,7 +232,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_set_header(laszip_header header)
+		public int set_header(header header)
 		{
 			if (header == null)
 			{
@@ -260,89 +254,89 @@ namespace laszip.net
 
 			try
 			{
-				this.header.file_source_ID = header.file_source_ID;
-				this.header.global_encoding = header.global_encoding;
-				this.header.project_ID_GUID_data_1 = header.project_ID_GUID_data_1;
-				this.header.project_ID_GUID_data_2 = header.project_ID_GUID_data_2;
-				this.header.project_ID_GUID_data_3 = header.project_ID_GUID_data_3;
-				Array.Copy(header.project_ID_GUID_data_4, this.header.project_ID_GUID_data_4, 8);
-				this.header.version_major = header.version_major;
-				this.header.version_minor = header.version_minor;
-				Array.Copy(header.system_identifier, this.header.system_identifier, 32);
-				Array.Copy(header.generating_software, this.header.generating_software, 32);
-				this.header.file_creation_day = header.file_creation_day;
-				this.header.file_creation_year = header.file_creation_year;
-				this.header.header_size = header.header_size;
-				this.header.offset_to_point_data = header.offset_to_point_data;
-				this.header.number_of_variable_length_records = header.number_of_variable_length_records;
-				this.header.point_data_format = header.point_data_format;
-				this.header.point_data_record_length = header.point_data_record_length;
-				this.header.number_of_point_records = header.number_of_point_records;
-				for (int i = 0; i < 5; i++) this.header.number_of_points_by_return[i] = header.number_of_points_by_return[i];
-				this.header.x_scale_factor = header.x_scale_factor;
-				this.header.y_scale_factor = header.y_scale_factor;
-				this.header.z_scale_factor = header.z_scale_factor;
-				this.header.x_offset = header.x_offset;
-				this.header.y_offset = header.y_offset;
-				this.header.z_offset = header.z_offset;
-				this.header.max_x = header.max_x;
-				this.header.min_x = header.min_x;
-				this.header.max_y = header.max_y;
-				this.header.min_y = header.min_y;
-				this.header.max_z = header.max_z;
-				this.header.min_z = header.min_z;
+				curHeader.file_source_ID = header.file_source_ID;
+				curHeader.global_encoding = header.global_encoding;
+				curHeader.project_ID_GUID_data_1 = header.project_ID_GUID_data_1;
+				curHeader.project_ID_GUID_data_2 = header.project_ID_GUID_data_2;
+				curHeader.project_ID_GUID_data_3 = header.project_ID_GUID_data_3;
+				Array.Copy(header.project_ID_GUID_data_4, curHeader.project_ID_GUID_data_4, 8);
+				curHeader.version_major = header.version_major;
+				curHeader.version_minor = header.version_minor;
+				Array.Copy(header.system_identifier, curHeader.system_identifier, 32);
+				Array.Copy(header.generating_software, curHeader.generating_software, 32);
+				curHeader.file_creation_day = header.file_creation_day;
+				curHeader.file_creation_year = header.file_creation_year;
+				curHeader.header_size = header.header_size;
+				curHeader.offset_to_point_data = header.offset_to_point_data;
+				curHeader.number_of_variable_length_records = header.number_of_variable_length_records;
+				curHeader.point_data_format = header.point_data_format;
+				curHeader.point_data_record_length = header.point_data_record_length;
+				curHeader.number_of_point_records = header.number_of_point_records;
+				for (int i = 0; i < 5; i++) curHeader.number_of_points_by_return[i] = header.number_of_points_by_return[i];
+				curHeader.x_scale_factor = header.x_scale_factor;
+				curHeader.y_scale_factor = header.y_scale_factor;
+				curHeader.z_scale_factor = header.z_scale_factor;
+				curHeader.x_offset = header.x_offset;
+				curHeader.y_offset = header.y_offset;
+				curHeader.z_offset = header.z_offset;
+				curHeader.max_x = header.max_x;
+				curHeader.min_x = header.min_x;
+				curHeader.max_y = header.max_y;
+				curHeader.min_y = header.min_y;
+				curHeader.max_z = header.max_z;
+				curHeader.min_z = header.min_z;
 
-				if (this.header.version_minor >= 3)
+				if (curHeader.version_minor >= 3)
 				{
-					this.header.start_of_waveform_data_packet_record = header.start_of_first_extended_variable_length_record;
+					curHeader.start_of_waveform_data_packet_record = header.start_of_first_extended_variable_length_record;
 				}
 
-				if (this.header.version_minor >= 4)
+				if (curHeader.version_minor >= 4)
 				{
-					this.header.start_of_first_extended_variable_length_record = header.start_of_first_extended_variable_length_record;
-					this.header.number_of_extended_variable_length_records = header.number_of_extended_variable_length_records;
-					this.header.extended_number_of_point_records = header.extended_number_of_point_records;
-					for (int i = 0; i < 15; i++) this.header.extended_number_of_points_by_return[i] = header.extended_number_of_points_by_return[i];
+					curHeader.start_of_first_extended_variable_length_record = header.start_of_first_extended_variable_length_record;
+					curHeader.number_of_extended_variable_length_records = header.number_of_extended_variable_length_records;
+					curHeader.extended_number_of_point_records = header.extended_number_of_point_records;
+					for (int i = 0; i < 15; i++) curHeader.extended_number_of_points_by_return[i] = header.extended_number_of_points_by_return[i];
 				}
 
-				this.header.user_data_in_header_size = header.user_data_in_header_size;
-				this.header.user_data_in_header = null;
+				curHeader.user_data_in_header_size = header.user_data_in_header_size;
+				curHeader.user_data_in_header = null;
 
 				if (header.user_data_in_header_size != 0)
 				{
-					this.header.user_data_in_header = new byte[header.user_data_in_header_size];
-					Array.Copy(header.user_data_in_header, this.header.user_data_in_header, header.user_data_in_header_size);
+					curHeader.user_data_in_header = new byte[header.user_data_in_header_size];
+					Array.Copy(header.user_data_in_header, curHeader.user_data_in_header, header.user_data_in_header_size);
 				}
 
-				this.header.vlrs = new List<laszip_vlr>();
+				curHeader.vlrs = new List<vlr>();
 				if (header.number_of_variable_length_records != 0)
 				{
 					for (int i = 0; i < header.number_of_variable_length_records; i++)
 					{
-						this.header.vlrs.Add(new laszip_vlr());
-						this.header.vlrs[i].reserved = header.vlrs[i].reserved;
-						Array.Copy(header.vlrs[i].user_id, this.header.vlrs[i].user_id, 16);
-						this.header.vlrs[i].record_id = header.vlrs[i].record_id;
-						this.header.vlrs[i].record_length_after_header = header.vlrs[i].record_length_after_header;
-						Array.Copy(header.vlrs[i].description, this.header.vlrs[i].description, 32);
+						curHeader.vlrs.Add(new vlr());
+						curHeader.vlrs[i].reserved = header.vlrs[i].reserved;
+						Array.Copy(header.vlrs[i].user_id, curHeader.vlrs[i].user_id, 16);
+						curHeader.vlrs[i].record_id = header.vlrs[i].record_id;
+						curHeader.vlrs[i].record_length_after_header = header.vlrs[i].record_length_after_header;
+						Array.Copy(header.vlrs[i].description, curHeader.vlrs[i].description, 32);
 						if (header.vlrs[i].record_length_after_header != 0)
 						{
-							this.header.vlrs[i].data = new byte[header.vlrs[i].record_length_after_header];
-							Array.Copy(header.vlrs[i].data, this.header.vlrs[i].data, header.vlrs[i].record_length_after_header);
+							curHeader.vlrs[i].data = new byte[header.vlrs[i].record_length_after_header];
+							Array.Copy(header.vlrs[i].data, curHeader.vlrs[i].data, header.vlrs[i].record_length_after_header);
 						}
 						else
 						{
-							this.header.vlrs[i].data = null;
+							curHeader.vlrs[i].data = null;
 						}
 					}
 				}
 
-				this.header.user_data_after_header_size = header.user_data_after_header_size;
-				this.header.user_data_after_header = null;
+				curHeader.user_data_after_header_size = header.user_data_after_header_size;
+				curHeader.user_data_after_header = null;
 				if (header.user_data_after_header_size != 0)
 				{
-					this.header.user_data_after_header = new byte[header.user_data_after_header_size];
-					Array.Copy(header.user_data_after_header, this.header.user_data_after_header, header.user_data_after_header_size);
+					curHeader.user_data_after_header = new byte[header.user_data_after_header_size];
+					Array.Copy(header.user_data_after_header, curHeader.user_data_after_header, header.user_data_after_header_size);
 				}
 			}
 			catch
@@ -355,54 +349,54 @@ namespace laszip.net
 			return 0;
 		}
 
-		int laszip_check_for_integer_overflow()
+		int check_for_integer_overflow()
 		{
 			try
 			{
 				// quantize and dequantize the bounding box with current scale_factor and offset
-				int quant_min_x = MyDefs.I32_QUANTIZE((header.min_x - header.x_offset) / header.x_scale_factor);
-				int quant_max_x = MyDefs.I32_QUANTIZE((header.max_x - header.x_offset) / header.x_scale_factor);
-				int quant_min_y = MyDefs.I32_QUANTIZE((header.min_y - header.y_offset) / header.y_scale_factor);
-				int quant_max_y = MyDefs.I32_QUANTIZE((header.max_y - header.y_offset) / header.y_scale_factor);
-				int quant_min_z = MyDefs.I32_QUANTIZE((header.min_z - header.z_offset) / header.z_scale_factor);
-				int quant_max_z = MyDefs.I32_QUANTIZE((header.max_z - header.z_offset) / header.z_scale_factor);
+				int quant_min_x = MyDefs.I32_QUANTIZE((curHeader.min_x - curHeader.x_offset) / curHeader.x_scale_factor);
+				int quant_max_x = MyDefs.I32_QUANTIZE((curHeader.max_x - curHeader.x_offset) / curHeader.x_scale_factor);
+				int quant_min_y = MyDefs.I32_QUANTIZE((curHeader.min_y - curHeader.y_offset) / curHeader.y_scale_factor);
+				int quant_max_y = MyDefs.I32_QUANTIZE((curHeader.max_y - curHeader.y_offset) / curHeader.y_scale_factor);
+				int quant_min_z = MyDefs.I32_QUANTIZE((curHeader.min_z - curHeader.z_offset) / curHeader.z_scale_factor);
+				int quant_max_z = MyDefs.I32_QUANTIZE((curHeader.max_z - curHeader.z_offset) / curHeader.z_scale_factor);
 
-				double dequant_min_x = header.x_scale_factor * quant_min_x + header.x_offset;
-				double dequant_max_x = header.x_scale_factor * quant_max_x + header.x_offset;
-				double dequant_min_y = header.y_scale_factor * quant_min_y + header.y_offset;
-				double dequant_max_y = header.y_scale_factor * quant_max_y + header.y_offset;
-				double dequant_min_z = header.z_scale_factor * quant_min_z + header.z_offset;
-				double dequant_max_z = header.z_scale_factor * quant_max_z + header.z_offset;
+				double dequant_min_x = curHeader.x_scale_factor * quant_min_x + curHeader.x_offset;
+				double dequant_max_x = curHeader.x_scale_factor * quant_max_x + curHeader.x_offset;
+				double dequant_min_y = curHeader.y_scale_factor * quant_min_y + curHeader.y_offset;
+				double dequant_max_y = curHeader.y_scale_factor * quant_max_y + curHeader.y_offset;
+				double dequant_min_z = curHeader.z_scale_factor * quant_min_z + curHeader.z_offset;
+				double dequant_max_z = curHeader.z_scale_factor * quant_max_z + curHeader.z_offset;
 
 				// make sure that there is not sign flip (a 32-bit integer overflow) for the bounding box
-				if ((header.min_x > 0) != (dequant_min_x > 0))
+				if ((curHeader.min_x > 0) != (dequant_min_x > 0))
 				{
-					error = string.Format("quantization sign flip for min_x from {0} to {1}. set scale factor for x coarser than {2}", header.min_x, dequant_min_x, header.x_scale_factor);
+					error = string.Format("quantization sign flip for min_x from {0} to {1}. set scale factor for x coarser than {2}", curHeader.min_x, dequant_min_x, curHeader.x_scale_factor);
 					return 1;
 				}
-				if ((header.max_x > 0) != (dequant_max_x > 0))
+				if ((curHeader.max_x > 0) != (dequant_max_x > 0))
 				{
-					error = string.Format("quantization sign flip for max_x from {0} to {1}. set scale factor for x coarser than {2}", header.max_x, dequant_max_x, header.x_scale_factor);
+					error = string.Format("quantization sign flip for max_x from {0} to {1}. set scale factor for x coarser than {2}", curHeader.max_x, dequant_max_x, curHeader.x_scale_factor);
 					return 1;
 				}
-				if ((header.min_y > 0) != (dequant_min_y > 0))
+				if ((curHeader.min_y > 0) != (dequant_min_y > 0))
 				{
-					error = string.Format("quantization sign flip for min_y from {0} to {1}. set scale factor for y coarser than {2}", header.min_y, dequant_min_y, header.y_scale_factor);
+					error = string.Format("quantization sign flip for min_y from {0} to {1}. set scale factor for y coarser than {2}", curHeader.min_y, dequant_min_y, curHeader.y_scale_factor);
 					return 1;
 				}
-				if ((header.max_y > 0) != (dequant_max_y > 0))
+				if ((curHeader.max_y > 0) != (dequant_max_y > 0))
 				{
-					error = string.Format("quantization sign flip for max_y from {0} to {1}. set scale factor for y coarser than {2}", header.max_y, dequant_max_y, header.y_scale_factor);
+					error = string.Format("quantization sign flip for max_y from {0} to {1}. set scale factor for y coarser than {2}", curHeader.max_y, dequant_max_y, curHeader.y_scale_factor);
 					return 1;
 				}
-				if ((header.min_z > 0) != (dequant_min_z > 0))
+				if ((curHeader.min_z > 0) != (dequant_min_z > 0))
 				{
-					error = string.Format("quantization sign flip for min_z from {0} to {1}. set scale factor for z coarser than {2}", header.min_z, dequant_min_z, header.z_scale_factor);
+					error = string.Format("quantization sign flip for min_z from {0} to {1}. set scale factor for z coarser than {2}", curHeader.min_z, dequant_min_z, curHeader.z_scale_factor);
 					return 1;
 				}
-				if ((header.max_z > 0) != (dequant_max_z > 0))
+				if ((curHeader.max_z > 0) != (dequant_max_z > 0))
 				{
-					error = string.Format("quantization sign flip for max_z from {0} to {1}. set scale factor for z coarser than {2}", header.max_z, dequant_max_z, header.z_scale_factor);
+					error = string.Format("quantization sign flip for max_z from {0} to {1}. set scale factor for z coarser than {2}", curHeader.max_z, dequant_max_z, curHeader.z_scale_factor);
 					return 1;
 				}
 			}
@@ -416,7 +410,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		int laszip_auto_offset()
+		int auto_offset()
 		{
 			try
 			{
@@ -433,63 +427,63 @@ namespace laszip.net
 				}
 
 				// check scale factor
-				double x_scale_factor = header.x_scale_factor;
-				double y_scale_factor = header.y_scale_factor;
-				double z_scale_factor = header.z_scale_factor;
+				double x_scale_factor = curHeader.x_scale_factor;
+				double y_scale_factor = curHeader.y_scale_factor;
+				double z_scale_factor = curHeader.z_scale_factor;
 
 				if ((x_scale_factor <= 0) || double.IsInfinity(x_scale_factor))
 				{
-					error = string.Format("invalid x scale_factor {0} in header", header.x_scale_factor);
+					error = string.Format("invalid x scale_factor {0} in header", curHeader.x_scale_factor);
 					return 1;
 				}
 
 				if ((y_scale_factor <= 0) || double.IsInfinity(y_scale_factor))
 				{
-					error = string.Format("invalid y scale_factor {0} in header", header.y_scale_factor);
+					error = string.Format("invalid y scale_factor {0} in header", curHeader.y_scale_factor);
 					return 1;
 				}
 
 				if ((z_scale_factor <= 0) || double.IsInfinity(z_scale_factor))
 				{
-					error = string.Format("invalid z scale_factor {0} in header", header.z_scale_factor);
+					error = string.Format("invalid z scale_factor {0} in header", curHeader.z_scale_factor);
 					return 1;
 				}
 
-				double center_bb_x = (header.min_x + header.max_x) / 2;
-				double center_bb_y = (header.min_y + header.max_y) / 2;
-				double center_bb_z = (header.min_z + header.max_z) / 2;
+				double center_bb_x = (curHeader.min_x + curHeader.max_x) / 2;
+				double center_bb_y = (curHeader.min_y + curHeader.max_y) / 2;
+				double center_bb_z = (curHeader.min_z + curHeader.max_z) / 2;
 
 				if (double.IsInfinity(center_bb_x))
 				{
-					error = string.Format("invalid x coordinate at center of bounding box (min: {0} max: {1})", header.min_x, header.max_x);
+					error = string.Format("invalid x coordinate at center of bounding box (min: {0} max: {1})", curHeader.min_x, curHeader.max_x);
 					return 1;
 				}
 
 				if (double.IsInfinity(center_bb_y))
 				{
-					error = string.Format("invalid y coordinate at center of bounding box (min: {0} max: {1})", header.min_y, header.max_y);
+					error = string.Format("invalid y coordinate at center of bounding box (min: {0} max: {1})", curHeader.min_y, curHeader.max_y);
 					return 1;
 				}
 
 				if (double.IsInfinity(center_bb_z))
 				{
-					error = string.Format("invalid z coordinate at center of bounding box (min: {0} max: {1})", header.min_z, header.max_z);
+					error = string.Format("invalid z coordinate at center of bounding box (min: {0} max: {1})", curHeader.min_z, curHeader.max_z);
 					return 1;
 				}
 
-				double x_offset = header.x_offset;
-				double y_offset = header.y_offset;
-				double z_offset = header.z_offset;
+				double x_offset = curHeader.x_offset;
+				double y_offset = curHeader.y_offset;
+				double z_offset = curHeader.z_offset;
 
-				header.x_offset = (MyDefs.I64_FLOOR(center_bb_x / x_scale_factor / 10000000)) * 10000000 * x_scale_factor;
-				header.y_offset = (MyDefs.I64_FLOOR(center_bb_y / y_scale_factor / 10000000)) * 10000000 * y_scale_factor;
-				header.z_offset = (MyDefs.I64_FLOOR(center_bb_z / z_scale_factor / 10000000)) * 10000000 * z_scale_factor;
+				curHeader.x_offset = (MyDefs.I64_FLOOR(center_bb_x / x_scale_factor / 10000000)) * 10000000 * x_scale_factor;
+				curHeader.y_offset = (MyDefs.I64_FLOOR(center_bb_y / y_scale_factor / 10000000)) * 10000000 * y_scale_factor;
+				curHeader.z_offset = (MyDefs.I64_FLOOR(center_bb_z / z_scale_factor / 10000000)) * 10000000 * z_scale_factor;
 
-				if (laszip_check_for_integer_overflow() != 0)
+				if (check_for_integer_overflow() != 0)
 				{
-					header.x_offset = x_offset;
-					header.y_offset = y_offset;
-					header.z_offset = z_offset;
+					curHeader.x_offset = x_offset;
+					curHeader.y_offset = y_offset;
+					curHeader.z_offset = z_offset;
 					return 1;
 				}
 			}
@@ -503,7 +497,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_set_point(laszip_point point)
+		public int set_point(point point)
 		{
 			if (point == null)
 			{
@@ -519,41 +513,41 @@ namespace laszip.net
 
 			try
 			{
-				this.point.classification = point.classification;
-				this.point.edge_of_flight_line = point.edge_of_flight_line;
-				this.point.extended_classification = point.extended_classification;
-				this.point.extended_classification_flags = point.extended_classification_flags;
-				this.point.extended_number_of_returns_of_given_pulse = point.extended_number_of_returns_of_given_pulse;
-				this.point.extended_point_type = point.extended_point_type;
-				this.point.extended_return_number = point.extended_return_number;
-				this.point.extended_scan_angle = point.extended_scan_angle;
-				this.point.extended_scanner_channel = point.extended_scanner_channel;
-				this.point.gps_time = point.gps_time;
-				this.point.intensity = point.intensity;
-				this.point.num_extra_bytes = point.num_extra_bytes;
-				this.point.number_of_returns_of_given_pulse = point.number_of_returns_of_given_pulse;
-				this.point.point_source_ID = point.point_source_ID;
-				this.point.return_number = point.return_number;
-				Array.Copy(point.rgb, this.point.rgb, 4);
-				this.point.scan_angle_rank = point.scan_angle_rank;
-				this.point.scan_direction_flag = point.scan_direction_flag;
-				this.point.user_data = point.user_data;
-				this.point.X = point.X;
-				this.point.Y = point.Y;
-				this.point.Z = point.Z;
-				Array.Copy(point.wave_packet, this.point.wave_packet, 29);
+				curPoint.classification_and_classification_flags = point.classification_and_classification_flags;
+				curPoint.edge_of_flight_line = point.edge_of_flight_line;
+				curPoint.extended_classification = point.extended_classification;
+				curPoint.extended_classification_flags = point.extended_classification_flags;
+				curPoint.extended_number_of_returns = point.extended_number_of_returns;
+				curPoint.extended_point_type = point.extended_point_type;
+				curPoint.extended_return_number = point.extended_return_number;
+				curPoint.extended_scan_angle = point.extended_scan_angle;
+				curPoint.extended_scanner_channel = point.extended_scanner_channel;
+				curPoint.gps_time = point.gps_time;
+				curPoint.intensity = point.intensity;
+				curPoint.num_extra_bytes = point.num_extra_bytes;
+				curPoint.number_of_returns = point.number_of_returns;
+				curPoint.point_source_ID = point.point_source_ID;
+				curPoint.return_number = point.return_number;
+				Array.Copy(point.rgb, curPoint.rgb, 4);
+				curPoint.scan_angle_rank = point.scan_angle_rank;
+				curPoint.scan_direction_flag = point.scan_direction_flag;
+				curPoint.user_data = point.user_data;
+				curPoint.X = point.X;
+				curPoint.Y = point.Y;
+				curPoint.Z = point.Z;
+				Array.Copy(point.wave_packet, curPoint.wave_packet, 29);
 
-				if (this.point.extra_bytes != null)
+				if (curPoint.extra_bytes != null)
 				{
 					if (point.extra_bytes != null)
 					{
-						if (this.point.num_extra_bytes == point.num_extra_bytes)
+						if (curPoint.num_extra_bytes == point.num_extra_bytes)
 						{
-							Array.Copy(point.extra_bytes, this.point.extra_bytes, point.num_extra_bytes);
+							Array.Copy(point.extra_bytes, curPoint.extra_bytes, point.num_extra_bytes);
 						}
 						else
 						{
-							error = string.Format("target point has {0} extra bytes but source point has {1}", this.point.num_extra_bytes, point.num_extra_bytes);
+							error = string.Format("target point has {0} extra bytes but source point has {1}", curPoint.num_extra_bytes, point.num_extra_bytes);
 							return 1;
 						}
 					}
@@ -582,7 +576,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_set_coordinates(double[] coordinates)
+		public int set_coordinates(double[] coordinates)
 		{
 			if (coordinates == null)
 			{
@@ -599,9 +593,9 @@ namespace laszip.net
 			try
 			{
 				// set the coordinates
-				point.X = MyDefs.I32_QUANTIZE((coordinates[0] - header.x_offset) / header.x_scale_factor);
-				point.Y = MyDefs.I32_QUANTIZE((coordinates[1] - header.y_offset) / header.y_scale_factor);
-				point.Z = MyDefs.I32_QUANTIZE((coordinates[2] - header.z_offset) / header.z_scale_factor);
+				curPoint.X = MyDefs.I32_QUANTIZE((coordinates[0] - curHeader.x_offset) / curHeader.x_scale_factor);
+				curPoint.Y = MyDefs.I32_QUANTIZE((coordinates[1] - curHeader.y_offset) / curHeader.y_scale_factor);
+				curPoint.Z = MyDefs.I32_QUANTIZE((coordinates[2] - curHeader.z_offset) / curHeader.z_scale_factor);
 			}
 			catch
 			{
@@ -613,7 +607,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_get_coordinates(double[] coordinates)
+		public int get_coordinates(double[] coordinates)
 		{
 			if (coordinates == null)
 			{
@@ -624,9 +618,9 @@ namespace laszip.net
 			try
 			{
 				// get the coordinates
-				coordinates[0] = header.x_scale_factor * point.X + header.x_offset;
-				coordinates[1] = header.y_scale_factor * point.Y + header.y_offset;
-				coordinates[2] = header.z_scale_factor * point.Z + header.z_offset;
+				coordinates[0] = curHeader.x_scale_factor * curPoint.X + curHeader.x_offset;
+				coordinates[1] = curHeader.y_scale_factor * curPoint.Y + curHeader.y_offset;
+				coordinates[2] = curHeader.z_scale_factor * curPoint.Z + curHeader.z_offset;
 			}
 			catch
 			{
@@ -638,7 +632,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public unsafe int laszip_set_geokeys(ushort number, laszip_geokey[] key_entries)
+		public unsafe int set_geokeys(ushort number, geokey[] key_entries)
 		{
 			if (number == 0)
 			{
@@ -667,11 +661,11 @@ namespace laszip.net
 			try
 			{
 				// create the geokey directory
-				byte[] buffer = new byte[sizeof(laszip_geokey) * (number + 1)];
+				byte[] buffer = new byte[sizeof(geokey) * (number + 1)];
 
 				fixed (byte* pBuffer = buffer)
 				{
-					laszip_geokey* key_entries_plus_one = (laszip_geokey*)pBuffer;
+					geokey* key_entries_plus_one = (geokey*)pBuffer;
 
 					key_entries_plus_one[0].key_id = 1;            // aka key_directory_version
 					key_entries_plus_one[0].tiff_tag_location = 1; // aka key_revision
@@ -681,7 +675,7 @@ namespace laszip.net
 				}
 
 				// fill a VLR
-				laszip_vlr vlr = new laszip_vlr();
+				vlr vlr = new vlr();
 				vlr.reserved = 0xAABB;
 				byte[] user_id = Encoding.ASCII.GetBytes("LASF_Projection");
 				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
@@ -695,7 +689,7 @@ namespace laszip.net
 				vlr.data = buffer;
 
 				// add the VLR
-				if (laszip_add_vlr(vlr) != 0)
+				if (add_vlr(vlr) != 0)
 				{
 					error = string.Format("setting {0} geokeys", number);
 					return 1;
@@ -711,7 +705,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_set_geodouble_params(ushort number, double[] geodouble_params)
+		public int set_geodouble_params(ushort number, double[] geodouble_params)
 		{
 			if (number == 0)
 			{
@@ -740,7 +734,7 @@ namespace laszip.net
 			try
 			{
 				// fill a VLR
-				laszip_vlr vlr = new laszip_vlr();
+				vlr vlr = new vlr();
 				vlr.reserved = 0xAABB;
 				byte[] user_id = Encoding.ASCII.GetBytes("LASF_Projection");
 				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
@@ -756,7 +750,7 @@ namespace laszip.net
 				vlr.data = buffer;
 
 				// add the VLR
-				if (laszip_add_vlr(vlr) != 0)
+				if (add_vlr(vlr) != 0)
 				{
 					error = string.Format("setting {0} geodouble_params", number);
 					return 1;
@@ -772,7 +766,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_set_geoascii_params(ushort number, byte[] geoascii_params)
+		public int set_geoascii_params(ushort number, byte[] geoascii_params)
 		{
 			if (number == 0)
 			{
@@ -801,7 +795,7 @@ namespace laszip.net
 			try
 			{
 				// fill a VLR
-				laszip_vlr vlr = new laszip_vlr();
+				vlr vlr = new vlr();
 				vlr.reserved = 0xAABB;
 				byte[] user_id = Encoding.ASCII.GetBytes("LASF_Projection");
 				Array.Copy(user_id, vlr.user_id, Math.Min(user_id.Length, 16));
@@ -815,7 +809,7 @@ namespace laszip.net
 				vlr.data = geoascii_params;
 
 				// add the VLR
-				if (laszip_add_vlr(vlr) != 0)
+				if (add_vlr(vlr) != 0)
 				{
 					error = string.Format("setting {0} geoascii_params", number);
 					return 1;
@@ -831,21 +825,20 @@ namespace laszip.net
 			return 0;
 		}
 
-		static bool ArrayCompare(byte[] a, byte[] b)
+		static bool strncmp(byte[] a, byte[] b, int num)
 		{
-			int len = Math.Min(a.Length, b.Length);
-			int i = 0;
-			for (; i < len; i++)
+			if (a.Length != num || b.Length != num) return false;
+
+			for (int i = 0; i < num; i++)
 			{
 				if (a[i] != b[i]) return false;
-				if (a[i] == 0) break;
+				if (a[i] == 0) return true;
 			}
 
-			if (i < len - 1) return true;
-			return a.Length == b.Length;
+			return true;
 		}
 
-		public int laszip_add_vlr(laszip_vlr vlr)
+		public int add_vlr(vlr vlr)
 		{
 			if (vlr == null)
 			{
@@ -873,27 +866,28 @@ namespace laszip.net
 
 			try
 			{
-				if (header.vlrs.Count > 0)
+				if (curHeader.vlrs.Count > 0)
 				{
-					// overwrite existing VLR ?
-					for (int i = (int)header.number_of_variable_length_records - 1; i >= 0; i--)
+					// remove existing VLRs with same record and user id
+					for (int i = (int)curHeader.number_of_variable_length_records - 1; i >= 0; i--)
 					{
-						if (header.vlrs[i].record_id == vlr.record_id && !ArrayCompare(header.vlrs[i].user_id, vlr.user_id))
+						if (curHeader.vlrs[i].record_id == vlr.record_id && strncmp(curHeader.vlrs[i].user_id, vlr.user_id, 16))
 						{
-							if (header.vlrs[i].record_length_after_header != 0)
-								header.offset_to_point_data -= header.vlrs[i].record_length_after_header;
+							if (curHeader.vlrs[i].record_length_after_header != 0)
+								curHeader.offset_to_point_data -= curHeader.vlrs[i].record_length_after_header;
 
-							header.vlrs.RemoveAt(i);
+							curHeader.offset_to_point_data -= 54;
+							curHeader.vlrs.RemoveAt(i);
 						}
 					}
 				}
 
-				header.vlrs.Add(vlr);
-				header.number_of_variable_length_records = (uint)header.vlrs.Count;
-				header.offset_to_point_data += 54;
+				curHeader.vlrs.Add(vlr);
+				curHeader.number_of_variable_length_records = (uint)curHeader.vlrs.Count;
+				curHeader.offset_to_point_data += 54;
 
 				// copy the VLR
-				header.offset_to_point_data += vlr.record_length_after_header;
+				curHeader.offset_to_point_data += vlr.record_length_after_header;
 			}
 			catch
 			{
@@ -905,7 +899,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		static int CheckHeaderAndSetup(laszip_header header, bool compress, out LASzip laszip, ref laszip_point point, out uint laszip_vrl_payload_size, out string error)
+		static int CheckHeaderAndSetup(header curHeader, bool compress, out LASzip laszip, ref point curPoint, out uint laszip_vrl_payload_size, out string error)
 		{
 			laszip = null;
 			laszip_vrl_payload_size = 0;
@@ -915,44 +909,44 @@ namespace laszip.net
 
 			uint vlrs_size = 0;
 
-			if (header.version_major != 1)
+			if (curHeader.version_major != 1)
 			{
-				error = string.Format("unknown LAS version {0}.{1}", header.version_major, header.version_minor);
+				error = string.Format("unknown LAS version {0}.{1}", curHeader.version_major, curHeader.version_minor);
 				return 1;
 			}
 
-			if (compress && (header.point_data_format > 5))
+			if (compress && (curHeader.point_data_format > 5))
 			{
-				error = string.Format("compressor does not yet support point data format {1}", header.point_data_format);
+				error = string.Format("compressor does not yet support point data format {1}", curHeader.point_data_format);
 				return 1;
 			}
 
-			if (header.number_of_variable_length_records != 0)
+			if (curHeader.number_of_variable_length_records != 0)
 			{
-				if (header.vlrs == null)
+				if (curHeader.vlrs == null)
 				{
-					error = string.Format("number_of_variable_length_records is {0} but vlrs pointer is zero", header.number_of_variable_length_records);
+					error = string.Format("number_of_variable_length_records is {0} but vlrs pointer is zero", curHeader.number_of_variable_length_records);
 					return 1;
 				}
 
-				for (int i = 0; i < header.number_of_variable_length_records; i++)
+				for (int i = 0; i < curHeader.number_of_variable_length_records; i++)
 				{
 					vlrs_size += 54;
-					if (header.vlrs[i].record_length_after_header != 0)
+					if (curHeader.vlrs[i].record_length_after_header != 0)
 					{
-						if (header.vlrs == null)
+						if (curHeader.vlrs == null)
 						{
-							error = string.Format("vlrs[{0}].record_length_after_header is {1} but vlrs[{0}].data pointer is zero", i, header.vlrs[i].record_length_after_header);
+							error = string.Format("vlrs[{0}].record_length_after_header is {1} but vlrs[{0}].data pointer is zero", i, curHeader.vlrs[i].record_length_after_header);
 							return 1;
 						}
-						vlrs_size += header.vlrs[i].record_length_after_header;
+						vlrs_size += curHeader.vlrs[i].record_length_after_header;
 					}
 				}
 			}
 
-			if ((vlrs_size + header.header_size + header.user_data_after_header_size) != header.offset_to_point_data)
+			if ((vlrs_size + curHeader.header_size + curHeader.user_data_after_header_size) != curHeader.offset_to_point_data)
 			{
-				error = string.Format("header_size ({0}) plus vlrs_size ({1}) plus user_data_after_header_size ({2}) does not equal offset_to_point_data ({3})", header.header_size, vlrs_size, header.user_data_after_header_size, header.offset_to_point_data);
+				error = string.Format("header_size ({0}) plus vlrs_size ({1}) plus user_data_after_header_size ({2}) does not equal offset_to_point_data ({3})", curHeader.header_size, vlrs_size, curHeader.user_data_after_header_size, curHeader.offset_to_point_data);
 				return 1;
 			}
 
@@ -966,9 +960,9 @@ namespace laszip.net
 				return 1;
 			}
 
-			if (!laszip.setup(header.point_data_format, header.point_data_record_length, LASzip.COMPRESSOR_NONE))
+			if (!laszip.setup(curHeader.point_data_format, curHeader.point_data_record_length, LASzip.COMPRESSOR_NONE))
 			{
-				error = string.Format("invalid combination of point_data_format {0} and point_data_record_length {1}", header.point_data_format, header.point_data_record_length);
+				error = string.Format("invalid combination of point_data_format {0} and point_data_record_length {1}", curHeader.point_data_format, curHeader.point_data_record_length);
 				return 1;
 			}
 
@@ -984,8 +978,8 @@ namespace laszip.net
 					case LASitem.Type.RGB12:
 					case LASitem.Type.WAVEPACKET13: break;
 					case LASitem.Type.BYTE:
-						point.num_extra_bytes = laszip.items[i].size;
-						point.extra_bytes = new byte[point.num_extra_bytes];
+						curPoint.num_extra_bytes = laszip.items[i].size;
+						curPoint.extra_bytes = new byte[curPoint.num_extra_bytes];
 						break;
 					default:
 						error = string.Format("unknown LASitem type {0}", laszip.items[i].type);
@@ -996,9 +990,9 @@ namespace laszip.net
 
 			if (compress)
 			{
-				if (!laszip.setup(header.point_data_format, header.point_data_record_length, LASzip.COMPRESSOR_DEFAULT))
+				if (!laszip.setup(curHeader.point_data_format, curHeader.point_data_record_length, LASzip.COMPRESSOR_DEFAULT))
 				{
-					error = string.Format("cannot compress point_data_format {0} with point_data_record_length {1}", header.point_data_format, header.point_data_record_length);
+					error = string.Format("cannot compress point_data_format {0} with point_data_record_length {1}", curHeader.point_data_format, curHeader.point_data_record_length);
 					return 1;
 				}
 				laszip.request_version(2);
@@ -1013,7 +1007,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_open_writer(Stream streamout, bool compress, bool leaveOpen = false)
+		public int open_writer(Stream streamout, bool compress, bool leaveOpen = false)
 		{
 			if (!streamout.CanWrite)
 			{
@@ -1038,13 +1032,13 @@ namespace laszip.net
 				LASzip laszip;
 				uint laszip_vrl_payload_size;
 
-				int err = CheckHeaderAndSetup(header, compress, out laszip, ref point, out laszip_vrl_payload_size, out error);
+				int err = CheckHeaderAndSetup(curHeader, compress, out laszip, ref curPoint, out laszip_vrl_payload_size, out error);
 				if (err != 0) return err;
 
 				this.streamout = streamout;
 				leaveStreamOutOpen = leaveOpen;
 
-				return laszip_open_writer_stream(compress, laszip, laszip_vrl_payload_size);
+				return open_writer_stream(compress, laszip, laszip_vrl_payload_size);
 			}
 			catch
 			{
@@ -1053,7 +1047,7 @@ namespace laszip.net
 			}
 		}
 
-		public int laszip_open_writer(string file_name, bool compress)
+		public int open_writer(string file_name, bool compress)
 		{
 			if (file_name == null || file_name.Length == 0)
 			{
@@ -1078,7 +1072,7 @@ namespace laszip.net
 				LASzip laszip;
 				uint laszip_vrl_payload_size;
 
-				int err = CheckHeaderAndSetup(header, compress, out laszip, ref point, out laszip_vrl_payload_size, out error);
+				int err = CheckHeaderAndSetup(curHeader, compress, out laszip, ref curPoint, out laszip_vrl_payload_size, out error);
 				if (err != 0) return err;
 
 				#region open the file
@@ -1094,7 +1088,7 @@ namespace laszip.net
 				}
 				#endregion
 
-				return laszip_open_writer_stream(compress, laszip, laszip_vrl_payload_size);
+				return open_writer_stream(compress, laszip, laszip_vrl_payload_size);
 			}
 			catch
 			{
@@ -1103,7 +1097,7 @@ namespace laszip.net
 			}
 		}
 
-		int laszip_open_writer_stream(bool compress, LASzip laszip, uint laszip_vrl_payload_size)
+		int open_writer_stream(bool compress, LASzip laszip, uint laszip_vrl_payload_size)
 		{
 			#region write the header variable after variable
 			try
@@ -1115,207 +1109,207 @@ namespace laszip.net
 			}
 			catch
 			{
-				error = "writing header.file_signature";
+				error = "writing Header.file_signature";
 				return 1;
 			}
 
-			try { streamout.Write(BitConverter.GetBytes(header.file_source_ID), 0, 2); }
-			catch { error = "writing header.file_source_ID"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.file_source_ID), 0, 2); }
+			catch { error = "writing Header.file_source_ID"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.global_encoding), 0, 2); }
-			catch { error = "writing header.global_encoding"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.global_encoding), 0, 2); }
+			catch { error = "writing Header.global_encoding"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.project_ID_GUID_data_1), 0, 4); }
-			catch { error = "writing header.project_ID_GUID_data_1"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.project_ID_GUID_data_1), 0, 4); }
+			catch { error = "writing Header.project_ID_GUID_data_1"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.project_ID_GUID_data_2), 0, 2); }
-			catch { error = "writing header.project_ID_GUID_data_2"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.project_ID_GUID_data_2), 0, 2); }
+			catch { error = "writing Header.project_ID_GUID_data_2"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.project_ID_GUID_data_3), 0, 2); }
-			catch { error = "writing header.project_ID_GUID_data_3"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.project_ID_GUID_data_3), 0, 2); }
+			catch { error = "writing Header.project_ID_GUID_data_3"; return 1; }
 
-			try { streamout.Write(header.project_ID_GUID_data_4, 0, 8); }
-			catch { error = "writing header.project_ID_GUID_data_4"; return 1; }
+			try { streamout.Write(curHeader.project_ID_GUID_data_4, 0, 8); }
+			catch { error = "writing Header.project_ID_GUID_data_4"; return 1; }
 
-			try { streamout.WriteByte(header.version_major); }
-			catch { error = "writing header.version_major"; return 1; }
+			try { streamout.WriteByte(curHeader.version_major); }
+			catch { error = "writing Header.version_major"; return 1; }
 
-			try { streamout.WriteByte(header.version_minor); }
-			catch { error = "writing header.version_minor"; return 1; }
+			try { streamout.WriteByte(curHeader.version_minor); }
+			catch { error = "writing Header.version_minor"; return 1; }
 
-			try { streamout.Write(header.system_identifier, 0, 32); }
-			catch { error = "writing header.system_identifier"; return 1; }
+			try { streamout.Write(curHeader.system_identifier, 0, 32); }
+			catch { error = "writing Header.system_identifier"; return 1; }
 
-			if (header.generating_software == null || header.generating_software.Length != 32)
+			if (curHeader.generating_software == null || curHeader.generating_software.Length != 32)
 			{
 				byte[] generatingSoftware = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
+				Array.Copy(generatingSoftware, curHeader.generating_software, Math.Min(generatingSoftware.Length, 32));
 			}
 
-			try { streamout.Write(header.generating_software, 0, 32); }
-			catch { error = "writing header.generating_software"; return 1; }
+			try { streamout.Write(curHeader.generating_software, 0, 32); }
+			catch { error = "writing Header.generating_software"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.file_creation_day), 0, 2); }
-			catch { error = "writing header.file_creation_day"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.file_creation_day), 0, 2); }
+			catch { error = "writing Header.file_creation_day"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.file_creation_year), 0, 2); }
-			catch { error = "writing header.file_creation_year"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.file_creation_year), 0, 2); }
+			catch { error = "writing Header.file_creation_year"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.header_size), 0, 2); }
-			catch { error = "writing header.header_size"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.header_size), 0, 2); }
+			catch { error = "writing Header.header_size"; return 1; }
 
-			if (compress) header.offset_to_point_data += (54 + laszip_vrl_payload_size);
+			if (compress) curHeader.offset_to_point_data += (54 + laszip_vrl_payload_size);
 
-			try { streamout.Write(BitConverter.GetBytes(header.offset_to_point_data), 0, 4); }
-			catch { error = "writing header.offset_to_point_data"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.offset_to_point_data), 0, 4); }
+			catch { error = "writing Header.offset_to_point_data"; return 1; }
 
 			if (compress)
 			{
-				header.offset_to_point_data -= (54 + laszip_vrl_payload_size);
-				header.number_of_variable_length_records += 1;
+				curHeader.offset_to_point_data -= (54 + laszip_vrl_payload_size);
+				curHeader.number_of_variable_length_records += 1;
 			}
 
-			try { streamout.Write(BitConverter.GetBytes(header.number_of_variable_length_records), 0, 4); }
-			catch { error = "writing header.number_of_variable_length_records"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.number_of_variable_length_records), 0, 4); }
+			catch { error = "writing Header.number_of_variable_length_records"; return 1; }
 
 			if (compress)
 			{
-				header.number_of_variable_length_records -= 1;
-				header.point_data_format |= 128;
+				curHeader.number_of_variable_length_records -= 1;
+				curHeader.point_data_format |= 128;
 			}
 
-			try { streamout.WriteByte(header.point_data_format); }
-			catch { error = "writing header.point_data_format"; return 1; }
+			try { streamout.WriteByte(curHeader.point_data_format); }
+			catch { error = "writing Header.point_data_format"; return 1; }
 
-			if (compress) header.point_data_format &= 127;
+			if (compress) curHeader.point_data_format &= 127;
 
-			try { streamout.Write(BitConverter.GetBytes(header.point_data_record_length), 0, 2); }
-			catch { error = "writing header.point_data_record_length"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.point_data_record_length), 0, 2); }
+			catch { error = "writing Header.point_data_record_length"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.number_of_point_records), 0, 4); }
-			catch { error = "writing header.number_of_point_records"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.number_of_point_records), 0, 4); }
+			catch { error = "writing Header.number_of_point_records"; return 1; }
 
 			for (uint i = 0; i < 5; i++)
 			{
-				try { streamout.Write(BitConverter.GetBytes(header.number_of_points_by_return[i]), 0, 4); }
-				catch { error = string.Format("writing header.number_of_points_by_return {0}", i); return 1; }
+				try { streamout.Write(BitConverter.GetBytes(curHeader.number_of_points_by_return[i]), 0, 4); }
+				catch { error = string.Format("writing Header.number_of_points_by_return {0}", i); return 1; }
 			}
 
-			try { streamout.Write(BitConverter.GetBytes(header.x_scale_factor), 0, 8); }
-			catch { error = "writing header.x_scale_factor"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.x_scale_factor), 0, 8); }
+			catch { error = "writing Header.x_scale_factor"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.y_scale_factor), 0, 8); }
-			catch { error = "writing header.y_scale_factor"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.y_scale_factor), 0, 8); }
+			catch { error = "writing Header.y_scale_factor"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.z_scale_factor), 0, 8); }
-			catch { error = "writing header.z_scale_factor"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.z_scale_factor), 0, 8); }
+			catch { error = "writing Header.z_scale_factor"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.x_offset), 0, 8); }
-			catch { error = "writing header.x_offset"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.x_offset), 0, 8); }
+			catch { error = "writing Header.x_offset"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.y_offset), 0, 8); }
-			catch { error = "writing header.y_offset"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.y_offset), 0, 8); }
+			catch { error = "writing Header.y_offset"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.z_offset), 0, 8); }
-			catch { error = "writing header.z_offset"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.z_offset), 0, 8); }
+			catch { error = "writing Header.z_offset"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.max_x), 0, 8); }
-			catch { error = "writing header.max_x"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.max_x), 0, 8); }
+			catch { error = "writing Header.max_x"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.min_x), 0, 8); }
-			catch { error = "writing header.min_x"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.min_x), 0, 8); }
+			catch { error = "writing Header.min_x"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.max_y), 0, 8); }
-			catch { error = "writing header.max_y"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.max_y), 0, 8); }
+			catch { error = "writing Header.max_y"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.min_y), 0, 8); }
-			catch { error = "writing header.min_y"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.min_y), 0, 8); }
+			catch { error = "writing Header.min_y"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.max_z), 0, 8); }
-			catch { error = "writing header.max_z"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.max_z), 0, 8); }
+			catch { error = "writing Header.max_z"; return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(header.min_z), 0, 8); }
-			catch { error = "writing header.min_z"; return 1; }
+			try { streamout.Write(BitConverter.GetBytes(curHeader.min_z), 0, 8); }
+			catch { error = "writing Header.min_z"; return 1; }
 
 			#region special handling for LAS 1.3+
-			if (header.version_major == 1 && header.version_minor >= 3)
+			if (curHeader.version_major == 1 && curHeader.version_minor >= 3)
 			{
-				if (header.header_size < 235)
+				if (curHeader.header_size < 235)
 				{
-					error = string.Format("for LAS 1.{0} header_size should at least be 235 but it is only {1}", header.version_minor, header.header_size);
+					error = string.Format("for LAS 1.{0} header_size should at least be 235 but it is only {1}", curHeader.version_minor, curHeader.header_size);
 					return 1;
 				}
 
-				try { streamout.Write(BitConverter.GetBytes(header.start_of_waveform_data_packet_record), 0, 8); }
-				catch { error = "writing header.start_of_waveform_data_packet_record"; return 1; }
+				try { streamout.Write(BitConverter.GetBytes(curHeader.start_of_waveform_data_packet_record), 0, 8); }
+				catch { error = "writing Header.start_of_waveform_data_packet_record"; return 1; }
 
-				header.user_data_in_header_size = header.header_size - 235u;
+				curHeader.user_data_in_header_size = curHeader.header_size - 235u;
 			}
-			else header.user_data_in_header_size = header.header_size - 227u;
+			else curHeader.user_data_in_header_size = curHeader.header_size - 227u;
 			#endregion
 
 			#region special handling for LAS 1.4+
-			if (header.version_major == 1 && header.version_minor >= 4)
+			if (curHeader.version_major == 1 && curHeader.version_minor >= 4)
 			{
-				if (header.header_size < 375)
+				if (curHeader.header_size < 375)
 				{
-					error = string.Format("for LAS 1.{0} header_size should at least be 375 but it is only {1}", header.version_minor, header.header_size);
+					error = string.Format("for LAS 1.{0} header_size should at least be 375 but it is only {1}", curHeader.version_minor, curHeader.header_size);
 					return 1;
 				}
 
-				try { streamout.Write(BitConverter.GetBytes(header.start_of_first_extended_variable_length_record), 0, 8); }
-				catch { error = "writing header.start_of_first_extended_variable_length_record"; return 1; }
+				try { streamout.Write(BitConverter.GetBytes(curHeader.start_of_first_extended_variable_length_record), 0, 8); }
+				catch { error = "writing Header.start_of_first_extended_variable_length_record"; return 1; }
 
-				try { streamout.Write(BitConverter.GetBytes(header.number_of_extended_variable_length_records), 0, 4); }
-				catch { error = "writing header.number_of_extended_variable_length_records"; return 1; }
+				try { streamout.Write(BitConverter.GetBytes(curHeader.number_of_extended_variable_length_records), 0, 4); }
+				catch { error = "writing Header.number_of_extended_variable_length_records"; return 1; }
 
-				try { streamout.Write(BitConverter.GetBytes(header.extended_number_of_point_records), 0, 8); }
-				catch { error = "writing header.extended_number_of_point_records"; return 1; }
+				try { streamout.Write(BitConverter.GetBytes(curHeader.extended_number_of_point_records), 0, 8); }
+				catch { error = "writing Header.extended_number_of_point_records"; return 1; }
 
 				for (uint i = 0; i < 15; i++)
 				{
-					try { streamout.Write(BitConverter.GetBytes(header.extended_number_of_points_by_return[i]), 0, 8); }
-					catch { error = string.Format("writing header.extended_number_of_points_by_return[{0}]", i); return 1; }
+					try { streamout.Write(BitConverter.GetBytes(curHeader.extended_number_of_points_by_return[i]), 0, 8); }
+					catch { error = string.Format("writing Header.extended_number_of_points_by_return[{0}]", i); return 1; }
 				}
 
-				header.user_data_in_header_size = header.header_size - 375u;
+				curHeader.user_data_in_header_size = curHeader.header_size - 375u;
 			}
 			#endregion
 
 			#region write any number of user-defined bytes that might have been added to the header
-			if (header.user_data_in_header_size != 0)
+			if (curHeader.user_data_in_header_size != 0)
 			{
-				try { streamout.Write(header.user_data_in_header, 0, (int)header.user_data_in_header_size); }
-				catch { error = string.Format("writing {0} bytes of data into header.user_data_in_header", header.user_data_in_header_size); return 1; }
+				try { streamout.Write(curHeader.user_data_in_header, 0, (int)curHeader.user_data_in_header_size); }
+				catch { error = string.Format("writing {0} bytes of data into Header.user_data_in_header", curHeader.user_data_in_header_size); return 1; }
 			}
 			#endregion
 
 			#region write variable length records into the header
-			if (header.number_of_variable_length_records != 0)
+			if (curHeader.number_of_variable_length_records != 0)
 			{
-				for (int i = 0; i < header.number_of_variable_length_records; i++)
+				for (int i = 0; i < curHeader.number_of_variable_length_records; i++)
 				{
 					// write variable length records variable after variable (to avoid alignment issues)
-					try { streamout.Write(BitConverter.GetBytes(header.vlrs[i].reserved), 0, 2); }
-					catch { error = string.Format("writing header.vlrs[{0}].reserved", i); return 1; }
+					try { streamout.Write(BitConverter.GetBytes(curHeader.vlrs[i].reserved), 0, 2); }
+					catch { error = string.Format("writing Header.vlrs[{0}].reserved", i); return 1; }
 
-					try { streamout.Write(header.vlrs[i].user_id, 0, 16); }
-					catch { error = string.Format("writing header.vlrs[{0}].user_id", i); return 1; }
+					try { streamout.Write(curHeader.vlrs[i].user_id, 0, 16); }
+					catch { error = string.Format("writing Header.vlrs[{0}].user_id", i); return 1; }
 
-					try { streamout.Write(BitConverter.GetBytes(header.vlrs[i].record_id), 0, 2); }
-					catch { error = string.Format("writing header.vlrs[{0}].record_id", i); return 1; }
+					try { streamout.Write(BitConverter.GetBytes(curHeader.vlrs[i].record_id), 0, 2); }
+					catch { error = string.Format("writing Header.vlrs[{0}].record_id", i); return 1; }
 
-					try { streamout.Write(BitConverter.GetBytes(header.vlrs[i].record_length_after_header), 0, 2); }
-					catch { error = string.Format("writing header.vlrs[{0}].record_length_after_header", i); return 1; }
+					try { streamout.Write(BitConverter.GetBytes(curHeader.vlrs[i].record_length_after_header), 0, 2); }
+					catch { error = string.Format("writing Header.vlrs[{0}].record_length_after_header", i); return 1; }
 
-					try { streamout.Write(header.vlrs[i].description, 0, 32); }
-					catch { error = string.Format("writing header.vlrs[{0}].description", i); return 1; }
+					try { streamout.Write(curHeader.vlrs[i].description, 0, 32); }
+					catch { error = string.Format("writing Header.vlrs[{0}].description", i); return 1; }
 
 					// write data following the header of the variable length record
-					if (header.vlrs[i].record_length_after_header != 0)
+					if (curHeader.vlrs[i].record_length_after_header != 0)
 					{
-						try { streamout.Write(header.vlrs[i].data, 0, header.vlrs[i].record_length_after_header); }
-						catch { error = string.Format("writing {0} bytes of data into header.vlrs[{1}].data", header.vlrs[i].record_length_after_header, i); return 1; }
+						try { streamout.Write(curHeader.vlrs[i].data, 0, curHeader.vlrs[i].record_length_after_header); }
+						catch { error = string.Format("writing {0} bytes of data into Header.vlrs[{1}].data", curHeader.vlrs[i].record_length_after_header, i); return 1; }
 					}
 				}
 			}
@@ -1323,25 +1317,25 @@ namespace laszip.net
 			if (compress)
 			{
 				#region write the LASzip VLR header
-				uint i = header.number_of_variable_length_records;
+				uint i = curHeader.number_of_variable_length_records;
 
 				ushort reserved = 0xAABB;
 				try { streamout.Write(BitConverter.GetBytes(reserved), 0, 2); }
-				catch { error = string.Format("writing header.vlrs[{0}].reserved", i); return 1; }
+				catch { error = string.Format("writing Header.vlrs[{0}].reserved", i); return 1; }
 
 				byte[] user_id1 = Encoding.ASCII.GetBytes("laszip encoded");
 				byte[] user_id = new byte[16];
 				Array.Copy(user_id1, user_id, Math.Min(16, user_id1.Length));
 				try { streamout.Write(user_id, 0, 16); }
-				catch { error = string.Format("writing header.vlrs[{0}].user_id", i); return 1; }
+				catch { error = string.Format("writing Header.vlrs[{0}].user_id", i); return 1; }
 
 				ushort record_id = 22204;
 				try { streamout.Write(BitConverter.GetBytes(record_id), 0, 2); }
-				catch { error = string.Format("writing header.vlrs[{0}].record_id", i); return 1; }
+				catch { error = string.Format("writing Header.vlrs[{0}].record_id", i); return 1; }
 
 				ushort record_length_after_header = (ushort)laszip_vrl_payload_size;
 				try { streamout.Write(BitConverter.GetBytes(record_length_after_header), 0, 2); }
-				catch { error = string.Format("writing header.vlrs[{0}].record_length_after_header", i); return 1; }
+				catch { error = string.Format("writing Header.vlrs[{0}].record_length_after_header", i); return 1; }
 
 				// description field must be a null-terminate string, so we don't copy more than 31 characters
 				byte[] description1 = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
@@ -1349,7 +1343,7 @@ namespace laszip.net
 				Array.Copy(description1, description, Math.Min(31, description1.Length));
 
 				try { streamout.Write(description, 0, 32); }
-				catch { error = string.Format("writing header.vlrs[{0}].description", i); return 1; }
+				catch { error = string.Format("writing Header.vlrs[{0}].description", i); return 1; }
 
 				// write the LASzip VLR payload
 
@@ -1415,10 +1409,10 @@ namespace laszip.net
 			#endregion
 
 			#region write any number of user-defined bytes that might have been added after the header
-			if (header.user_data_after_header_size != 0)
+			if (curHeader.user_data_after_header_size != 0)
 			{
-				try { streamout.Write(header.user_data_after_header, 0, (int)header.user_data_after_header_size); }
-				catch { error = string.Format("writing {0} bytes of data into header.user_data_after_header", header.user_data_after_header_size); return 1; }
+				try { streamout.Write(curHeader.user_data_after_header, 0, (int)curHeader.user_data_after_header_size); }
+				catch { error = string.Format("writing {0} bytes of data into Header.user_data_after_header", curHeader.user_data_after_header_size); return 1; }
 			}
 			#endregion
 
@@ -1442,14 +1436,14 @@ namespace laszip.net
 			#endregion
 
 			// set the point number and point count
-			npoints = header.number_of_point_records;
+			npoints = curHeader.number_of_point_records;
 			p_count = 0;
 
 			error = null;
 			return 0;
 		}
 
-		public int laszip_write_point()
+		public int write_point()
 		{
 			if (writer == null)
 			{
@@ -1460,7 +1454,7 @@ namespace laszip.net
 			try
 			{
 				// write the point
-				if (!writer.write(point))
+				if (!writer.write(curPoint))
 				{
 					error = string.Format("writing point with index {0} of {1} total points", p_count, npoints);
 					return 1;
@@ -1478,7 +1472,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_close_writer()
+		public int close_writer()
 		{
 			if (writer == null)
 			{
@@ -1508,7 +1502,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_open_reader(Stream streamin, ref bool is_compressed, bool leaveOpen = false)
+		public int open_reader(Stream streamin, ref bool is_compressed, bool leaveOpen = false)
 		{
 			if (!streamin.CanRead)
 			{
@@ -1537,10 +1531,10 @@ namespace laszip.net
 			this.streamin = streamin;
 			leaveStreamInOpen = leaveOpen;
 
-			return laszip_open_reader_stream(ref is_compressed);
+			return open_reader_stream(ref is_compressed);
 		}
 
-		public int laszip_open_reader(string file_name, ref bool is_compressed)
+		public int open_reader(string file_name, ref bool is_compressed)
 		{
 			if (file_name == null || file_name.Length == 0)
 			{
@@ -1572,10 +1566,10 @@ namespace laszip.net
 				return 1;
 			}
 
-			return laszip_open_reader_stream(ref is_compressed);
+			return open_reader_stream(ref is_compressed);
 		}
 
-		int laszip_open_reader_stream(ref bool is_compressed)
+		int open_reader_stream(ref bool is_compressed)
 		{
 			try
 			{
@@ -1584,7 +1578,7 @@ namespace laszip.net
 				#region read the header variable after variable
 				if (streamin.Read(buffer, 0, 4) != 4)
 				{
-					error = "reading header.file_signature";
+					error = "reading Header.file_signature";
 					return 1;
 				}
 
@@ -1596,297 +1590,297 @@ namespace laszip.net
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.file_source_ID";
+					error = "reading Header.file_source_ID";
 					return 1;
 				}
-				header.file_source_ID = BitConverter.ToUInt16(buffer, 0);
+				curHeader.file_source_ID = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.global_encoding";
+					error = "reading Header.global_encoding";
 					return 1;
 				}
-				header.global_encoding = BitConverter.ToUInt16(buffer, 0);
+				curHeader.global_encoding = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 4) != 4)
 				{
-					error = "reading header.project_ID_GUID_data_1";
+					error = "reading Header.project_ID_GUID_data_1";
 					return 1;
 				}
-				header.project_ID_GUID_data_1 = BitConverter.ToUInt32(buffer, 0);
+				curHeader.project_ID_GUID_data_1 = BitConverter.ToUInt32(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.project_ID_GUID_data_2";
+					error = "reading Header.project_ID_GUID_data_2";
 					return 1;
 				}
-				header.project_ID_GUID_data_2 = BitConverter.ToUInt16(buffer, 0);
+				curHeader.project_ID_GUID_data_2 = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.project_ID_GUID_data_3";
+					error = "reading Header.project_ID_GUID_data_3";
 					return 1;
 				}
-				header.project_ID_GUID_data_3 = BitConverter.ToUInt16(buffer, 0);
+				curHeader.project_ID_GUID_data_3 = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(header.project_ID_GUID_data_4, 0, 8) != 8)
+				if (streamin.Read(curHeader.project_ID_GUID_data_4, 0, 8) != 8)
 				{
-					error = "reading header.project_ID_GUID_data_4";
+					error = "reading Header.project_ID_GUID_data_4";
 					return 1;
 				}
 
 				if (streamin.Read(buffer, 0, 1) != 1)
 				{
-					error = "reading header.version_major";
+					error = "reading Header.version_major";
 					return 1;
 				}
-				header.version_major = buffer[0];
+				curHeader.version_major = buffer[0];
 
 				if (streamin.Read(buffer, 0, 1) != 1)
 				{
-					error = "reading header.version_minor";
+					error = "reading Header.version_minor";
 					return 1;
 				}
-				header.version_minor = buffer[0];
+				curHeader.version_minor = buffer[0];
 
-				if (streamin.Read(header.system_identifier, 0, 32) != 32)
+				if (streamin.Read(curHeader.system_identifier, 0, 32) != 32)
 				{
-					error = "reading header.system_identifier";
-					return 1;
-				}
-
-				if (streamin.Read(header.generating_software, 0, 32) != 32)
-				{
-					error = "reading header.generating_software";
+					error = "reading Header.system_identifier";
 					return 1;
 				}
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (streamin.Read(curHeader.generating_software, 0, 32) != 32)
 				{
-					error = "reading header.file_creation_day";
+					error = "reading Header.generating_software";
 					return 1;
 				}
-				header.file_creation_day = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.file_creation_year";
+					error = "reading Header.file_creation_day";
 					return 1;
 				}
-				header.file_creation_year = BitConverter.ToUInt16(buffer, 0);
+				curHeader.file_creation_day = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.header_size";
+					error = "reading Header.file_creation_year";
 					return 1;
 				}
-				header.header_size = BitConverter.ToUInt16(buffer, 0);
+				curHeader.file_creation_year = BitConverter.ToUInt16(buffer, 0);
+
+				if (streamin.Read(buffer, 0, 2) != 2)
+				{
+					error = "reading Header.header_size";
+					return 1;
+				}
+				curHeader.header_size = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 4) != 4)
 				{
-					error = "reading header.offset_to_point_data";
+					error = "reading Header.offset_to_point_data";
 					return 1;
 				}
-				header.offset_to_point_data = BitConverter.ToUInt32(buffer, 0);
+				curHeader.offset_to_point_data = BitConverter.ToUInt32(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 4) != 4)
 				{
-					error = "reading header.number_of_variable_length_records";
+					error = "reading Header.number_of_variable_length_records";
 					return 1;
 				}
-				header.number_of_variable_length_records = BitConverter.ToUInt32(buffer, 0);
+				curHeader.number_of_variable_length_records = BitConverter.ToUInt32(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 1) != 1)
 				{
-					error = "reading header.point_data_format";
+					error = "reading Header.point_data_format";
 					return 1;
 				}
-				header.point_data_format = buffer[0];
+				curHeader.point_data_format = buffer[0];
 
 				if (streamin.Read(buffer, 0, 2) != 2)
 				{
-					error = "reading header.point_data_record_length";
+					error = "reading Header.point_data_record_length";
 					return 1;
 				}
-				header.point_data_record_length = BitConverter.ToUInt16(buffer, 0);
+				curHeader.point_data_record_length = BitConverter.ToUInt16(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 4) != 4)
 				{
-					error = "reading header.number_of_point_records";
+					error = "reading Header.number_of_point_records";
 					return 1;
 				}
-				header.number_of_point_records = BitConverter.ToUInt32(buffer, 0);
+				curHeader.number_of_point_records = BitConverter.ToUInt32(buffer, 0);
 
 				for (int i = 0; i < 5; i++)
 				{
 					if (streamin.Read(buffer, 0, 4) != 4)
 					{
-						error = string.Format("reading header.number_of_points_by_return {0}", i);
+						error = string.Format("reading Header.number_of_points_by_return {0}", i);
 						return 1;
 					}
-					header.number_of_points_by_return[i] = BitConverter.ToUInt32(buffer, 0);
+					curHeader.number_of_points_by_return[i] = BitConverter.ToUInt32(buffer, 0);
 				}
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.x_scale_factor";
+					error = "reading Header.x_scale_factor";
 					return 1;
 				}
-				header.x_scale_factor = BitConverter.ToDouble(buffer, 0);
+				curHeader.x_scale_factor = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.y_scale_factor";
+					error = "reading Header.y_scale_factor";
 					return 1;
 				}
-				header.y_scale_factor = BitConverter.ToDouble(buffer, 0);
+				curHeader.y_scale_factor = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.z_scale_factor";
+					error = "reading Header.z_scale_factor";
 					return 1;
 				}
-				header.z_scale_factor = BitConverter.ToDouble(buffer, 0);
+				curHeader.z_scale_factor = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.x_offset";
+					error = "reading Header.x_offset";
 					return 1;
 				}
-				header.x_offset = BitConverter.ToDouble(buffer, 0);
+				curHeader.x_offset = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.y_offset";
+					error = "reading Header.y_offset";
 					return 1;
 				}
-				header.y_offset = BitConverter.ToDouble(buffer, 0);
+				curHeader.y_offset = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.z_offset";
+					error = "reading Header.z_offset";
 					return 1;
 				}
-				header.z_offset = BitConverter.ToDouble(buffer, 0);
+				curHeader.z_offset = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.max_x";
+					error = "reading Header.max_x";
 					return 1;
 				}
-				header.max_x = BitConverter.ToDouble(buffer, 0);
+				curHeader.max_x = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.min_x";
+					error = "reading Header.min_x";
 					return 1;
 				}
-				header.min_x = BitConverter.ToDouble(buffer, 0);
+				curHeader.min_x = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.max_y";
+					error = "reading Header.max_y";
 					return 1;
 				}
-				header.max_y = BitConverter.ToDouble(buffer, 0);
+				curHeader.max_y = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.min_y";
+					error = "reading Header.min_y";
 					return 1;
 				}
-				header.min_y = BitConverter.ToDouble(buffer, 0);
+				curHeader.min_y = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.max_z";
+					error = "reading Header.max_z";
 					return 1;
 				}
-				header.max_z = BitConverter.ToDouble(buffer, 0);
+				curHeader.max_z = BitConverter.ToDouble(buffer, 0);
 
 				if (streamin.Read(buffer, 0, 8) != 8)
 				{
-					error = "reading header.min_z";
+					error = "reading Header.min_z";
 					return 1;
 				}
-				header.min_z = BitConverter.ToDouble(buffer, 0);
+				curHeader.min_z = BitConverter.ToDouble(buffer, 0);
 
 				// special handling for LAS 1.3
-				if ((header.version_major == 1) && (header.version_minor >= 3))
+				if ((curHeader.version_major == 1) && (curHeader.version_minor >= 3))
 				{
-					if (header.header_size < 235)
+					if (curHeader.header_size < 235)
 					{
-						error = string.Format("for LAS 1.{0} header_size should at least be 235 but it is only {1}", header.version_minor, header.header_size);
+						error = string.Format("for LAS 1.{0} header_size should at least be 235 but it is only {1}", curHeader.version_minor, curHeader.header_size);
 						return 1;
 					}
 					else
 					{
 						if (streamin.Read(buffer, 0, 8) != 8)
 						{
-							error = "reading header.start_of_waveform_data_packet_record";
+							error = "reading Header.start_of_waveform_data_packet_record";
 							return 1;
 						}
-						header.start_of_waveform_data_packet_record = BitConverter.ToUInt64(buffer, 0);
-						header.user_data_in_header_size = (uint)header.header_size - 235;
+						curHeader.start_of_waveform_data_packet_record = BitConverter.ToUInt64(buffer, 0);
+						curHeader.user_data_in_header_size = (uint)curHeader.header_size - 235;
 					}
 				}
 				else
 				{
-					header.user_data_in_header_size = (uint)header.header_size - 227;
+					curHeader.user_data_in_header_size = (uint)curHeader.header_size - 227;
 				}
 
 				// special handling for LAS 1.4
-				if ((header.version_major == 1) && (header.version_minor >= 4))
+				if ((curHeader.version_major == 1) && (curHeader.version_minor >= 4))
 				{
-					if (header.header_size < 375)
+					if (curHeader.header_size < 375)
 					{
-						error = string.Format("for LAS 1.{0} header_size should at least be 375 but it is only {1}", header.version_minor, header.header_size);
+						error = string.Format("for LAS 1.{0} header_size should at least be 375 but it is only {1}", curHeader.version_minor, curHeader.header_size);
 						return 1;
 					}
 					else
 					{
 						if (streamin.Read(buffer, 0, 8) != 8)
 						{
-							error = "reading header.start_of_first_extended_variable_length_record";
+							error = "reading Header.start_of_first_extended_variable_length_record";
 							return 1;
 						}
-						header.start_of_first_extended_variable_length_record = BitConverter.ToUInt64(buffer, 0);
+						curHeader.start_of_first_extended_variable_length_record = BitConverter.ToUInt64(buffer, 0);
 
 						if (streamin.Read(buffer, 0, 4) != 4)
 						{
-							error = "reading header.number_of_extended_variable_length_records";
+							error = "reading Header.number_of_extended_variable_length_records";
 							return 1;
 						}
-						header.number_of_extended_variable_length_records = BitConverter.ToUInt32(buffer, 0);
+						curHeader.number_of_extended_variable_length_records = BitConverter.ToUInt32(buffer, 0);
 
 						if (streamin.Read(buffer, 0, 8) != 8)
 						{
-							error = "reading header.extended_number_of_point_records";
+							error = "reading Header.extended_number_of_point_records";
 							return 1;
 						}
-						header.extended_number_of_point_records = BitConverter.ToUInt64(buffer, 0);
+						curHeader.extended_number_of_point_records = BitConverter.ToUInt64(buffer, 0);
 
 						for (int i = 0; i < 15; i++)
 						{
 							if (streamin.Read(buffer, 0, 8) != 8)
 							{
-								error = string.Format("reading header.extended_number_of_points_by_return[{0}]", i);
+								error = string.Format("reading Header.extended_number_of_points_by_return[{0}]", i);
 								return 1;
 							}
-							header.extended_number_of_points_by_return[i] = BitConverter.ToUInt64(buffer, 0);
+							curHeader.extended_number_of_points_by_return[i] = BitConverter.ToUInt64(buffer, 0);
 						}
-						header.user_data_in_header_size = (uint)header.header_size - 375;
+						curHeader.user_data_in_header_size = (uint)curHeader.header_size - 375;
 					}
 				}
 
 				// load any number of user-defined bytes that might have been added to the header
-				if (header.user_data_in_header_size != 0)
+				if (curHeader.user_data_in_header_size != 0)
 				{
-					header.user_data_in_header = new byte[header.user_data_in_header_size];
+					curHeader.user_data_in_header = new byte[curHeader.user_data_in_header_size];
 
-					if (streamin.Read(header.user_data_in_header, 0, (int)header.user_data_in_header_size) != header.user_data_in_header_size)
+					if (streamin.Read(curHeader.user_data_in_header, 0, (int)curHeader.user_data_in_header_size) != curHeader.user_data_in_header_size)
 					{
-						error = string.Format("reading {0} bytes of data into header.user_data_in_header", header.user_data_in_header_size);
+						error = string.Format("reading {0} bytes of data into Header.user_data_in_header", curHeader.user_data_in_header_size);
 						return 1;
 					}
 				}
@@ -1896,53 +1890,53 @@ namespace laszip.net
 				uint vlrs_size = 0;
 				LASzip laszip = null;
 
-				if (header.number_of_variable_length_records != 0)
+				if (curHeader.number_of_variable_length_records != 0)
 				{
-					header.vlrs = new List<laszip_vlr>();
+					curHeader.vlrs = new List<vlr>();
 
-					for (int i = 0; i < header.number_of_variable_length_records; i++)
+					for (int i = 0; i < curHeader.number_of_variable_length_records; i++)
 					{
-						header.vlrs.Add(new laszip_vlr());
+						curHeader.vlrs.Add(new vlr());
 
 						// make sure there are enough bytes left to read a variable length record before the point block starts
-						if (((int)header.offset_to_point_data - vlrs_size - header.header_size) < 54)
+						if (((int)curHeader.offset_to_point_data - vlrs_size - curHeader.header_size) < 54)
 						{
-							warning = string.Format("only {0} bytes until point block after reading {1} of {2} vlrs. skipping remaining vlrs ...", (int)header.offset_to_point_data - vlrs_size - header.header_size, i, header.number_of_variable_length_records);
-							header.number_of_variable_length_records = (uint)i;
+							warning = string.Format("only {0} bytes until point block after reading {1} of {2} vlrs. skipping remaining vlrs ...", (int)curHeader.offset_to_point_data - vlrs_size - curHeader.header_size, i, curHeader.number_of_variable_length_records);
+							curHeader.number_of_variable_length_records = (uint)i;
 							break;
 						}
 
 						// read variable length records variable after variable (to avoid alignment issues)
 						if (streamin.Read(buffer, 0, 2) != 2)
 						{
-							error = string.Format("reading header.vlrs[{0}].reserved", i);
+							error = string.Format("reading Header.vlrs[{0}].reserved", i);
 							return 1;
 						}
-						header.vlrs[i].reserved = BitConverter.ToUInt16(buffer, 0);
+						curHeader.vlrs[i].reserved = BitConverter.ToUInt16(buffer, 0);
 
-						if (streamin.Read(header.vlrs[i].user_id, 0, 16) != 16)
+						if (streamin.Read(curHeader.vlrs[i].user_id, 0, 16) != 16)
 						{
-							error = string.Format("reading header.vlrs[{0}].user_id", i);
+							error = string.Format("reading Header.vlrs[{0}].user_id", i);
 							return 1;
 						}
-
-						if (streamin.Read(buffer, 0, 2) != 2)
-						{
-							error = string.Format("reading header.vlrs[{0}].record_id", i);
-							return 1;
-						}
-						header.vlrs[i].record_id = BitConverter.ToUInt16(buffer, 0);
 
 						if (streamin.Read(buffer, 0, 2) != 2)
 						{
-							error = string.Format("reading header.vlrs[{0}].record_length_after_header", i);
+							error = string.Format("reading Header.vlrs[{0}].record_id", i);
 							return 1;
 						}
-						header.vlrs[i].record_length_after_header = BitConverter.ToUInt16(buffer, 0);
+						curHeader.vlrs[i].record_id = BitConverter.ToUInt16(buffer, 0);
 
-						if (streamin.Read(header.vlrs[i].description, 0, 32) != 32)
+						if (streamin.Read(buffer, 0, 2) != 2)
 						{
-							error = string.Format("reading header.vlrs[{0}].description", i);
+							error = string.Format("reading Header.vlrs[{0}].record_length_after_header", i);
+							return 1;
+						}
+						curHeader.vlrs[i].record_length_after_header = BitConverter.ToUInt16(buffer, 0);
+
+						if (streamin.Read(curHeader.vlrs[i].description, 0, 32) != 32)
+						{
+							error = string.Format("reading Header.vlrs[{0}].description", i);
 							return 1;
 						}
 
@@ -1950,27 +1944,27 @@ namespace laszip.net
 						vlrs_size += 54;
 
 						// check variable length record contents
-						if (header.vlrs[i].reserved != 0xAABB)
+						if (curHeader.vlrs[i].reserved != 0xAABB)
 						{
-							warning = string.Format("wrong header.vlrs[{0}].reserved: {1} != 0xAABB", i, header.vlrs[i].reserved);
+							warning = string.Format("wrong Header.vlrs[{0}].reserved: {1} != 0xAABB", i, curHeader.vlrs[i].reserved);
 						}
 
 						// make sure there are enough bytes left to read the data of the variable length record before the point block starts
-						if (((int)header.offset_to_point_data - vlrs_size - header.header_size) < header.vlrs[i].record_length_after_header)
+						if (((int)curHeader.offset_to_point_data - vlrs_size - curHeader.header_size) < curHeader.vlrs[i].record_length_after_header)
 						{
-							warning = string.Format("only {0} bytes until point block when trying to read {1} bytes into header.vlrs[{2}].data", (int)header.offset_to_point_data - vlrs_size - header.header_size, header.vlrs[i].record_length_after_header, i);
-							header.vlrs[i].record_length_after_header = (ushort)(header.offset_to_point_data - vlrs_size - header.header_size);
+							warning = string.Format("only {0} bytes until point block when trying to read {1} bytes into Header.vlrs[{2}].data", (int)curHeader.offset_to_point_data - vlrs_size - curHeader.header_size, curHeader.vlrs[i].record_length_after_header, i);
+							curHeader.vlrs[i].record_length_after_header = (ushort)(curHeader.offset_to_point_data - vlrs_size - curHeader.header_size);
 						}
 
 						string userid = "";
-						for (int a = 0; a < header.vlrs[i].user_id.Length; a++)
+						for (int a = 0; a < curHeader.vlrs[i].user_id.Length; a++)
 						{
-							if (header.vlrs[i].user_id[a] == 0) break;
-							userid += (char)header.vlrs[i].user_id[a];
+							if (curHeader.vlrs[i].user_id[a] == 0) break;
+							userid += (char)curHeader.vlrs[i].user_id[a];
 						}
 
 						// load data following the header of the variable length record
-						if (header.vlrs[i].record_length_after_header != 0)
+						if (curHeader.vlrs[i].record_length_after_header != 0)
 						{
 							if (userid == "laszip encoded")
 							{
@@ -2092,58 +2086,58 @@ namespace laszip.net
 							}
 							else
 							{
-								header.vlrs[i].data = new byte[header.vlrs[i].record_length_after_header];
-								if (streamin.Read(header.vlrs[i].data, 0, header.vlrs[i].record_length_after_header) != header.vlrs[i].record_length_after_header)
+								curHeader.vlrs[i].data = new byte[curHeader.vlrs[i].record_length_after_header];
+								if (streamin.Read(curHeader.vlrs[i].data, 0, curHeader.vlrs[i].record_length_after_header) != curHeader.vlrs[i].record_length_after_header)
 								{
-									error = string.Format("reading {0} bytes of data into header.vlrs[{1}].data", header.vlrs[i].record_length_after_header, i);
+									error = string.Format("reading {0} bytes of data into Header.vlrs[{1}].data", curHeader.vlrs[i].record_length_after_header, i);
 									return 1;
 								}
 							}
 						}
 						else
 						{
-							header.vlrs[i].data = null;
+							curHeader.vlrs[i].data = null;
 						}
 
 						// keep track on the number of bytes we have read so far
-						vlrs_size += header.vlrs[i].record_length_after_header;
+						vlrs_size += curHeader.vlrs[i].record_length_after_header;
 
 						// special handling for LASzip VLR
 						if (userid == "laszip encoded")
 						{
 							// we take our the VLR for LASzip away
-							header.offset_to_point_data -= (uint)(54 + header.vlrs[i].record_length_after_header);
-							vlrs_size -= (uint)(54 + header.vlrs[i].record_length_after_header);
-							header.vlrs.RemoveAt(i);
+							curHeader.offset_to_point_data -= (uint)(54 + curHeader.vlrs[i].record_length_after_header);
+							vlrs_size -= (uint)(54 + curHeader.vlrs[i].record_length_after_header);
+							curHeader.vlrs.RemoveAt(i);
 							i--;
-							header.number_of_variable_length_records--;
+							curHeader.number_of_variable_length_records--;
 						}
 					}
 				}
 				#endregion
 
 				// load any number of user-defined bytes that might have been added after the header
-				header.user_data_after_header_size = header.offset_to_point_data - vlrs_size - header.header_size;
-				if (header.user_data_after_header_size != 0)
+				curHeader.user_data_after_header_size = curHeader.offset_to_point_data - vlrs_size - curHeader.header_size;
+				if (curHeader.user_data_after_header_size != 0)
 				{
-					header.user_data_after_header = new byte[header.user_data_after_header_size];
+					curHeader.user_data_after_header = new byte[curHeader.user_data_after_header_size];
 
-					if (streamin.Read(header.user_data_after_header, 0, (int)header.user_data_after_header_size) != header.user_data_after_header_size)
+					if (streamin.Read(curHeader.user_data_after_header, 0, (int)curHeader.user_data_after_header_size) != curHeader.user_data_after_header_size)
 					{
-						error = string.Format("reading {0} bytes of data into header.user_data_after_header", header.user_data_after_header_size);
+						error = string.Format("reading {0} bytes of data into Header.user_data_after_header", curHeader.user_data_after_header_size);
 						return 1;
 					}
 				}
 
 				// remove extra bits in point data type
-				if ((header.point_data_format & 128) != 0 || (header.point_data_format & 64) != 0)
+				if ((curHeader.point_data_format & 128) != 0 || (curHeader.point_data_format & 64) != 0)
 				{
 					if (laszip == null)
 					{
 						error = "this file was compressed with an experimental version of LASzip. contact 'martin.isenburg@rapidlasso.com' for assistance";
 						return 1;
 					}
-					header.point_data_format &= 127;
+					curHeader.point_data_format &= 127;
 				}
 
 				// check if file is compressed
@@ -2162,9 +2156,9 @@ namespace laszip.net
 					// no. setup an un-compressed read
 					is_compressed = false;
 					laszip = new LASzip();
-					if (!laszip.setup(header.point_data_format, header.point_data_record_length, LASzip.COMPRESSOR_NONE))
+					if (!laszip.setup(curHeader.point_data_format, curHeader.point_data_record_length, LASzip.COMPRESSOR_NONE))
 					{
-						error = string.Format("invalid combination of point_data_format {0} and point_data_record_length {1}", header.point_data_format, header.point_data_record_length);
+						error = string.Format("invalid combination of point_data_format {0} and point_data_record_length {1}", curHeader.point_data_format, curHeader.point_data_record_length);
 						return 1;
 					}
 				}
@@ -2182,8 +2176,8 @@ namespace laszip.net
 						case LASitem.Type.WAVEPACKET13:
 							break;
 						case LASitem.Type.BYTE:
-							point.num_extra_bytes = laszip.items[i].size;
-							point.extra_bytes = new byte[point.num_extra_bytes];
+							curPoint.num_extra_bytes = laszip.items[i].size;
+							curPoint.extra_bytes = new byte[curPoint.num_extra_bytes];
 							break;
 						default:
 							error = string.Format("unknown LASitem type {0}", laszip.items[i].type);
@@ -2208,7 +2202,7 @@ namespace laszip.net
 				laszip = null;
 
 				// set the point number and point count
-				npoints = header.number_of_point_records;
+				npoints = curHeader.number_of_point_records;
 				p_count = 0;
 			}
 			catch
@@ -2221,7 +2215,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_seek_point(long index)
+		public int seek_point(long index)
 		{
 			try
 			{
@@ -2243,7 +2237,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_read_point()
+		public int read_point()
 		{
 			if (reader == null)
 			{
@@ -2254,7 +2248,7 @@ namespace laszip.net
 			try
 			{
 				// read the point
-				if (!reader.read(point))
+				if (!reader.read(curPoint))
 				{
 					error = string.Format("reading point with index {0} of {1} total points", p_count, npoints);
 					return 1;
@@ -2272,7 +2266,7 @@ namespace laszip.net
 			return 0;
 		}
 
-		public int laszip_close_reader()
+		public int close_reader()
 		{
 			if (reader == null)
 			{

@@ -29,7 +29,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemCompressed_WAVEPACKET13_v1 : LASreadItemCompressed
 	{
@@ -51,7 +51,7 @@ namespace laszip.net
 			ic_xyz=new IntegerCompressor(dec, 32, 3);
 		}
 
-		public unsafe override bool init(laszip_point item)
+		public unsafe override bool init(laszip.point item)
 		{
 			// init state
 			last_diff_32=0;
@@ -77,7 +77,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public unsafe override void read(laszip_point item)
+		public unsafe override void read(laszip.point item)
 		{
 			item.wave_packet[0]=(byte)(dec.decodeSymbol(m_packet_index));
 

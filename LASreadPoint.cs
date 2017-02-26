@@ -30,7 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadPoint
 	{
@@ -259,7 +259,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public bool read(laszip_point point)
+		public bool read(laszip.point point)
 		{
 			try
 			{
@@ -566,7 +566,7 @@ namespace laszip.net
 		// used for seeking
 		long point_start;
 		uint point_size;
-		laszip_point seek_point=new laszip_point();
+		laszip.point seek_point=new laszip.point();
 		string last_error;
 	}
 }

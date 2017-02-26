@@ -29,7 +29,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_POINT14 : LASreadItemRaw
 	{
@@ -43,8 +43,8 @@ namespace laszip.net
 
 			//public byte return_number : 4;
 			public byte return_number { get { return (byte)(returns&0xF); } set { returns=(byte)((returns&0xF0)|(value&0xF)); } }
-			//public byte number_of_returns_of_given_pulse : 4;
-			public byte number_of_returns_of_given_pulse { get { return (byte)((returns>>4)&0xF); } set { returns=(byte)((returns&0xF)|((value&0xF)<<4)); } }
+			//public byte number_of_returns : 4;
+			public byte number_of_returns { get { return (byte)((returns>>4)&0xF); } set { returns=(byte)((returns&0xF)|((value&0xF)<<4)); } }
 			public byte returns;
 
 			//public byte classification_flags : 4;
@@ -66,7 +66,7 @@ namespace laszip.net
 
 		public LASreadItemRaw_POINT14() { }
 
-		public unsafe override void read(laszip_point item)
+		public unsafe override void read(laszip.point item)
 		{
 			if(instream.Read(buffer, 0, 30)!=30) throw new EndOfStreamException();
 
@@ -78,33 +78,33 @@ namespace laszip.net
 				item.Y=p14->y;
 				item.Z=p14->z;
 				item.intensity=p14->intensity;
-				if(p14->number_of_returns_of_given_pulse>7)
+				if(p14->number_of_returns>7)
 				{
 					if(p14->return_number>6)
 					{
-						if(p14->return_number>=p14->number_of_returns_of_given_pulse)
+						if(p14->return_number>=p14->number_of_returns)
 						{
-							item.number_of_returns_of_given_pulse=7;
+							item.number_of_returns=7;
 						}
 						else
 						{
-							item.number_of_returns_of_given_pulse=6;
+							item.number_of_returns=6;
 						}
 					}
 					else
 					{
 						item.return_number=p14->return_number;
 					}
-					item.number_of_returns_of_given_pulse=7;
+					item.number_of_returns=7;
 				}
 				else
 				{
 					item.return_number=p14->return_number;
-					item.number_of_returns_of_given_pulse=p14->number_of_returns_of_given_pulse;
+					item.number_of_returns=p14->number_of_returns;
 				}
 				item.scan_direction_flag=p14->scan_direction_flag;
 				item.edge_of_flight_line=p14->edge_of_flight_line;
-				item.classification=(byte)((p14->classification_flags<<5)|(p14->classification&31));
+				item.classification_and_classification_flags = (byte)((p14->classification_flags<<5)|(p14->classification&31));
 				item.scan_angle_rank=MyDefs.I8_CLAMP(MyDefs.I16_QUANTIZE(p14->scan_angle*0.006));
 				item.user_data=p14->user_data;
 				item.point_source_ID=p14->point_source_ID;
@@ -112,7 +112,7 @@ namespace laszip.net
 				item.extended_classification_flags=(byte)(p14->classification_flags&8); // TODO Häää?
 				item.extended_classification=p14->classification;
 				item.extended_return_number=p14->return_number;
-				item.extended_number_of_returns_of_given_pulse=p14->number_of_returns_of_given_pulse;
+				item.extended_number_of_returns=p14->number_of_returns;
 				item.extended_scan_angle=p14->scan_angle;
 				item.gps_time=p14->gps_time;
 			}

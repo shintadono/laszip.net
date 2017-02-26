@@ -67,7 +67,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class ArithmeticEncoder
 	{

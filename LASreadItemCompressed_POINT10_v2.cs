@@ -29,7 +29,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemCompressed_POINT10_v2 : LASreadItemCompressed
 	{
@@ -43,12 +43,17 @@ namespace laszip.net
 
 			// all these bits combine to flags
 			//public byte return_number : 3;
-			//public byte number_of_returns_of_given_pulse : 3;
+			//public byte number_of_returns : 3;
 			//public byte scan_direction_flag : 1;
 			//public byte edge_of_flight_line : 1;
 			public byte flags;
 
-			public byte classification;
+			// all the following bits combine to classification_and_classification_flags
+			//public byte classification : 5;
+			//public byte synthetic_flag : 1;
+			//public byte keypoint_flag : 1;
+			//public byte withheld_flag : 1;
+			public byte classification_and_classification_flags;
 			public sbyte scan_angle_rank;
 			public byte user_data;
 			public ushort point_source_ID;
@@ -77,7 +82,7 @@ namespace laszip.net
 			}
 		}
 
-		public override bool init(laszip_point item)
+		public override bool init(laszip.point item)
 		{
 			// init state
 			for(int i=0; i<16; i++)
@@ -110,7 +115,7 @@ namespace laszip.net
 			last.z=item.Z;
 			last.intensity=0; // but set intensity to zero
 			last.flags=item.flags;
-			last.classification=item.classification;
+			last.classification_and_classification_flags = item.classification_and_classification_flags;
 			last.scan_angle_rank=item.scan_angle_rank;
 			last.user_data=item.user_data;
 			last.point_source_ID=item.point_source_ID;
@@ -118,7 +123,7 @@ namespace laszip.net
 			return true;
 		}
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			// decompress which other values have changed
 			uint changed_values=dec.decodeSymbol(m_changed_values);
@@ -139,7 +144,7 @@ namespace laszip.net
 				}
 
 				r=(byte)(last.flags&0x7); // return_number
-				n=(byte)((last.flags>>3)&0x7); // number_of_returns_of_given_pulse
+				n=(byte)((last.flags>>3)&0x7); // number_of_returns
 				m=Laszip_Common_v2.number_return_map[n, r];
 				l=Laszip_Common_v2.number_return_level[n, r];
 
@@ -157,12 +162,12 @@ namespace laszip.net
 				// decompress the classification ... if it has changed
 				if((changed_values&8)!=0)
 				{
-					if(m_classification[last.classification]==null)
+					if(m_classification[last.classification_and_classification_flags] ==null)
 					{
-						m_classification[last.classification]=dec.createSymbolModel(256);
-						dec.initSymbolModel(m_classification[last.classification]);
+						m_classification[last.classification_and_classification_flags] =dec.createSymbolModel(256);
+						dec.initSymbolModel(m_classification[last.classification_and_classification_flags]);
 					}
-					last.classification=(byte)dec.decodeSymbol(m_classification[last.classification]);
+					last.classification_and_classification_flags = (byte)dec.decodeSymbol(m_classification[last.classification_and_classification_flags]);
 				}
 
 				// decompress the scan_angle_rank ... if it has changed
@@ -193,7 +198,7 @@ namespace laszip.net
 			else
 			{
 				r=(byte)(last.flags&0x7); // return_number
-				n=(byte)((last.flags>>3)&0x7); // number_of_returns_of_given_pulse
+				n=(byte)((last.flags>>3)&0x7); // number_of_returns
 				m=Laszip_Common_v2.number_return_map[n, r];
 				l=Laszip_Common_v2.number_return_level[n, r];
 			}
@@ -222,7 +227,7 @@ namespace laszip.net
 			item.Z=last.z;
 			item.intensity=last.intensity;
 			item.flags=last.flags;
-			item.classification=last.classification;
+			item.classification_and_classification_flags = last.classification_and_classification_flags;
 			item.scan_angle_rank=last.scan_angle_rank;
 			item.user_data=last.user_data;
 			item.point_source_ID=last.point_source_ID;

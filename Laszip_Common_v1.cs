@@ -31,7 +31,7 @@
 //===============================================================================
 using System.Runtime.InteropServices;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	[StructLayout(LayoutKind.Sequential, Pack=1)]
 	struct LASwavepacket13

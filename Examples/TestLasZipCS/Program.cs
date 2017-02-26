@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using laszip.net;
+using LASzip.Net;
 
 namespace TestLasZipCS
 {
@@ -24,18 +24,18 @@ namespace TestLasZipCS
 
 		static void ReadLaz()
 		{
-			var lazReader = new laszip_dll();
+			var lazReader = new laszip();
 			var compressed = true;
-			lazReader.laszip_open_reader(FileName, ref compressed);
-			var numberOfPoints = lazReader.header.number_of_point_records;
+			lazReader.open_reader(FileName, ref compressed);
+			var numberOfPoints = lazReader.curHeader.number_of_point_records;
 
 			// Check some header values
-			Debug.WriteLine(lazReader.header.min_x);
-			Debug.WriteLine(lazReader.header.min_y);
-			Debug.WriteLine(lazReader.header.min_z);
-			Debug.WriteLine(lazReader.header.max_x);
-			Debug.WriteLine(lazReader.header.max_y);
-			Debug.WriteLine(lazReader.header.max_z);
+			Debug.WriteLine(lazReader.curHeader.min_x);
+			Debug.WriteLine(lazReader.curHeader.min_y);
+			Debug.WriteLine(lazReader.curHeader.min_z);
+			Debug.WriteLine(lazReader.curHeader.max_x);
+			Debug.WriteLine(lazReader.curHeader.max_y);
+			Debug.WriteLine(lazReader.curHeader.max_z);
 
 			int classification = 0;
 			var point = new Point3D();
@@ -45,20 +45,20 @@ namespace TestLasZipCS
 			for (int pointIndex = 0; pointIndex < numberOfPoints; pointIndex++)
 			{
 				// Read the point
-				lazReader.laszip_read_point();
-				
+				lazReader.read_point();
+
 				// Get precision coordinates
-				lazReader.laszip_get_coordinates(coordArray);
+				lazReader.get_coordinates(coordArray);
 				point.X = coordArray[0];
 				point.Y = coordArray[1];
 				point.Z = coordArray[2];
-				
+
 				// Get classification value
-				classification = lazReader.point.classification;
+				classification = lazReader.curPoint.classification;
 			}
 
 			// Close the reader
-			lazReader.laszip_close_reader();
+			lazReader.close_reader();
 		}
 
 		private static void WriteLaz()
@@ -77,23 +77,23 @@ namespace TestLasZipCS
 			point.Z = 200.0;
 			points.Add(point);
 
-			var lazWriter = new laszip_dll();
-			var err = lazWriter.laszip_clean();
+			var lazWriter = new laszip();
+			var err = lazWriter.clean();
 			if (err == 0)
 			{
 				// Number of point records needs to be set
-				lazWriter.header.number_of_point_records = (uint)points.Count;
+				lazWriter.curHeader.number_of_point_records = (uint)points.Count;
 
 				// Header Min/Max needs to be set to extents of points
-				lazWriter.header.min_x = points[0].X; // LL Point
-				lazWriter.header.min_y = points[0].Y;
-				lazWriter.header.min_z = points[0].Z;
-				lazWriter.header.max_x = points[1].X; // UR Point
-				lazWriter.header.max_y = points[1].Y;
-				lazWriter.header.max_z = points[1].Z;
+				lazWriter.curHeader.min_x = points[0].X; // LL Point
+				lazWriter.curHeader.min_y = points[0].Y;
+				lazWriter.curHeader.min_z = points[0].Z;
+				lazWriter.curHeader.max_x = points[1].X; // UR Point
+				lazWriter.curHeader.max_y = points[1].Y;
+				lazWriter.curHeader.max_z = points[1].Z;
 
 				// Open the writer and test for errors
-				err = lazWriter.laszip_open_writer(FileName, true);
+				err = lazWriter.open_writer(FileName, true);
 				if (err == 0)
 				{
 					double[] coordArray = new double[3];
@@ -104,18 +104,18 @@ namespace TestLasZipCS
 						coordArray[2] = p.Z;
 
 						// Set the coordinates in the lazWriter object
-						lazWriter.laszip_set_coordinates(coordArray);
+						lazWriter.set_coordinates(coordArray);
 
 						// Set the classification to ground
-						lazWriter.point.classification = 2;
+						lazWriter.curPoint.classification = 2;
 
 						// Write the point to the file
-						err = lazWriter.laszip_write_point();
+						err = lazWriter.write_point();
 						if (err != 0) break;
 					}
 
 					// Close the writer to release the file (OS lock)
-					err = lazWriter.laszip_close_writer();
+					err = lazWriter.close_writer();
 					lazWriter = null;
 				}
 			}
@@ -123,7 +123,7 @@ namespace TestLasZipCS
 			if (err != 0)
 			{
 				// Show last error that occurred
-				Debug.WriteLine(lazWriter.laszip_get_error());
+				Debug.WriteLine(lazWriter.get_error());
 			}
 			// --- Upon completion, file should be 389 bytes
 		}

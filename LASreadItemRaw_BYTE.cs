@@ -28,13 +28,13 @@
 
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	class LASreadItemRaw_BYTE : LASreadItemRaw
 	{
 		public LASreadItemRaw_BYTE(uint number) { this.number=number; }
 
-		public override void read(laszip_point item)
+		public override void read(laszip.point item)
 		{
 			if(instream.Read(item.extra_bytes, 0, (int)number)!=(int)number) throw new EndOfStreamException();
 		}

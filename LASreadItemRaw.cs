@@ -28,7 +28,7 @@
 
 using System.IO;
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	abstract class LASreadItemRaw : LASreadItem
 	{

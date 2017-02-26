@@ -26,10 +26,10 @@
 //
 //===============================================================================
 
-namespace laszip.net
+namespace LASzip.Net
 {
 	abstract class LASreadItemCompressed : LASreadItem
 	{
-		public abstract bool init(laszip_point item);
+		public abstract bool init(laszip.point item);
 	}
 }
