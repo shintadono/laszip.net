@@ -8,8 +8,8 @@
     <ProjectGuid>{0A6D6401-4779-4517-967E-969020D68742}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>laszip.net</RootNamespace>
-    <AssemblyName>laszip.net</AssemblyName>
+    <RootNamespace>LASzip.Net</RootNamespace>
+    <AssemblyName>LASzip.Net</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -55,6 +55,8 @@
     <Compile Include="Consts.cs" />
     <Compile Include="IntegerCompressor.cs" />
     <Compile Include="LASitem.cs" />
+    <Compile Include="LASquadtree.cs" />
+    <Compile Include="LASquantizer.cs" />
     <Compile Include="LASreadItem.cs" />
     <Compile Include="LASreadItemCompressed.cs" />
     <Compile Include="LASreadItemCompressed_BYTE_v1.cs" />

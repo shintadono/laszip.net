@@ -77,7 +77,10 @@ namespace LASzip.Net
 			return (int)(n>=0?n+0.5:n-0.5);
 		}
 
-		//#define U32_QUANTIZE(n) (((n) >= 0) ? (U32)((n)+0.5f) : (U32)(0))
+		public static uint U32_QUANTIZE(double n)
+		{
+			return (uint)(n >= 0 ? n + 0.5 : 0);
+		}
 
 		//#define I64_QUANTIZE(n) (((n) >= 0) ? (I64)((n)+0.5f) : (I64)((n)-0.5f))
 		//#define U64_QUANTIZE(n) (((n) >= 0) ? (U64)((n)+0.5f) : (U64)(0))

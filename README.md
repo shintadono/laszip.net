@@ -1,4 +1,4 @@
-laszip.net
+LASzip.Net
 ==========
 
 The LASzip LiDAR compressor packaged as a simple stand-alone assembly for

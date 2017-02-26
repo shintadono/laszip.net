@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("TestLasZipVB")>
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("laszip.net")>
+<Assembly: AssemblyProduct("LASzip.Net")>
 <Assembly: AssemblyCopyright("Copyright of C# port © 2014-2017 by Shinta <shintadono@googlemail.com>\r\nCopyright © 2005-2014, martin isenburg <martin.isenburg@rapidlasso.com>, rapidlasso - tools to catch reality <http:\\rapidlasso.com>")>
 <Assembly: AssemblyTrademark("")>
 

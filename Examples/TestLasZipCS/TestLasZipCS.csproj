@@ -39,9 +39,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\laszip.net.csproj">
+    <ProjectReference Include="..\..\LASzip.Net.csproj">
       <Project>{0a6d6401-4779-4517-967e-969020d68742}</Project>
-      <Name>laszip.net</Name>
+      <Name>LASzip.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("laszip.net")]
+[assembly: AssemblyTitle("LASzip.Net")]
 [assembly: AssemblyDescription("Classes for reading and writing of LAS/LAZ files. Ported from LASzip.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("laszip.net")]
+[assembly: AssemblyProduct("LASzip.Net")]
 [assembly: AssemblyCopyright("Copyright of C# port © 2014-2017 by Shinta <shintadono@googlemail.com>\r\nCopyright © 2005-2014, martin isenburg <martin.isenburg@rapidlasso.com>, rapidlasso - tools to catch reality <http:\\rapidlasso.com>")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
