@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -74,56 +74,56 @@ namespace LASzip.Net
 		// Constructor & Destructor
 		public ArithmeticEncoder()
 		{
-			outbuffer=new byte[2*AC.BUFFER_SIZE];
-			endbuffer=2*AC.BUFFER_SIZE;
+			outbuffer = new byte[2 * AC.BUFFER_SIZE];
+			endbuffer = 2 * AC.BUFFER_SIZE;
 		}
 
 		// Manage encoding
 		public bool init(Stream outstream)
 		{
-			if(outstream==null) return false;
-			this.outstream=outstream;
-			interval_base=0;
-			length=AC.MaxLength;
-			outbyte=0;
-			endbyte=endbuffer;
+			if (outstream == null) return false;
+			this.outstream = outstream;
+			interval_base = 0;
+			length = AC.MaxLength;
+			outbyte = 0;
+			endbyte = endbuffer;
 			return true;
 		}
 
 		public void done()
 		{
-			uint init_interval_base=interval_base; // done encoding: set final data bytes
-			bool another_byte=true;
+			uint init_interval_base = interval_base; // done encoding: set final data bytes
+			bool another_byte = true;
 
-			if(length>2*AC.MinLength)
+			if (length > 2 * AC.MinLength)
 			{
-				interval_base+=AC.MinLength; // base offset
-				length=AC.MinLength>>1; // set new length for 1 more byte
+				interval_base += AC.MinLength; // base offset
+				length = AC.MinLength >> 1; // set new length for 1 more byte
 			}
 			else
 			{
-				interval_base+=AC.MinLength>>1; // interval base offset
-				length=AC.MinLength>>9; // set new length for 2 more bytes
-				another_byte=false;
+				interval_base += AC.MinLength >> 1; // interval base offset
+				length = AC.MinLength >> 9; // set new length for 2 more bytes
+				another_byte = false;
 			}
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
 			renorm_enc_interval(); // renormalization = output last bytes
 
-			if(endbyte!=endbuffer)
+			if (endbyte != endbuffer)
 			{
-				Debug.Assert(outbyte<AC.BUFFER_SIZE);
+				Debug.Assert(outbyte < AC.BUFFER_SIZE);
 				outstream.Write(outbuffer, AC.BUFFER_SIZE, AC.BUFFER_SIZE);
 			}
 
-			if(outbyte!=0) outstream.Write(outbuffer, 0, outbyte);
+			if (outbyte != 0) outstream.Write(outbuffer, 0, outbyte);
 
 			// write two or three zero bytes to be in sync with the decoder's byte reads
 			outstream.WriteByte(0);
 			outstream.WriteByte(0);
-			if(another_byte) outstream.WriteByte(0);
+			if (another_byte) outstream.WriteByte(0);
 
-			outstream=null;
+			outstream = null;
 		}
 
 		// Manage an entropy model for a single bit
@@ -132,9 +132,9 @@ namespace LASzip.Net
 			return new ArithmeticBitModel();
 		}
 
-		public void initBitModel(ArithmeticBitModel m)
+		public void initBitModel(ArithmeticBitModel model)
 		{
-			m.init();
+			model.init();
 		}
 
 		// Manage an entropy model for n symbols (table optional)
@@ -143,120 +143,120 @@ namespace LASzip.Net
 			return new ArithmeticModel(n, true);
 		}
 
-		public void initSymbolModel(ArithmeticModel m, uint[] table=null)
+		public void initSymbolModel(ArithmeticModel model, uint[] table = null)
 		{
-			m.init(table);
+			model.init(table);
 		}
 
 		// Encode a bit with modelling
 		public void encodeBit(ArithmeticBitModel m, uint bit)
 		{
-			Debug.Assert(m!=null&&(bit<=1));
+			Debug.Assert(m != null && (bit <= 1));
 
-			uint x=m.bit_0_prob*(length>>BM.LengthShift); // product l x p0
-			// update interval
-			if(bit==0)
+			uint x = m.bit_0_prob * (length >> BM.LengthShift); // product l x p0
+																// update interval
+			if (bit == 0)
 			{
-				length=x;
+				length = x;
 				++m.bit_0_count;
 			}
 			else
 			{
-				uint init_interval_base=interval_base;
-				interval_base+=x;
-				length-=x;
-				if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
+				uint init_interval_base = interval_base;
+				interval_base += x;
+				length -= x;
+				if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
 			}
 
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
-			if(--m.bits_until_update==0) m.update(); // periodic model update
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
+			if (--m.bits_until_update == 0) m.update(); // periodic model update
 		}
 
 		// Encode a symbol with modelling
 		public void encodeSymbol(ArithmeticModel m, uint sym)
 		{
-			Debug.Assert(m!=null);
+			Debug.Assert(m != null);
 
-			Debug.Assert(sym<=m.last_symbol);
-			uint x, init_interval_base=interval_base;
+			Debug.Assert(sym <= m.last_symbol);
+			uint x, init_interval_base = interval_base;
 
 			// compute products
-			if(sym==m.last_symbol)
+			if (sym == m.last_symbol)
 			{
-				x=m.distribution[sym]*(length>>DM.LengthShift);
-				interval_base+=x; // update interval
-				length-=x; // no product needed
+				x = m.distribution[sym] * (length >> DM.LengthShift);
+				interval_base += x; // update interval
+				length -= x; // no product needed
 			}
 			else
 			{
-				x=m.distribution[sym]*(length>>=DM.LengthShift);
-				interval_base+=x; // update interval
-				length=m.distribution[sym+1]*length-x;
+				x = m.distribution[sym] * (length >>= DM.LengthShift);
+				interval_base += x; // update interval
+				length = m.distribution[sym + 1] * length - x;
 			}
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
 
 			++m.symbol_count[sym];
-			if(--m.symbols_until_update==0) m.update(); // periodic model update
+			if (--m.symbols_until_update == 0) m.update(); // periodic model update
 		}
 
 		// Encode a bit without modelling
 		public void writeBit(uint bit)
 		{
-			Debug.Assert(bit<2);
+			Debug.Assert(bit < 2);
 
-			uint init_interval_base=interval_base;
-			interval_base+=bit*(length>>=1); // new interval base and length
+			uint init_interval_base = interval_base;
+			interval_base += bit * (length >>= 1); // new interval base and length
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
 		}
 
 		// Encode bits without modelling
 		public void writeBits(int bits, uint sym)
 		{
-			Debug.Assert(bits!=0&&(bits<=32)&&(sym<(1u<<bits)));
+			Debug.Assert(bits != 0 && (bits <= 32) && (sym < (1u << bits)));
 
-			if(bits>19)
+			if (bits > 19)
 			{
 				writeShort((ushort)sym);
-				sym=sym>>16;
-				bits=bits-16;
+				sym = sym >> 16;
+				bits = bits - 16;
 			}
 
-			uint init_interval_base=interval_base;
-			interval_base+=sym*(length>>=bits); // new interval base and length
+			uint init_interval_base = interval_base;
+			interval_base += sym * (length >>= bits); // new interval base and length
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
 		}
 
 		// Encode an unsigned char without modelling
 		public void writeByte(byte sym)
 		{
-			uint init_interval_base=interval_base;
-			interval_base+=(uint)(sym)*(length>>=8); // new interval base and length
+			uint init_interval_base = interval_base;
+			interval_base += (uint)(sym) * (length >>= 8); // new interval base and length
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
 		}
 
 		// Encode an unsigned short without modelling
 		public void writeShort(ushort sym)
 		{
-			uint init_interval_base=interval_base;
-			interval_base+=(uint)(sym)*(length>>=16); // new interval base and length
+			uint init_interval_base = interval_base;
+			interval_base += (uint)(sym) * (length >>= 16); // new interval base and length
 
-			if(init_interval_base>interval_base) propagate_carry(); // overflow = carry
-			if(length<AC.MinLength) renorm_enc_interval(); // renormalization
+			if (init_interval_base > interval_base) propagate_carry(); // overflow = carry
+			if (length < AC.MinLength) renorm_enc_interval(); // renormalization
 		}
 
 		// Encode an unsigned int without modelling
 		public void writeInt(uint sym)
 		{
-			writeShort((ushort)(sym&0xFFFF)); // lower 16 bits
-			writeShort((ushort)(sym>>16)); // UPPER 16 bits
+			writeShort((ushort)(sym & 0xFFFF)); // lower 16 bits
+			writeShort((ushort)(sym >> 16)); // UPPER 16 bits
 		}
 
 		// Encode a float without modelling
@@ -268,8 +268,8 @@ namespace LASzip.Net
 		// Encode an unsigned 64 bit int without modelling
 		public void writeInt64(ulong sym)
 		{
-			writeInt((uint)(sym&0xFFFFFFFF)); // lower 32 bits
-			writeInt((uint)(sym>>32)); // UPPER 32 bits
+			writeInt((uint)(sym & 0xFFFFFFFF)); // lower 32 bits
+			writeInt((uint)(sym >> 32)); // UPPER 32 bits
 		}
 
 		// Encode a double without modelling
@@ -278,23 +278,26 @@ namespace LASzip.Net
 			writeInt64(*(ulong*)&sym);
 		}
 
+		// Only write to outstream if ArithmeticEncoder is dummy
+		public Stream getByteStreamOut() { return outstream; }
+
 		Stream outstream;
 
 		void propagate_carry()
 		{
 			int p;
-			if(outbyte==0) p=endbuffer-1;
-			else p=outbyte-1;
+			if (outbyte == 0) p = endbuffer - 1;
+			else p = outbyte - 1;
 
-			while(outbuffer[p]==0xFFU)
+			while (outbuffer[p] == 0xFFU)
 			{
-				outbuffer[p]=0;
-				if(p==0) p=endbuffer-1;
+				outbuffer[p] = 0;
+				if (p == 0) p = endbuffer - 1;
 				else p--;
 
-				Debug.Assert(p>=0);
-				Debug.Assert(p<endbuffer);
-				Debug.Assert(outbyte<endbuffer);
+				Debug.Assert(0 <= p);
+				Debug.Assert(p < endbuffer);
+				Debug.Assert(outbyte < endbuffer);
 			}
 			outbuffer[p]++;
 		}
@@ -303,22 +306,22 @@ namespace LASzip.Net
 		{
 			do
 			{ // output and discard top byte
-				Debug.Assert(outbyte>=0);
-				Debug.Assert(outbyte<endbuffer);
-				Debug.Assert(outbyte<endbyte);
-				outbuffer[outbyte++]=(byte)(interval_base>>24);
-				if(outbyte==endbyte) manage_outbuffer();
-				interval_base<<=8;
-			} while((length<<=8)<AC.MinLength); // length multiplied by 256
+				Debug.Assert(0 <= outbyte);
+				Debug.Assert(outbyte < endbuffer);
+				Debug.Assert(outbyte < endbyte);
+				outbuffer[outbyte++] = (byte)(interval_base >> 24);
+				if (outbyte == endbyte) manage_outbuffer();
+				interval_base <<= 8;
+			} while ((length <<= 8) < AC.MinLength); // length multiplied by 256
 		}
 
 		void manage_outbuffer()
 		{
-			if(outbyte==endbuffer) outbyte=0;
+			if (outbyte == endbuffer) outbyte = 0;
 			outstream.Write(outbuffer, outbyte, AC.BUFFER_SIZE);
-			endbyte=outbyte+AC.BUFFER_SIZE;
-			Debug.Assert(endbyte>outbyte);
-			Debug.Assert(outbyte<endbuffer);
+			endbyte = outbyte + AC.BUFFER_SIZE;
+			Debug.Assert(endbyte > outbyte);
+			Debug.Assert(outbyte < endbuffer);
 		}
 
 		byte[] outbuffer;

@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -76,12 +76,12 @@ namespace LASzip.Net
 		public int init()
 		{
 			// initialization to equiprobable model
-			bit_0_count=1;
-			bit_count=2;
-			bit_0_prob=1u<<(BM.LengthShift-1);
+			bit_0_count = 1;
+			bit_count = 2;
+			bit_0_prob = 1u << (BM.LengthShift - 1);
 
 			// start with frequent updates
-			update_cycle=bits_until_update=4;
+			update_cycle = bits_until_update = 4;
 
 			return 0;
 		}
@@ -89,21 +89,21 @@ namespace LASzip.Net
 		internal void update()
 		{
 			// halve counts when a threshold is reached
-			if((bit_count+=update_cycle)>BM.MaxCount)
+			if ((bit_count += update_cycle) > BM.MaxCount)
 			{
-				bit_count=(bit_count+1)>>1;
-				bit_0_count=(bit_0_count+1)>>1;
-				if(bit_0_count==bit_count) ++bit_count;
+				bit_count = (bit_count + 1) >> 1;
+				bit_0_count = (bit_0_count + 1) >> 1;
+				if (bit_0_count == bit_count) ++bit_count;
 			}
 
 			// compute scaled bit 0 probability
-			uint scale=0x80000000u/bit_count;
-			bit_0_prob=(bit_0_count*scale)>>(31-BM.LengthShift);
+			uint scale = 0x80000000u / bit_count;
+			bit_0_prob = (bit_0_count * scale) >> (31 - BM.LengthShift);
 
 			// set frequency of model updates
-			update_cycle=(5*update_cycle)>>2;
-			if(update_cycle>64) update_cycle=64;
-			bits_until_update=update_cycle;
+			update_cycle = (5 * update_cycle) >> 2;
+			if (update_cycle > 64) update_cycle = 64;
+			bits_until_update = update_cycle;
 		}
 
 		internal uint update_cycle, bits_until_update;

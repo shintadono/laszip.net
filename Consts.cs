@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -69,24 +69,24 @@ namespace LASzip.Net
 	static class AC
 	{
 		// this header byte needs to change in case incompatible change happen
-		internal const int HEADER_BYTE=2;
-		internal const int BUFFER_SIZE=1024;
+		internal const int HEADER_BYTE = 2;
+		internal const int BUFFER_SIZE = 1024;
 
-		internal const uint MinLength=0x01000000u; // threshold for renormalization
-		internal const uint MaxLength=0xFFFFFFFFu; // maximum AC interval length
-	}
-
-	static class DM
-	{
-		// Maximum values for general models
-		internal const int LengthShift=15; // length bits discarded before mult.
-		internal const uint MaxCount=1u<<LengthShift; // for adaptive models
+		internal const uint MinLength = 0x01000000u; // threshold for renormalization
+		internal const uint MaxLength = 0xFFFFFFFFu; // maximum AC interval length
 	}
 
 	static class BM
 	{
 		// Maximum values for binary models
-		internal const int LengthShift=13; // length bits discarded before mult.
-		internal const uint MaxCount=1u<<LengthShift; // for adaptive models
+		internal const int LengthShift = 13; // length bits discarded before mult.
+		internal const uint MaxCount = 1u << LengthShift; // for adaptive models
+	}
+
+	static class DM
+	{
+		// Maximum values for general models
+		internal const int LengthShift = 15; // length bits discarded before mult.
+		internal const uint MaxCount = 1u << LengthShift; // for adaptive models
 	}
 }

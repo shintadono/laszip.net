@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -75,27 +75,30 @@ namespace LASzip.Net
 		// Constructor & Destructor
 		public ArithmeticDecoder()
 		{
-			instream=null;
+			instream = null;
 		}
 
 		// Manage decoding
-		public bool init(Stream instream)
+		public bool init(Stream instream, bool really_init = true)
 		{
-			if(instream==null) return false;
-			this.instream=instream;
+			if (instream == null) return false;
+			this.instream = instream;
 
-			length=AC.MaxLength;
-			value=(uint)instream.ReadByte()<<24;
-			value|=(uint)instream.ReadByte()<<16;
-			value|=(uint)instream.ReadByte()<<8;
-			value|=(uint)instream.ReadByte();
+			length = AC.MaxLength;
+			if (really_init)
+			{
+				value = (uint)instream.ReadByte() << 24;
+				value |= (uint)instream.ReadByte() << 16;
+				value |= (uint)instream.ReadByte() << 8;
+				value |= (uint)instream.ReadByte();
+			}
 
 			return true;
 		}
 
 		public void done()
 		{
-			instream=null;
+			instream = null;
 		}
 
 		// Manage an entropy model for a single bit
@@ -104,9 +107,9 @@ namespace LASzip.Net
 			return new ArithmeticBitModel();
 		}
 
-		public void initBitModel(ArithmeticBitModel m)
+		public void initBitModel(ArithmeticBitModel model)
 		{
-			m.init();
+			model.init();
 		}
 
 		// Manage an entropy model for n symbols (table optional)
@@ -115,33 +118,33 @@ namespace LASzip.Net
 			return new ArithmeticModel(n, false);
 		}
 
-		public void initSymbolModel(ArithmeticModel m, uint[] table=null)
+		public void initSymbolModel(ArithmeticModel model, uint[] table = null)
 		{
-			m.init(table);
+			model.init(table);
 		}
 
 		// Decode a bit with modelling
 		public uint decodeBit(ArithmeticBitModel m)
 		{
-			Debug.Assert(m!=null);
+			Debug.Assert(m != null);
 
-			uint x=m.bit_0_prob*(length>>BM.LengthShift); // product l x p0
-			uint sym=(value>=x)?1u:0u; // decision
+			uint x = m.bit_0_prob * (length >> BM.LengthShift); // product l x p0
+			uint sym = (value >= x) ? 1u : 0u; // decision
 
 			// update & shift interval
-			if(sym==0)
+			if (sym == 0)
 			{
-				length=x;
+				length = x;
 				++m.bit_0_count;
 			}
 			else
 			{
-				value-=x; // shifted interval base = 0
-				length-=x;
+				value -= x; // shifted interval base = 0
+				length -= x;
 			}
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
-			if(--m.bits_until_update==0) m.update(); // periodic model update
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
+			if (--m.bits_until_update == 0) m.update(); // periodic model update
 
 			return sym; // return data bit value
 		}
@@ -149,59 +152,59 @@ namespace LASzip.Net
 		// Decode a symbol with modelling
 		public uint decodeSymbol(ArithmeticModel m)
 		{
-			uint n, sym, x, y=length;
+			uint n, sym, x, y = length;
 
-			if(m.decoder_table!=null)
+			if (m.decoder_table != null)
 			{ // use table look-up for faster decoding
 
-				uint dv=value/(length>>=DM.LengthShift);
-				uint t=dv>>m.table_shift;
+				uint dv = value / (length >>= DM.LengthShift);
+				uint t = dv >> m.table_shift;
 
-				sym=m.decoder_table[t]; // initial decision based on table look-up
-				n=m.decoder_table[t+1]+1;
+				sym = m.decoder_table[t]; // initial decision based on table look-up
+				n = m.decoder_table[t + 1] + 1;
 
-				while(n>sym+1)
+				while (n > sym + 1)
 				{ // finish with bisection search
-					uint k=(sym+n)>>1;
-					if(m.distribution[k]>dv) n=k; else sym=k;
+					uint k = (sym + n) >> 1;
+					if (m.distribution[k] > dv) n = k; else sym = k;
 				}
 
 				// compute products
-				x=m.distribution[sym]*length;
-				if(sym!=m.last_symbol) y=m.distribution[sym+1]*length;
+				x = m.distribution[sym] * length;
+				if (sym != m.last_symbol) y = m.distribution[sym + 1] * length;
 			}
 			else
 			{ // decode using only multiplications
-				x=sym=0;
-				length>>=DM.LengthShift;
-				uint k=(n=m.symbols)>>1;
+				x = sym = 0;
+				length >>= DM.LengthShift;
+				uint k = (n = m.symbols) >> 1;
 
 				// decode via bisection search
 				do
 				{
-					uint z=length*m.distribution[k];
-					if(z>value)
+					uint z = length * m.distribution[k];
+					if (z > value)
 					{
-						n=k;
-						y=z; // value is smaller
+						n = k;
+						y = z; // value is smaller
 					}
 					else
 					{
-						sym=k;
-						x=z; // value is larger or equal
+						sym = k;
+						x = z; // value is larger or equal
 					}
-				} while((k=(sym+n)>>1)!=sym);
+				} while ((k = (sym + n) >> 1) != sym);
 			}
 
-			value-=x; // update interval
-			length=y-x;
+			value -= x; // update interval
+			length = y - x;
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
 
 			++m.symbol_count[sym];
-			if(--m.symbols_until_update==0) m.update(); // periodic model update
+			if (--m.symbols_until_update == 0) m.update(); // periodic model update
 
-			Debug.Assert(sym<m.symbols);
+			Debug.Assert(sym < m.symbols);
 
 			return sym;
 		}
@@ -209,37 +212,35 @@ namespace LASzip.Net
 		// Decode a bit without modelling
 		public uint readBit()
 		{
-			uint sym=value/(length>>=1); // decode symbol, change length
-			value-=length*sym; // update interval
+			uint sym = value / (length >>= 1); // decode symbol, change length
+			value -= length * sym; // update interval
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<2);
-
+			if (sym >= 2) throw new Exception("4711");
+		
 			return sym;
 		}
 
 		// Decode bits without modelling
 		public uint readBits(uint bits)
 		{
-			Debug.Assert(bits!=0&&(bits<=32));
+			Debug.Assert(bits != 0 && (bits <= 32));
 
-			if(bits>19)
+			if (bits > 19)
 			{
-				uint tmp=readShort();
-				bits=bits-16;
-				uint tmp1=readBits(bits)<<16;
-				return (tmp1|tmp);
+				uint tmp = readShort();
+				bits = bits - 16;
+				uint tmp1 = readBits(bits) << 16;
+				return (tmp1 | tmp);
 			}
 
-			uint sym=value/(length>>=(int)bits); // decode symbol, change length
-			value-=length*sym; // update interval
+			uint sym = value / (length >>= (int)bits); // decode symbol, change length
+			value -= length * sym; // update interval
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<(1u<<(int)bits));
-
-			if(sym>=(1u<<(int)bits)) throw new Exception("4711");
+			if (sym >= (1u << (int)bits)) throw new Exception("4711");
 
 			return sym;
 		}
@@ -247,14 +248,12 @@ namespace LASzip.Net
 		// Decode an unsigned char without modelling
 		public byte readByte()
 		{
-			uint sym=value/(length>>=8); // decode symbol, change length
-			value-=length*sym; // update interval
+			uint sym = value / (length >>= 8); // decode symbol, change length
+			value -= length * sym; // update interval
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<(1u<<8));
-
-			if(sym>=(1u<<8)) throw new Exception("4711");
+			if (sym >= (1u << 8)) throw new Exception("4711");
 
 			return (byte)sym;
 		}
@@ -262,14 +261,12 @@ namespace LASzip.Net
 		// Decode an unsigned short without modelling
 		public ushort readShort()
 		{
-			uint sym=value/(length>>=16); // decode symbol, change length
-			value-=length*sym; // update interval
+			uint sym = value / (length >>= 16); // decode symbol, change length
+			value -= length * sym; // update interval
 
-			if(length<AC.MinLength) renorm_dec_interval(); // renormalization
+			if (length < AC.MinLength) renorm_dec_interval(); // renormalization
 
-			Debug.Assert(sym<(1u<<16));
-
-			if(sym>=(1u<<16)) throw new Exception("4711");
+			if (sym >= (1u << 16)) throw new Exception("4711");
 
 			return (ushort)sym;
 		}
@@ -277,32 +274,35 @@ namespace LASzip.Net
 		// Decode an unsigned int without modelling
 		public uint readInt()
 		{
-			uint lowerInt=readShort();
-			uint upperInt=readShort();
-			return (upperInt<<16)|lowerInt;
+			uint lowerInt = readShort();
+			uint upperInt = readShort();
+			return (upperInt << 16) | lowerInt;
 		}
 
 		// Decode a float without modelling
 		public unsafe float readFloat() // danger in float reinterpretation
 		{
-			uint ret=readInt();
+			uint ret = readInt();
 			return *(float*)&ret;
 		}
 
 		// Decode an unsigned 64 bit int without modelling
 		public ulong readInt64()
 		{
-			ulong lowerInt=readInt();
-			ulong upperInt=readInt();
-			return (upperInt<<32)|lowerInt;
+			ulong lowerInt = readInt();
+			ulong upperInt = readInt();
+			return (upperInt << 32) | lowerInt;
 		}
 
 		// Decode a double without modelling
 		public unsafe double readDouble() // danger in float reinterpretation
 		{
-			ulong ret=readInt64();
+			ulong ret = readInt64();
 			return *(double*)&ret;
 		}
+
+		// Only read from instream if ArithmeticDecoder is dummy
+		public Stream getByteStreamIn() { return instream; }
 
 		Stream instream;
 
@@ -310,8 +310,8 @@ namespace LASzip.Net
 		{
 			do
 			{ // read least-significant byte
-				value=(value<<8)|(uint)instream.ReadByte();
-			} while((length<<=8)<AC.MinLength); // length multiplied by 256
+				value = (value << 8) | (uint)instream.ReadByte();
+			} while ((length <<= 8) < AC.MinLength); // length multiplied by 256
 		}
 
 		uint value, length;
