@@ -35,4 +35,5 @@ _ReSharper*/
 *.zip
 *.[Pp]ublish.xml
 *.VC.db
+*.VC.opendb
 .vs
