@@ -40,6 +40,8 @@ you can't create version 1 LAZ files, while reading version 1 is still possible.
 
   twdotson (https://github.com/twdotson)
 
+  Jean-Noël Pioche
+
 **COPYRIGHT**
 
   (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality

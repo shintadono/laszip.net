@@ -34,3 +34,5 @@ _ReSharper*/
 *.[Rr]e[Ss]harper
 *.zip
 *.[Pp]ublish.xml
+*.VC.db
+.vs
