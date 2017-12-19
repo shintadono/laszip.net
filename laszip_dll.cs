@@ -876,7 +876,7 @@ namespace laszip.net
 				if (header.vlrs.Count > 0)
 				{
 					// overwrite existing VLR ?
-					for (int i = (int)header.number_of_variable_length_records - 1; i >= 0; i++)
+					for (int i = (int)header.number_of_variable_length_records - 1; i >= 0; i--)
 					{
 						if (header.vlrs[i].record_id == vlr.record_id && !ArrayCompare(header.vlrs[i].user_id, vlr.user_id))
 						{
