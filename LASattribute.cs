@@ -59,6 +59,19 @@ namespace LASzip.Net
 		public readonly double[] offset = new double[3]; // 24 = 3*8 bytes
 		public string description;// [32] bytes
 
+		internal LASattribute(LASattribute attribute)
+		{
+			data_type = attribute.data_type;
+			options = attribute.options;
+			name = attribute.name;
+			attribute.no_data.CopyTo(no_data, 0);
+			attribute.min.CopyTo(min, 0);
+			attribute.max.CopyTo(max, 0);
+			attribute.scale.CopyTo(scale, 0);
+			attribute.offset.CopyTo(offset, 0);
+			description = attribute.description;
+		}
+
 		public LASattribute(byte size)
 		{
 			if (size == 0) throw new ArgumentOutOfRangeException(nameof(size), "Must be greater zero (0).");
