@@ -54,6 +54,7 @@
     <Compile Include="ArithmeticModel.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="IntegerCompressor.cs" />
+    <Compile Include="LASattribute.cs" />
     <Compile Include="LASitem.cs" />
     <Compile Include="LASquadtree.cs" />
     <Compile Include="LASquantizer.cs" />

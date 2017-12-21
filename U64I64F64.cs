@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 namespace LASzip.Net
 {
 	[StructLayout(LayoutKind.Explicit, Pack=1)]
-	struct U64I64F64
+	public struct U64I64F64
 	{
 		[FieldOffset(0)]
 		public ulong u64;
