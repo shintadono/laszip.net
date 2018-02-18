@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2017-2017 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2015, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2017-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -28,6 +28,7 @@
 //===============================================================================
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace LASzip.Net
 {
@@ -45,126 +46,205 @@ namespace LASzip.Net
 		F64 = 9
 	}
 
-	public class LASattribute
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
+	public struct LASattribute
 	{
-		//readonly byte reserved[2]; // 2 bytes
+		static unsafe int strncpy(byte* dst, byte[] src, int count)
+		{
+			int len = 0;
+			if (src != null) len = Math.Min(count, src.Length);
+			for (int i = 0; i < len; i++) dst[i] = src[i];
+			for (int i = len; i < count; i++) dst[i] = 0;
+			return len;
+		}
+
+		static unsafe int strncpy(byte* dst, string src, int count)
+		{
+			if (src == null) return strncpy(dst, (byte[])null, count);
+			return strncpy(dst, System.Text.Encoding.ASCII.GetBytes(src), count);
+		}
+
+		unsafe fixed byte reserved[2]; // 2 bytes
 		public byte data_type; // 1 byte; LAS_ATTRIBUTE-1; 0 denotes a byte[options].
 		public byte options; // 1 byte; Bitfield (no_data: 1, min: 2, max: 4, scale: 8, offset: 16) if data_type >= 0; otherwise, size of a byte[].
-		public string name; // [32] bytes
-							//readonly byte unused[4]; // 4 bytes
-		public readonly U64I64F64[] no_data = new U64I64F64[3]; // 24 = 3*8 bytes
-		public readonly U64I64F64[] min = new U64I64F64[3]; // 24 = 3*8 bytes
-		public readonly U64I64F64[] max = new U64I64F64[3]; // 24 = 3*8 bytes
-		public readonly double[] scale = new double[3]; // 24 = 3*8 bytes
-		public readonly double[] offset = new double[3]; // 24 = 3*8 bytes
-		public string description;// [32] bytes
+		unsafe fixed byte name[32]; // [32] bytes
+		unsafe fixed byte unused[4]; // 4 bytes
+		unsafe fixed ulong no_data[3]; // 24 = 3*8 bytes
+		unsafe fixed ulong min[3]; // 24 = 3*8 bytes
+		unsafe fixed ulong max[3]; // 24 = 3*8 bytes
+		unsafe fixed double scale[3]; // 24 = 3*8 bytes
+		unsafe fixed double offset[3]; // 24 = 3*8 bytes
+		unsafe fixed byte description[32]; // [32] bytes
 
-		internal LASattribute(LASattribute attribute)
+		public string Name
 		{
-			data_type = attribute.data_type;
-			options = attribute.options;
-			name = attribute.name;
-			attribute.no_data.CopyTo(no_data, 0);
-			attribute.min.CopyTo(min, 0);
-			attribute.max.CopyTo(max, 0);
-			attribute.scale.CopyTo(scale, 0);
-			attribute.offset.CopyTo(offset, 0);
-			description = attribute.description;
+			get { unsafe { fixed (byte* n = name) return new string((sbyte*)n); } }
+			set { unsafe { fixed (byte* n = name) strncpy(n, value, 32); } }
 		}
 
-		public LASattribute(byte size)
+		public U64I64F64 NoData(int dim)
+		{
+			if (!has_no_data() || 0 > dim || dim >= get_dim()) return new U64I64F64 { u64 = 0 };
+			unsafe { fixed (ulong* n = no_data) return new U64I64F64 { u64 = n[dim] }; }
+		}
+
+		public bool SetNoData(U64I64F64 no_data, int dim = 0)
+		{
+			if (data_type == 0 || 0 > dim || dim >= get_dim()) return false;
+
+			unsafe { fixed (ulong* n = this.no_data) n[dim] = no_data.u64; }
+			options |= 0x01;
+			return true;
+		}
+
+		public U64I64F64 Min(int dim)
+		{
+			if (!has_min() || 0 > dim || dim >= get_dim()) return new U64I64F64 { u64 = 0 };
+			unsafe { fixed (ulong* m = min) return new U64I64F64 { u64 = m[dim] }; }
+		}
+
+		public bool SetMin(U64I64F64 min, int dim = 0)
+		{
+			if (data_type == 0 || 0 > dim || dim >= get_dim()) return false;
+
+			unsafe { fixed (ulong* m = this.min) m[dim] = min.u64; }
+			options |= 0x02;
+			return true;
+		}
+
+		public U64I64F64 Max(int dim)
+		{
+			if (!has_max() || 0 > dim || dim >= get_dim()) return new U64I64F64 { u64 = 0 };
+			unsafe { fixed (ulong* m = max) return new U64I64F64 { u64 = m[dim] }; }
+		}
+
+		public bool SetMax(U64I64F64 max, int dim = 0)
+		{
+			if (data_type == 0 || 0 > dim || dim >= get_dim()) return false;
+
+			unsafe { fixed (ulong* m = this.max) m[dim] = max.u64; }
+			options |= 0x04;
+			return true;
+		}
+
+		public double Scale(int dim)
+		{
+			if (!has_scale() || 0 > dim || dim >= get_dim()) return 1.0; // Default for scale is 1.0.
+			unsafe { fixed (double* s = scale) return s[dim]; }
+		}
+
+		public double Offset(int dim)
+		{
+			if (!has_offset() || 0 > dim || dim >= get_dim()) return 0;
+			unsafe { fixed (double* o = offset) return o[dim]; }
+		}
+
+		public string Description
+		{
+			get { unsafe { fixed (byte* d = description) return new string((sbyte*)d); } }
+			set { unsafe { fixed (byte* d = description) strncpy(d, value, 32); } }
+		}
+
+		public LASattribute(byte size) : this()
 		{
 			if (size == 0) throw new ArgumentOutOfRangeException(nameof(size), "Must be greater zero (0).");
-			scale[0] = scale[1] = scale[2] = 1.0;
+
 			options = size;
+			unsafe { fixed (double* s = scale) s[0] = s[1] = s[2] = 1.0; }
 		}
 
-		public LASattribute(LAS_ATTRIBUTE type, string name, string description = null, int dim = 1)
+		public LASattribute(LAS_ATTRIBUTE type, string name, string description = null, int dim = 1) : this()
 		{
 			if (type > LAS_ATTRIBUTE.F64) throw new ArgumentOutOfRangeException(nameof(type), "Must be one of the enum values.");
 			if ((dim < 1) || (dim > 3)) throw new ArgumentOutOfRangeException(nameof(dim), "Must be 1, 2, or 3.");
 			if (name == null) throw new ArgumentNullException(nameof(name));
 
-			scale[0] = scale[1] = scale[2] = 1.0;
+			unsafe { fixed (double* s = scale) s[0] = s[1] = s[2] = 1.0; }
 			data_type = (byte)((dim - 1) * 10 + (int)type + 1);
 
-			if (name.Length > 31) this.name = name.Substring(0, 31);
-			else this.name = name;
-
-			if (description != null)
-			{
-				if (description.Length > 31) this.description = description.Substring(0, 31);
-				else this.description = description;
-			}
+			Name = name;
+			Description = description;
 		}
 
-		public bool set_no_data(byte no_data, int dim = 0) { if ((0 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].u64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(sbyte no_data, int dim = 0) { if ((1 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].i64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(ushort no_data, int dim = 0) { if ((2 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].u64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(short no_data, int dim = 0) { if ((3 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].i64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(uint no_data, int dim = 0) { if ((4 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].u64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(int no_data, int dim = 0) { if ((5 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].i64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(ulong no_data, int dim = 0) { if ((6 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].u64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(long no_data, int dim = 0) { if ((7 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].i64 = no_data; options |= 0x01; return true; } return false; }
-		public bool set_no_data(float no_data, int dim = 0) { if ((8 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.no_data[dim].f64 = no_data; options |= 0x01; return true; } return false; }
+		public bool set_no_data(byte no_data, int dim = 0) { return 0 != get_type() ? false : SetNoData(new U64I64F64 { u64 = no_data }, dim); }
+		public bool set_no_data(sbyte no_data, int dim = 0) { return 1 != get_type() ? false : SetNoData(new U64I64F64 { i64 = no_data }, dim); }
+		public bool set_no_data(ushort no_data, int dim = 0) { return 2 != get_type() ? false : SetNoData(new U64I64F64 { u64 = no_data }, dim); }
+		public bool set_no_data(short no_data, int dim = 0) { return 3 != get_type() ? false : SetNoData(new U64I64F64 { i64 = no_data }, dim); }
+		public bool set_no_data(uint no_data, int dim = 0) { return 4 != get_type() ? false : SetNoData(new U64I64F64 { u64 = no_data }, dim); }
+		public bool set_no_data(int no_data, int dim = 0) { return 5 != get_type() ? false : SetNoData(new U64I64F64 { i64 = no_data }, dim); }
+		public bool set_no_data(ulong no_data, int dim = 0) { return 6 != get_type() ? false : SetNoData(new U64I64F64 { u64 = no_data }, dim); }
+		public bool set_no_data(long no_data, int dim = 0) { return 7 != get_type() ? false : SetNoData(new U64I64F64 { i64 = no_data }, dim); }
+		public bool set_no_data(float no_data, int dim = 0) { return 8 != get_type() ? false : SetNoData(new U64I64F64 { f64 = no_data }, dim); }
 		public bool set_no_data(double no_data, int dim = 0)
 		{
-			if (dim >= 0 && dim < get_dim())
+			switch (get_type())
 			{
-				switch (get_type())
-				{
-					case 0:
-					case 2:
-					case 4:
-					case 6:
-						this.no_data[dim].u64 = (ulong)no_data; options |= 0x01; return true;
-					case 1:
-					case 3:
-					case 5:
-					case 7:
-						this.no_data[dim].i64 = (long)no_data; options |= 0x01; return true;
-					case 8:
-					case 9:
-						this.no_data[dim].f64 = no_data; options |= 0x01; return true;
-				}
+				case 0:
+				case 2:
+				case 4:
+				case 6:
+					return SetNoData(new U64I64F64 { u64 = (ulong)no_data }, dim);
+				case 1:
+				case 3:
+				case 5:
+				case 7:
+					return SetNoData(new U64I64F64 { i64 = (long)no_data }, dim);
+				case 8:
+				case 9:
+					return SetNoData(new U64I64F64 { f64 = no_data }, dim);
 			}
 			return false;
 		}
 
-		public void set_min(byte[] min, int dim = 0) { this.min[dim] = cast(min); options |= 0x02; }
-		public void update_min(byte[] min, int dim = 0) { this.min[dim] = smallest(cast(min), this.min[dim]); }
-		public bool set_min(byte min, int dim = 0) { if ((0 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].u64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(sbyte min, int dim = 0) { if ((1 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].i64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(ushort min, int dim = 0) { if ((2 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].u64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(short min, int dim = 0) { if ((3 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].i64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(uint min, int dim = 0) { if ((4 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].u64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(int min, int dim = 0) { if ((5 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].i64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(ulong min, int dim = 0) { if ((6 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].u64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(long min, int dim = 0) { if ((7 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].i64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(float min, int dim = 0) { if ((8 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].f64 = min; options |= 0x02; return true; } return false; }
-		public bool set_min(double min, int dim = 0) { if ((9 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.min[dim].f64 = min; options |= 0x02; return true; } return false; }
+		public void set_min(byte[] min, int dim = 0) { SetMin(cast(min), dim); }
+		public void update_min(byte[] min, int dim = 0) { SetMin(smallest(cast(min), Min(dim)), dim); }
+		public bool set_min(byte min, int dim = 0) { return 0 != get_type() ? false : SetMin(new U64I64F64 { u64 = min }, dim); }
+		public bool set_min(sbyte min, int dim = 0) { return 1 != get_type() ? false : SetMin(new U64I64F64 { i64 = min }, dim); }
+		public bool set_min(ushort min, int dim = 0) { return 2 != get_type() ? false : SetMin(new U64I64F64 { u64 = min }, dim); }
+		public bool set_min(short min, int dim = 0) { return 3 != get_type() ? false : SetMin(new U64I64F64 { i64 = min }, dim); }
+		public bool set_min(uint min, int dim = 0) { return 4 != get_type() ? false : SetMin(new U64I64F64 { u64 = min }, dim); }
+		public bool set_min(int min, int dim = 0) { return 5 != get_type() ? false : SetMin(new U64I64F64 { i64 = min }, dim); }
+		public bool set_min(ulong min, int dim = 0) { return 6 != get_type() ? false : SetMin(new U64I64F64 { u64 = min }, dim); }
+		public bool set_min(long min, int dim = 0) { return 7 != get_type() ? false : SetMin(new U64I64F64 { i64 = min }, dim); }
+		public bool set_min(float min, int dim = 0) { return 8 != get_type() ? false : SetMin(new U64I64F64 { f64 = min }, dim); }
+		public bool set_min(double min, int dim = 0) { return 9 != get_type() ? false : SetMin(new U64I64F64 { f64 = min }, dim); }
 
-		public void set_max(byte[] max, int dim = 0) { this.max[dim] = cast(max); options |= 0x04; }
-		public void update_max(byte[] max, int dim = 0) { this.max[dim] = biggest(cast(max), this.max[dim]); }
-		public bool set_max(byte max, int dim = 0) { if ((0 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].u64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(sbyte max, int dim = 0) { if ((1 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].i64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(ushort max, int dim = 0) { if ((2 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].u64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(short max, int dim = 0) { if ((3 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].i64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(uint max, int dim = 0) { if ((4 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].u64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(int max, int dim = 0) { if ((5 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].i64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(ulong max, int dim = 0) { if ((6 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].u64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(long max, int dim = 0) { if ((7 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].i64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(float max, int dim = 0) { if ((8 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].f64 = max; options |= 0x04; return true; } return false; }
-		public bool set_max(double max, int dim = 0) { if ((9 == get_type()) && (dim >= 0) && (dim < get_dim())) { this.max[dim].f64 = max; options |= 0x04; return true; } return false; }
+		public void set_max(byte[] max, int dim = 0) { SetMax(cast(max), dim); }
+		public void update_max(byte[] max, int dim = 0) { SetMax(biggest(cast(max), Max(dim)), dim); }
+		public bool set_max(byte max, int dim = 0) { return 0 != get_type() ? false : SetMax(new U64I64F64 { u64 = max }, dim); }
+		public bool set_max(sbyte max, int dim = 0) { return 1 != get_type() ? false : SetMax(new U64I64F64 { i64 = max }, dim); }
+		public bool set_max(ushort max, int dim = 0) { return 2 != get_type() ? false : SetMax(new U64I64F64 { u64 = max }, dim); }
+		public bool set_max(short max, int dim = 0) { return 3 != get_type() ? false : SetMax(new U64I64F64 { i64 = max }, dim); }
+		public bool set_max(uint max, int dim = 0) { return 4 != get_type() ? false : SetMax(new U64I64F64 { u64 = max }, dim); }
+		public bool set_max(int max, int dim = 0) { return 5 != get_type() ? false : SetMax(new U64I64F64 { i64 = max }, dim); }
+		public bool set_max(ulong max, int dim = 0) { return 6 != get_type() ? false : SetMax(new U64I64F64 { u64 = max }, dim); }
+		public bool set_max(long max, int dim = 0) { return 7 != get_type() ? false : SetMax(new U64I64F64 { i64 = max }, dim); }
+		public bool set_max(float max, int dim = 0) { return 8 != get_type() ? false : SetMax(new U64I64F64 { f64 = max }, dim); }
+		public bool set_max(double max, int dim = 0) { return 9 != get_type() ? false : SetMax(new U64I64F64 { f64 = max }, dim); }
 
-		public bool set_scale(float scale, int dim = 0) { if (data_type != 0 && (dim >= 0) && (dim < get_dim())) { this.scale[dim] = scale; options |= 0x08; return true; } return false; }
-		public bool set_offset(float offset, int dim = 0) { if (data_type != 0 && (dim >= 0) && (dim < get_dim())) { this.offset[dim] = offset; options |= 0x10; return true; } return false; }
+		public bool set_scale(double scale, int dim = 0)
+		{
+			if (data_type == 0 || 0 > dim || dim >= get_dim()) return false;
 
-		public bool has_no_data() { return (options & 0x01) != 0; }
-		public bool has_min() { return (options & 0x02) != 0; }
-		public bool has_max() { return (options & 0x04) != 0; }
-		public bool has_scale() { return (options & 0x08) != 0; }
-		public bool has_offset() { return (options & 0x10) != 0; }
+			unsafe { fixed (double* s = this.scale) s[dim] = scale; }
+			options |= 0x08;
+			return true;
+		}
+
+		public bool set_offset(double offset, int dim = 0)
+		{
+			if (data_type == 0 || 0 > dim || dim >= get_dim()) return false;
+
+			unsafe { fixed (double* o = this.offset) o[dim] = offset; }
+			options |= 0x10;
+			return true;
+		}
+
+		public bool has_no_data() { return data_type == 0 ? false : (options & 0x01) != 0; }
+		public bool has_min() { return data_type == 0 ? false : (options & 0x02) != 0; }
+		public bool has_max() { return data_type == 0 ? false : (options & 0x04) != 0; }
+		public bool has_scale() { return data_type == 0 ? false : (options & 0x08) != 0; }
+		public bool has_offset() { return data_type == 0 ? false : (options & 0x10) != 0; }
 
 		public int get_size()
 		{
@@ -188,83 +268,62 @@ namespace LASzip.Net
 			switch (get_type())
 			{
 				case 0: casted_value = value[0]; break;
-				case 1: casted_value = (int)value[0]; break;
+				case 1: casted_value = (sbyte)value[0]; break;
 				case 2: casted_value = BitConverter.ToUInt16(value, 0); break;
 				case 3: casted_value = BitConverter.ToInt16(value, 0); break;
 				case 4: casted_value = BitConverter.ToUInt32(value, 0); break;
 				case 5: casted_value = BitConverter.ToInt32(value, 0); break;
-				case 6: casted_value = (long)BitConverter.ToUInt64(value, 0); break;
+				case 6: casted_value = BitConverter.ToUInt64(value, 0); break; // was: (long)BitConverter.ToUInt64(value, 0); don't know why.
 				case 7: casted_value = BitConverter.ToInt64(value, 0); break;
 				case 8: casted_value = BitConverter.ToSingle(value, 0); break;
-				case 9: default: casted_value = BitConverter.ToDouble(value, 0); break;
+				case 9: casted_value = BitConverter.ToDouble(value, 0); break;
+				default: return 0;
 			}
-			return offset[0] + scale[0] * casted_value;
+			unsafe { fixed (double* o = offset, s = scale) return o[0] + s[0] * casted_value; }
 		}
 
 		int get_type()
 		{
-			return ((int)data_type - 1) % 10;
+			return (data_type - 1) % 10;
 		}
 
 		int get_dim()
 		{
-			return 1 + ((int)data_type - 1) / 10;
+			return 1 + (data_type - 1) / 10;
 		}
 
 		U64I64F64 cast(byte[] value)
 		{
-			int type = get_type();
-			U64I64F64 casted_value = new U64I64F64();
-
 			switch (get_type())
 			{
-				case 0: casted_value.u64 = value[0]; break;
-				case 1: casted_value.i64 = (int)value[0]; break;
-				case 2: casted_value.u64 = BitConverter.ToUInt16(value, 0); break;
-				case 3: casted_value.i64 = BitConverter.ToInt16(value, 0); break;
-				case 4: casted_value.u64 = BitConverter.ToUInt32(value, 0); break;
-				case 5: casted_value.i64 = BitConverter.ToInt32(value, 0); break;
-				case 6: casted_value.u64 = BitConverter.ToUInt64(value, 0); break;
-				case 7: casted_value.i64 = BitConverter.ToInt64(value, 0); break;
-				case 8: casted_value.f64 = BitConverter.ToSingle(value, 0); break;
-				case 9: default: casted_value.f64 = BitConverter.ToDouble(value, 0); break;
+				case 0: return new U64I64F64 { u64 = value[0] };
+				case 1: return new U64I64F64 { i64 = (sbyte)value[0] };
+				case 2: return new U64I64F64 { u64 = BitConverter.ToUInt16(value, 0) };
+				case 3: return new U64I64F64 { i64 = BitConverter.ToInt16(value, 0) };
+				case 4: return new U64I64F64 { u64 = BitConverter.ToUInt32(value, 0) };
+				case 5: return new U64I64F64 { i64 = BitConverter.ToInt32(value, 0) };
+				case 6: return new U64I64F64 { u64 = BitConverter.ToUInt64(value, 0) };
+				case 7: return new U64I64F64 { i64 = BitConverter.ToInt64(value, 0) };
+				case 8: return new U64I64F64 { f64 = BitConverter.ToSingle(value, 0) };
+				case 9: return new U64I64F64 { f64 = BitConverter.ToDouble(value, 0) };
+				default: return new U64I64F64();
 			}
-
-			return casted_value;
 		}
 
 		U64I64F64 smallest(U64I64F64 a, U64I64F64 b)
 		{
 			int type = get_type();
-			if (type >= 8) // float compare
-			{
-				if (a.f64 < b.f64) return a;
-				else return b;
-			}
-			if ((type & 1) != 0) // int compare
-			{
-				if (a.i64 < b.i64) return a;
-				else return b;
-			}
-			if (a.u64 < b.u64) return a;
-			else return b;
+			if (type >= 8) return a.f64 < b.f64 ? a : b; // float compare
+			if ((type & 1) != 0) return a.i64 < b.i64 ? a : b; // int compare
+			return a.u64 < b.u64 ? a : b;
 		}
 
 		U64I64F64 biggest(U64I64F64 a, U64I64F64 b)
 		{
 			int type = get_type();
-			if (type >= 8) // float compare
-			{
-				if (a.f64 > b.f64) return a;
-				else return b;
-			}
-			if ((type & 1) != 0) // int compare
-			{
-				if (a.i64 > b.i64) return a;
-				else return b;
-			}
-			if (a.u64 > b.u64) return a;
-			else return b;
+			if (type >= 8) return a.f64 > b.f64 ? a : b; // float compare
+			if ((type & 1) != 0) return a.i64 > b.i64 ? a : b; // int compare
+			return a.u64 > b.u64 ? a : b;
 		}
 	}
 }

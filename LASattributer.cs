@@ -13,8 +13,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2017-2017 by Shinta <shintadono@googlemail.com>
+//    (c) 2005-2015, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) of the C# port 2017-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -63,11 +63,14 @@ namespace LASzip.Net
 			int start = 0;
 			foreach (var attribute in attributes)
 			{
+				int size = attribute.get_size();
+				if (size <= 0) continue;
+
 				number_attributes++;
-				this.attributes.Add(new LASattribute(attribute));
+				this.attributes.Add(attribute);
 				attribute_starts.Add(start);
-				attribute_sizes.Add(attribute.get_size());
-				start += attribute.get_size();
+				attribute_sizes.Add(size);
+				start += size;
 			}
 
 			return true;
@@ -75,7 +78,7 @@ namespace LASzip.Net
 
 		public int add_attribute(LASattribute attribute)
 		{
-			if (attribute.get_size() == 0) return -1;
+			if (attribute.get_size() <= 0) return -1;
 
 			try
 			{
@@ -91,7 +94,7 @@ namespace LASzip.Net
 				else start = attribute_starts[number_attributes - 1] + attribute_sizes[number_attributes - 1];
 
 				number_attributes++;
-				attributes.Add(new LASattribute(attribute));
+				attributes.Add(attribute);
 				attribute_starts.Add(start);
 				attribute_sizes.Add(attribute.get_size());
 
@@ -110,11 +113,11 @@ namespace LASzip.Net
 
 		public int get_attribute_index(string name)
 		{
-			if (name.Length > 31) name = name.Substring(0, 31);
+			if (name.Length > 32) name = name.Substring(0, 32);
 
 			for (int i = 0; i < number_attributes; i++)
 			{
-				if (attributes[i].name == name) return i;
+				if (attributes[i].Name == name) return i;
 			}
 			return -1;
 		}
