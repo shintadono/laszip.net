@@ -58,6 +58,8 @@
     <Compile Include="IntegerCompressor.cs" />
     <Compile Include="LASattribute.cs" />
     <Compile Include="LASattributer.cs" />
+    <Compile Include="LASindex.cs" />
+    <Compile Include="LASinterval.cs" />
     <Compile Include="LASitem.cs" />
     <Compile Include="LASquadtree.cs" />
     <Compile Include="LASquantizer.cs" />
