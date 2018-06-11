@@ -93,7 +93,7 @@ namespace LASzip.Net
 		}
 	}
 
-	public class LASinterval : IDisposable
+	class LASinterval : IDisposable
 	{
 		public int index;
 		public uint start, end, full, total;
@@ -112,7 +112,7 @@ namespace LASzip.Net
 			this.threshold = threshold;
 		}
 
-		void IDisposable.Dispose()
+		public void Dispose()
 		{
 			// loop over all cells
 			foreach (var hash_element in cells)
@@ -524,47 +524,47 @@ namespace LASzip.Net
 		// read from file
 		public bool read(Stream stream)
 		{
-			byte[] buffer = new byte[4];
+			byte[] tmp = new byte[4];
 
-			if (stream.Read(buffer, 0, 4) != 4)
+			if (stream.Read(tmp, 0, 4) != 4)
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading signature");
 				return false;
 			}
 
-			if (buffer[0] != 'L' && buffer[1] != 'A' && buffer[2] != 'S' && buffer[3] != 'V')
+			if (tmp[0] != 'L' && tmp[1] != 'A' && tmp[2] != 'S' && tmp[3] != 'V')
 			{
-				Console.Error.WriteLine("ERROR (LASinterval): wrong signature '{0}{1}{3}{4}' instead of 'LASV'", (char)buffer[0], (char)buffer[1], (char)buffer[2], (char)buffer[3]);
+				Console.Error.WriteLine("ERROR (LASinterval): wrong signature '{0}{1}{3}{4}' instead of 'LASV'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
 				return false;
 			}
 
-			if (stream.Read(buffer, 0, 4) != 4)
+			if (stream.Read(tmp, 0, 4) != 4)
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading version");
 				return false;
 			}
 
-			uint version = BitConverter.ToUInt32(buffer, 0);
+			uint version = BitConverter.ToUInt32(tmp, 0);
 
 			// read number of cells
-			if (stream.Read(buffer, 0, 4) != 4)
+			if (stream.Read(tmp, 0, 4) != 4)
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading number of cells");
 				return false;
 			}
 
-			uint number_cells = BitConverter.ToUInt32(buffer, 0);
+			uint number_cells = BitConverter.ToUInt32(tmp, 0);
 
 			// loop over all cells
 			while (number_cells > 0)
 			{
 				// read index of cell
-				if (stream.Read(buffer, 0, 4) != 4)
+				if (stream.Read(tmp, 0, 4) != 4)
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading cell index");
 					return false;
 				}
-				int cell_index = BitConverter.ToInt32(buffer, 0);
+				int cell_index = BitConverter.ToInt32(tmp, 0);
 
 				// create cell and insert into hash
 				LASintervalStartCell start_cell = new LASintervalStartCell();
@@ -572,40 +572,40 @@ namespace LASzip.Net
 				LASintervalCell cell = start_cell;
 
 				// read number of intervals in cell
-				if (stream.Read(buffer, 0, 4) != 4)
+				if (stream.Read(tmp, 0, 4) != 4)
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading number of intervals in cell");
 					return false;
 				}
-				uint number_intervals = BitConverter.ToUInt32(buffer, 0);
+				uint number_intervals = BitConverter.ToUInt32(tmp, 0);
 
 				// read number of points in cell
-				if (stream.Read(buffer, 0, 4) != 4)
+				if (stream.Read(tmp, 0, 4) != 4)
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading number of points in cell");
 					return false;
 				}
-				uint number_points = BitConverter.ToUInt32(buffer, 0);
+				uint number_points = BitConverter.ToUInt32(tmp, 0);
 
 				start_cell.full = number_points;
 				start_cell.total = 0;
 				while (number_intervals > 0)
 				{
 					// read start of interval
-					if (stream.Read(buffer, 0, 4) != 4)
+					if (stream.Read(tmp, 0, 4) != 4)
 					{
 						Console.Error.WriteLine("ERROR (LASinterval): reading start of interval");
 						return false;
 					}
-					cell.start = BitConverter.ToUInt32(buffer, 0);
+					cell.start = BitConverter.ToUInt32(tmp, 0);
 
 					// read end of interval
-					if (stream.Read(buffer, 0, 4) != 4)
+					if (stream.Read(tmp, 0, 4) != 4)
 					{
 						Console.Error.WriteLine("ERROR (LASinterval): reading end of interval");
 						return false;
 					}
-					cell.end = BitConverter.ToUInt32(buffer, 0);
+					cell.end = BitConverter.ToUInt32(tmp, 0);
 
 					start_cell.total += cell.end - cell.start + 1;
 
@@ -622,7 +622,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		bool write(Stream stream)
+		public bool write(Stream stream)
 		{
 			try
 			{

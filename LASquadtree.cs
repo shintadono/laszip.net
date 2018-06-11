@@ -85,9 +85,10 @@ namespace LASzip.Net
 			}
 			if (tmp[0] != 'L' || tmp[1] != 'A' || tmp[2] != 'S' || tmp[3] != 'S')
 			{
-				Console.Error.WriteLine("ERROR (LASquadtree): wrong LASspatial signature {0,4} instead of 'LASS'", tmp);
+				Console.Error.WriteLine("ERROR (LASquadtree): wrong LASspatial signature '{0}{1}{3}{4}' instead of 'LASS'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
 				return false;
 			}
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -100,6 +101,7 @@ namespace LASzip.Net
 				Console.Error.WriteLine("ERROR (LASquadtree): unknown LASspatial type {0}", type);
 				return false;
 			}
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -108,7 +110,7 @@ namespace LASzip.Net
 			}
 			if (tmp[0] != 'L' || tmp[1] != 'A' || tmp[2] != 'S' || tmp[3] != 'Q')
 			{
-				//Console.Error.WriteLine("ERROR (LASquadtree): wrong signature {0,4} instead of 'LASV'", signature);
+				//Console.Error.WriteLine("ERROR (LASquadtree): wrong signature '{0}{1}{3}{4}' instead of 'LASQ'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
 				//return false;
 				levels = tmp[0];
 			}
@@ -137,6 +139,7 @@ namespace LASzip.Net
 				return false;
 			}
 			uint level_index = BitConverter.ToUInt32(tmp, 0);
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -144,6 +147,7 @@ namespace LASzip.Net
 				return false;
 			}
 			uint implicit_levels = BitConverter.ToUInt32(tmp, 0);
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -151,6 +155,7 @@ namespace LASzip.Net
 				return false;
 			}
 			min_x = BitConverter.ToSingle(tmp, 0);
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -158,6 +163,7 @@ namespace LASzip.Net
 				return false;
 			}
 			max_x = BitConverter.ToSingle(tmp, 0);
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -165,6 +171,7 @@ namespace LASzip.Net
 				return false;
 			}
 			min_y = BitConverter.ToSingle(tmp, 0);
+
 			try { stream.Read(tmp, 0, 4); }
 			catch
 			{
@@ -172,6 +179,7 @@ namespace LASzip.Net
 				return false;
 			}
 			max_y = BitConverter.ToSingle(tmp, 0);
+
 			return true;
 		}
 
