@@ -33,6 +33,7 @@ namespace LASzip.Net
 {
 	class LASwriteItemRaw_POINT14 : LASwriteItemRaw
 	{
+		// TODO use LASpoint14
 		[StructLayout(LayoutKind.Sequential, Pack=1)]
 		struct LAStempWritePoint14
 		{

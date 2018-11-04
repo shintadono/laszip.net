@@ -102,6 +102,7 @@
     <Compile Include="LASzip.cs" />
     <Compile Include="Laszip_Common_v1.cs" />
     <Compile Include="Laszip_Common_v2.cs" />
+    <Compile Include="Laszip_Decompress_Selective_v3.cs" />
     <Compile Include="laszip_dll.cs" />
     <Compile Include="laszip.geokey.cs" />
     <Compile Include="laszip.header.cs" />

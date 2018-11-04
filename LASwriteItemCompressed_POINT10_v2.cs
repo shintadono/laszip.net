@@ -33,32 +33,6 @@ namespace LASzip.Net
 {
 	class LASwriteItemCompressed_POINT10_v2 : LASwriteItemCompressed
 	{
-		[StructLayout(LayoutKind.Sequential, Pack=1)]
-		struct LASpoint10
-		{
-			public int x;
-			public int y;
-			public int z;
-			public ushort intensity;
-
-			// all these bits combine to flags
-			//public byte return_number : 3;
-			//public byte number_of_returns : 3;
-			//public byte scan_direction_flag : 1;
-			//public byte edge_of_flight_line : 1;
-			public byte flags;
-
-			// all the following bits combine to classification_and_classification_flags
-			//public byte classification : 5;
-			//public byte synthetic_flag : 1;
-			//public byte keypoint_flag : 1;
-			//public byte withheld_flag : 1;
-			public byte classification_and_classification_flags;
-			public sbyte scan_angle_rank;
-			public byte user_data;
-			public ushort point_source_ID;
-		}
-
 		public LASwriteItemCompressed_POINT10_v2(ArithmeticEncoder enc)
 		{
 			// set encoder
@@ -110,9 +84,9 @@ namespace LASzip.Net
 			}
 
 			// init last item
-			last.x=item.X;
-			last.y=item.Y;
-			last.z=item.Z;
+			last.X=item.X;
+			last.Y=item.Y;
+			last.Z=item.Z;
 			last.intensity=0; // but set intensity to zero
 			last.flags=item.flags;
 			last.classification_and_classification_flags = item.classification_and_classification_flags;
@@ -196,14 +170,14 @@ namespace LASzip.Net
 
 			// compress x coordinate
 			int median=last_x_diff_median5[m].get();
-			int diff=item.X-last.x;
+			int diff=item.X-last.X;
 			ic_dx.compress(median, diff, n==1?1u:0u);
 			last_x_diff_median5[m].add(diff);
 
 			// compress y coordinate
 			uint k_bits=ic_dx.getK();
 			median=last_y_diff_median5[m].get();
-			diff=item.Y-last.y;
+			diff=item.Y-last.Y;
 			ic_dy.compress(median, diff, (n==1?1u:0u)+(k_bits<20?k_bits&0xFEu:20u)); // &0xFE round k_bits to next even number
 			last_y_diff_median5[m].add(diff);
 
@@ -213,9 +187,9 @@ namespace LASzip.Net
 			last_height[l]=item.Z;
 
 			// copy the last point
-			last.x=item.X;
-			last.y=item.Y;
-			last.z=item.Z;
+			last.X=item.X;
+			last.Y=item.Y;
+			last.Z=item.Z;
 			last.intensity=item.intensity;
 			last.flags=item.flags;
 			last.classification_and_classification_flags = item.classification_and_classification_flags;

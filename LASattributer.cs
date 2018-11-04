@@ -13,7 +13,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2015, martin isenburg, rapidlasso - fast tools to catch reality
+//    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 //    (c) of the C# port 2017-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the

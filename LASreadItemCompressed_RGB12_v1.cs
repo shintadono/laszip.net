@@ -12,8 +12,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -35,15 +35,15 @@ namespace LASzip.Net
 		public LASreadItemCompressed_RGB12_v1(ArithmeticDecoder dec)
 		{
 			// set decoder
-			Debug.Assert(dec!=null);
-			this.dec=dec;
+			Debug.Assert(dec != null);
+			this.dec = dec;
 
 			// create models and integer compressors
-			m_byte_used=dec.createSymbolModel(64);
-			ic_rgb=new IntegerCompressor(dec, 8, 6);
+			m_byte_used = dec.createSymbolModel(64);
+			ic_rgb = new IntegerCompressor(dec, 8, 6);
 		}
 
-		public override bool init(laszip.point item)
+		public override bool init(laszip.point item, ref uint context) // context is unused
 		{
 			// init state
 
@@ -52,44 +52,44 @@ namespace LASzip.Net
 			ic_rgb.initDecompressor();
 
 			// init last item
-			r=item.rgb[0];
-			g=item.rgb[1];
-			b=item.rgb[2];
+			last_r = item.rgb[0];
+			last_g = item.rgb[1];
+			last_b = item.rgb[2];
 
 			return true;
 		}
 
-		public override void read(laszip.point item)
+		public override void read(laszip.point item, ref uint context) // context is unused
 		{
-			uint sym=dec.decodeSymbol(m_byte_used);
+			uint sym = dec.decodeSymbol(m_byte_used);
 
-			ushort[] item16=item.rgb;
+			ushort[] item_rgb = item.rgb;
 
-			if((sym&(1<<0))!=0) item16[0]=(ushort)ic_rgb.decompress(r&255, 0);
-			else item16[0]=(ushort)(r&0xFF);
+			if ((sym & (1 << 0)) != 0) item_rgb[0] = (ushort)ic_rgb.decompress(last_r & 255, 0);
+			else item_rgb[0] = (ushort)(last_r & 0xFF);
 
-			if((sym&(1<<1))!=0) item16[0]|=(ushort)(((ushort)ic_rgb.decompress(r>>8, 1))<<8);
-			else item16[0]|=(ushort)(r&0xFF00);
+			if ((sym & (1 << 1)) != 0) item_rgb[0] |= (ushort)(((ushort)ic_rgb.decompress(last_r >> 8, 1)) << 8);
+			else item_rgb[0] |= (ushort)(last_r & 0xFF00);
 
-			if((sym&(1<<2))!=0) item16[1]=(ushort)ic_rgb.decompress(g&255, 2);
-			else item16[1]=(ushort)(g&0xFF);
+			if ((sym & (1 << 2)) != 0) item_rgb[1] = (ushort)ic_rgb.decompress(last_g & 255, 2);
+			else item_rgb[1] = (ushort)(last_g & 0xFF);
 
-			if((sym&(1<<3))!=0) item16[1]|=(ushort)(((ushort)ic_rgb.decompress(g>>8, 3))<<8);
-			else item16[1]|=(ushort)(g&0xFF00);
+			if ((sym & (1 << 3)) != 0) item_rgb[1] |= (ushort)(((ushort)ic_rgb.decompress(last_g >> 8, 3)) << 8);
+			else item_rgb[1] |= (ushort)(last_g & 0xFF00);
 
-			if((sym&(1<<4))!=0) item16[2]=(ushort)ic_rgb.decompress(b&255, 4);
-			else item16[2]=(ushort)(b&0xFF);
+			if ((sym & (1 << 4)) != 0) item_rgb[2] = (ushort)ic_rgb.decompress(last_b & 255, 4);
+			else item_rgb[2] = (ushort)(last_b & 0xFF);
 
-			if((sym&(1<<5))!=0) item16[2]|=(ushort)(((ushort)ic_rgb.decompress(b>>8, 5))<<8);
-			else item16[2]|=(ushort)(b&0xFF00);
+			if ((sym & (1 << 5)) != 0) item_rgb[2] |= (ushort)(((ushort)ic_rgb.decompress(last_b >> 8, 5)) << 8);
+			else item_rgb[2] |= (ushort)(last_b & 0xFF00);
 
-			r=item16[0];
-			g=item16[1];
-			b=item16[2];
+			last_r = item_rgb[0];
+			last_g = item_rgb[1];
+			last_b = item_rgb[2];
 		}
 
 		ArithmeticDecoder dec;
-		ushort r, g, b;
+		ushort last_r, last_g, last_b;
 
 		ArithmeticModel m_byte_used;
 		IntegerCompressor ic_rgb;
