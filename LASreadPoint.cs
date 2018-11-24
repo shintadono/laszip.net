@@ -34,9 +34,6 @@ namespace LASzip.Net
 {
 	class LASreadPoint
 	{
-		// TODO move to common v3
-		const bool DEBUG_OUTPUT_NUM_BYTES_DETAILS = false;
-
 		public LASreadPoint(LASZIP_DECOMPRESS_SELECTIVE decompress_selective = LASZIP_DECOMPRESS_SELECTIVE.ALL)
 		{
 			point_size = 0;
@@ -74,19 +71,30 @@ namespace LASzip.Net
 			// is laszip exists then we must use its items
 			if (laszip != null)
 			{
+				if (num_items == 0) return false;
+				if (items == null) return false;
 				if (num_items != laszip.num_items) return false;
 				if (items != laszip.items) return false;
 			}
 
-			// create entropy decoder (if requested)
-			dec = null;
+			// delete old entropy decoder
+			if (dec != null)
+			{
+				dec = null;
+				layered_las14_compression = false;
+			}
+
 			if (laszip != null && laszip.compressor != 0)
 			{
+				// create new entropy decoder (if requested)
 				switch (laszip.coder)
 				{
 					case LASzip.CODER_ARITHMETIC: dec = new ArithmeticDecoder(); break;
 					default: return false; // entropy decoder not supported
 				}
+
+				// maybe layered compression for LAS 1.4
+				layered_las14_compression = laszip.compressor == LASzip.COMPRESSOR_LAYERED_CHUNKED;
 			}
 
 			// initizalize the readers
@@ -104,11 +112,11 @@ namespace LASzip.Net
 				{
 					case LASitem.Type.POINT10: readers_raw[i] = new LASreadItemRaw_POINT10(); break;
 					case LASitem.Type.GPSTIME11: readers_raw[i] = new LASreadItemRaw_GPSTIME11(); break;
-					case LASitem.Type.RGB12: readers_raw[i] = new LASreadItemRaw_RGB12(); break;
-					case LASitem.Type.WAVEPACKET13: readers_raw[i] = new LASreadItemRaw_WAVEPACKET13(); break;
-					case LASitem.Type.BYTE: readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size); break;
+					case LASitem.Type.RGB12: case LASitem.Type.RGB14: readers_raw[i] = new LASreadItemRaw_RGB12(); break;
+					case LASitem.Type.BYTE: case LASitem.Type.BYTE14: readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size); break;
 					case LASitem.Type.POINT14: readers_raw[i] = new LASreadItemRaw_POINT14(); break;
 					case LASitem.Type.RGBNIR14: readers_raw[i] = new LASreadItemRaw_RGBNIR14(); break;
+					case LASitem.Type.WAVEPACKET13: case LASitem.Type.WAVEPACKET14: readers_raw[i] = new LASreadItemRaw_WAVEPACKET13(); break;
 					default: return false;
 				}
 				point_size += items[i].size;
@@ -119,6 +127,14 @@ namespace LASzip.Net
 				readers_compressed = new LASreadItem[num_readers];
 
 				// seeks with compressed data need a seek point
+				seek_point = new laszip.point();
+
+				if (layered_las14_compression)
+				{
+					// because extended_point_type must be set
+					seek_point.extended_point_type = 1;
+				}
+
 				for (int i = 0; i < num_readers; i++)
 				{
 					switch (items[i].type)
@@ -138,27 +154,70 @@ namespace LASzip.Net
 							else if (items[i].version == 2) readers_compressed[i] = new LASreadItemCompressed_RGB12_v2(dec);
 							else return false;
 							break;
-						case LASitem.Type.WAVEPACKET13:
-							if (items[i].version == 1) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET13_v1(dec);
-							else return false;
-							break;
 						case LASitem.Type.BYTE:
-							seek_point.extra_bytes = new byte[items[i].size];
-							seek_point.num_extra_bytes = items[i].size;
+							// TODO ?
+							//seek_point.extra_bytes = new byte[items[i].size];
+							//seek_point.num_extra_bytes = items[i].size;
 							if (items[i].version == 1) readers_compressed[i] = new LASreadItemCompressed_BYTE_v1(dec, items[i].size);
 							else if (items[i].version == 2) readers_compressed[i] = new LASreadItemCompressed_BYTE_v2(dec, items[i].size);
 							else return false;
 							break;
+						// TODO
+						//case LASitem.Type.POINT14:
+						//	if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_selective); // version == 2 from lasproto
+						//	else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_POINT14_v4(dec, decompress_selective);
+						//	else return false;
+						//	break;
+						//case LASitem.Type.RGB14:
+						//	if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec, decompress_selective); // version == 2 from lasproto
+						//	else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGB14_v4(dec, decompress_selective);
+						//	else return false;
+						//	break;
+						//case LASitem.Type.RGBNIR14:
+						//	if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec, decompress_selective); // version == 2 from lasproto
+						//	else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v4(dec, decompress_selective);
+						//	else return false;
+						//	break;
+						//case LASitem.Type.BYTE14:
+						//	if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size, decompress_selective); // version == 2 from lasproto
+						//	else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_BYTE14_v4(dec, items[i].size, decompress_selective); // version == 2 from lasproto
+						//	else return false;
+						//	break;
+						case LASitem.Type.WAVEPACKET13:
+							if (items[i].version == 1) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET13_v1(dec);
+							else return false;
+							break;
+						// TODO
+						//case LASitem.Type.WAVEPACKET14:
+						//	if (items[i].version == 3) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec, decompress_selective);
+						//	else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v4(dec, decompress_selective);
+						//	else return false;
+						//	break;
 						default: return false;
 					}
+
+					// TODO
+					//if (i)
+					//{
+					//	if (layered_las14_compression)
+					//	{
+					//		// because combo LAS 1.0 - 1.4 point struct has padding
+					//		seek_point[i] = seek_point[i - 1] + (2 * items[i - 1].size);
+					//	}
+					//	else
+					//	{
+					//		seek_point[i] = seek_point[i - 1] + items[i - 1].size;
+					//	}
+					//}
 				}
 
-				if (laszip.compressor == LASzip.COMPRESSOR_POINTWISE_CHUNKED)
+				if (laszip.compressor != LASzip.COMPRESSOR_POINTWISE)
 				{
 					if (laszip.chunk_size != 0) chunk_size = laszip.chunk_size;
 					number_chunks = uint.MaxValue;
 				}
 			}
+
 			return true;
 		}
 
@@ -344,7 +403,6 @@ namespace LASzip.Net
 							{
 								((LASreadItemCompressed)(readers_compressed[i])).init(point, ref context);
 							}
-							if (DEBUG_OUTPUT_NUM_BYTES_DETAILS) Console.Error.WriteLine();
 						}
 						else
 						{
