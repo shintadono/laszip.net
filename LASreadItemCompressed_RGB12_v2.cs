@@ -87,7 +87,7 @@ namespace LASzip.Net
 			if ((sym & (1 << 1)) != 0)
 			{
 				corr = (int)dec.decodeSymbol(m_rgb_diff_1);
-				item.rgb[0] |= (ushort)((MyDefs.U8_FOLD(corr + (last_item[0] >> 8))) << 8);
+				item.rgb[0] |= (ushort)(MyDefs.U8_FOLD(corr + (last_item[0] >> 8)) << 8);
 			}
 			else
 			{
@@ -122,7 +122,7 @@ namespace LASzip.Net
 				if ((sym & (1 << 3)) != 0)
 				{
 					corr = (int)dec.decodeSymbol(m_rgb_diff_3);
-					item.rgb[1] |= (ushort)((MyDefs.U8_FOLD(corr + MyDefs.U8_CLAMP(diff + (last_item[1] >> 8)))) << 8);
+					item.rgb[1] |= (ushort)(MyDefs.U8_FOLD(corr + MyDefs.U8_CLAMP(diff + (last_item[1] >> 8))) << 8);
 				}
 				else
 				{
@@ -133,7 +133,7 @@ namespace LASzip.Net
 				{
 					corr = (int)dec.decodeSymbol(m_rgb_diff_5);
 					diff = (diff + ((item.rgb[1] >> 8) - (last_item[1] >> 8))) / 2;
-					item.rgb[2] |= (ushort)((MyDefs.U8_FOLD(corr + MyDefs.U8_CLAMP(diff + (last_item[2] >> 8)))) << 8);
+					item.rgb[2] |= (ushort)(MyDefs.U8_FOLD(corr + MyDefs.U8_CLAMP(diff + (last_item[2] >> 8))) << 8);
 				}
 				else
 				{

@@ -69,60 +69,60 @@ namespace LASzip.Net
 		public U32I32F32 y;
 		public U32I32F32 z;
 
-		//public LASwavepacket13 unpack(byte[] item)
-		//{
-		//	// unpack a LAS wavepacket out of raw memory
-		//	LASwavepacket13 r = new LASwavepacket13();
+		public static LASwavepacket13 unpack(byte[] item, int offset = 0)
+		{
+			// unpack a LAS wavepacket out of raw memory
+			LASwavepacket13 r = new LASwavepacket13();
 
-		//	r.offset = makeU64(item);
-		//	r.packet_size = makeU32(item, 8);
-		//	r.return_point.u32 = makeU32(item, 12);
+			r.offset = makeU64(item, offset);
+			r.packet_size = makeU32(item, offset + 8);
+			r.return_point.u32 = makeU32(item, offset + 12);
 
-		//	r.x.u32 = makeU32(item, 16);
-		//	r.y.u32 = makeU32(item, 20);
-		//	r.z.u32 = makeU32(item, 24);
+			r.x.u32 = makeU32(item, offset + 16);
+			r.y.u32 = makeU32(item, offset + 20);
+			r.z.u32 = makeU32(item, offset + 24);
 
-		//	return r;
-		//}
+			return r;
+		}
 
-		//public void pack(byte[] item)
-		//{
-		//	// pack a LAS wavepacket into raw memory
-		//	packU32((uint)(offset & 0xFFFFFFFF), item);
-		//	packU32((uint)(offset >> 32), item, 4);
+		public void pack(byte[] item, int item_offset = 0)
+		{
+			// pack a LAS wavepacket into raw memory
+			packU32((uint)(offset & 0xFFFFFFFF), item, item_offset);
+			packU32((uint)(offset >> 32), item, item_offset + 4);
 
-		//	packU32(packet_size, item, 8);
-		//	packU32(return_point.u32, item, 12);
-		//	packU32(x.u32, item, 16);
-		//	packU32(y.u32, item, 20);
-		//	packU32(z.u32, item, 24);
-		//}
+			packU32(packet_size, item, item_offset + 8);
+			packU32(return_point.u32, item, item_offset + 12);
+			packU32(x.u32, item, item_offset + 16);
+			packU32(y.u32, item, item_offset + 20);
+			packU32(z.u32, item, item_offset + 24);
+		}
 
-		//static ulong makeU64(byte[] item)
-		//{
-		//	ulong dw0 = (ulong)makeU32(item);
-		//	ulong dw1 = (ulong)makeU32(item, 4);
+		static ulong makeU64(byte[] item, int offset = 0)
+		{
+			ulong dw0 = (ulong)makeU32(item, offset);
+			ulong dw1 = (ulong)makeU32(item, offset + 4);
 
-		//	return dw0 | (dw1 << 32);
-		//}
+			return dw0 | (dw1 << 32);
+		}
 
-		//static uint makeU32(byte[] item, int offset = 0)
-		//{
-		//	uint b0 = (uint)item[offset + 0];
-		//	uint b1 = (uint)item[offset + 1];
-		//	uint b2 = (uint)item[offset + 2];
-		//	uint b3 = (uint)item[offset + 3];
+		static uint makeU32(byte[] item, int offset = 0)
+		{
+			uint b0 = (uint)item[offset + 0];
+			uint b1 = (uint)item[offset + 1];
+			uint b2 = (uint)item[offset + 2];
+			uint b3 = (uint)item[offset + 3];
 
-		//	return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-		//}
+			return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+		}
 
-		//static void packU32(uint v, byte[] item, int offset = 0)
-		//{
-		//	item[offset + 0] = (byte)(v & 0xFF);
-		//	item[offset + 1] = (byte)((v >> 8) & 0xFF);
-		//	item[offset + 2] = (byte)((v >> 16) & 0xFF);
-		//	item[offset + 3] = (byte)((v >> 24) & 0xFF);
-		//}
+		static void packU32(uint v, byte[] item, int offset = 0)
+		{
+			item[offset + 0] = (byte)(v & 0xFF);
+			item[offset + 1] = (byte)((v >> 8) & 0xFF);
+			item[offset + 2] = (byte)((v >> 16) & 0xFF);
+			item[offset + 3] = (byte)((v >> 24) & 0xFF);
+		}
 	}
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]

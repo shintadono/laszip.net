@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -47,7 +47,7 @@ namespace LASzip.Net
 		// counts n, or mix up the position of r and n. we therefore
 		// "complete" the table to also map those "undesired" r & n
 		// combinations to different contexts
-		internal static readonly byte[,] number_return_map=new byte[,]
+		internal static readonly byte[,] number_return_map = new byte[,]
 		{
 			{ 15, 14, 13, 12, 11, 10,  9,  8 },
 			{ 14,  0,  1,  3,  6, 10, 10,  9 },
@@ -75,8 +75,8 @@ namespace LASzip.Net
 		// counts n, or mix up the position of r and n. we therefore
 		// "complete" the table to also map those "undesired" r & n
 		// combinations to different contexts
-		// FunFact: number_return_level[r, n]==Math.Abs(r-n);
-		internal static readonly byte[,] number_return_level=new byte[,]
+		// FunFact: number_return_level[r, n] == Math.Abs(r-n);
+		internal static readonly byte[,] number_return_level = new byte[,]
 		{
 			{  0,  1,  2,  3,  4,  5,  6,  7 },
 			{  1,  0,  1,  2,  3,  4,  5,  6 },

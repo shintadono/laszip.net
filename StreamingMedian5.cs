@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -36,86 +36,86 @@ namespace LASzip.Net
 		public int values2;
 		public int values3;
 		public int values4;
-		public bool low;
+		public bool low; // Using low (start value: false) instead of high (start value: true) removes the need for a constructor.
 
 		public void init()
 		{
-			values0=values1=values2=values3=values4=0;
-			low=false;
+			values0 = values1 = values2 = values3 = values4 = 0;
+			low = false;
 		}
 
 		public void add(int v)
 		{
-			if(!low)
+			if (!low)
 			{
-				if(v<values2)
+				if (v < values2)
 				{
-					values4=values3;
-					values3=values2;
-					if(v<values0)
+					values4 = values3;
+					values3 = values2;
+					if (v < values0)
 					{
-						values2=values1;
-						values1=values0;
-						values0=v;
+						values2 = values1;
+						values1 = values0;
+						values0 = v;
 					}
-					else if(v<values1)
+					else if (v < values1)
 					{
-						values2=values1;
-						values1=v;
+						values2 = values1;
+						values1 = v;
 					}
 					else
 					{
-						values2=v;
+						values2 = v;
 					}
 				}
 				else
 				{
-					if(v<values3)
+					if (v < values3)
 					{
-						values4=values3;
-						values3=v;
+						values4 = values3;
+						values3 = v;
 					}
 					else
 					{
-						values4=v;
+						values4 = v;
 					}
-					low=true;
+					low = true;
 				}
 			}
 			else
 			{
-				if(values2<v)
+				if (values2 < v)
 				{
-					values0=values1;
-					values1=values2;
-					if(values4<v)
+					values0 = values1;
+					values1 = values2;
+					if (values4 < v)
 					{
-						values2=values3;
-						values3=values4;
-						values4=v;
+						values2 = values3;
+						values3 = values4;
+						values4 = v;
 					}
-					else if(values3<v)
+					else if (values3 < v)
 					{
-						values2=values3;
-						values3=v;
+						values2 = values3;
+						values3 = v;
 					}
 					else
 					{
-						values2=v;
+						values2 = v;
 					}
 				}
 				else
 				{
-					if(values1<v)
+					if (values1 < v)
 					{
-						values0=values1;
-						values1=v;
+						values0 = values1;
+						values1 = v;
 					}
 					else
 					{
-						values0=v;
+						values0 = v;
 					}
-					low=false;
+					low = false;
 				}
 			}
 		}
