@@ -161,27 +161,26 @@ namespace LASzip.Net
 							else if (items[i].version == 2) readers_compressed[i] = new LASreadItemCompressed_BYTE_v2(dec, items[i].size);
 							else return false;
 							break;
-						// TODO
 						case LASitem.Type.POINT14:
 							if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_selective); // version == 2 from lasproto
-							//else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_POINT14_v4(dec, decompress_selective);
+							else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_POINT14_v4(dec, decompress_selective);
 							else return false;
 							break;
 						case LASitem.Type.RGB14:
 							if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec, decompress_selective); // version == 2 from lasproto
-							//else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGB14_v4(dec, decompress_selective);
+							else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGB14_v4(dec, decompress_selective);
 							else return false;
 							break;
 						case LASitem.Type.RGBNIR14:
 							if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec, decompress_selective); // version == 2 from lasproto
-							//else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v4(dec, decompress_selective);
+							else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v4(dec, decompress_selective);
 							else return false;
 							break;
 						case LASitem.Type.BYTE14:
 							seek_point.extra_bytes = new byte[items[i].size];
 							seek_point.num_extra_bytes = items[i].size;
 							if ((items[i].version == 3) || (items[i].version == 2)) readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size, decompress_selective); // version == 2 from lasproto
-							//else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_BYTE14_v4(dec, items[i].size, decompress_selective); // version == 2 from lasproto
+							else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_BYTE14_v4(dec, items[i].size, decompress_selective); // version == 2 from lasproto
 							else return false;
 							break;
 						case LASitem.Type.WAVEPACKET13:
@@ -190,7 +189,7 @@ namespace LASzip.Net
 							break;
 						case LASitem.Type.WAVEPACKET14:
 							if (items[i].version == 3) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec, decompress_selective);
-							//else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v4(dec, decompress_selective);
+							else if (items[i].version == 4) readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v4(dec, decompress_selective);
 							else return false;
 							break;
 						default: return false;

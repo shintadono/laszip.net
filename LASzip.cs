@@ -110,8 +110,7 @@ namespace LASzip.Net
 					break;
 				case LASitem.Type.WAVEPACKET14:
 					if (item.size != 29) return return_error("WAVEPACKET14 has size != 29");
-					// TODO What about version 4?
-					if (item.version != 0 && item.version != 3) return return_error("WAVEPACKET14 has version != 0 and != 3 and != 4"); // version == 4 fixes context-switch
+					if (item.version != 0 && item.version != 3 && item.version != 4) return return_error("WAVEPACKET14 has version != 0 and != 3 and != 4"); // version == 4 fixes context-switch
 					break;
 				default:
 					if (true)
