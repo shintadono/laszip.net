@@ -34,7 +34,9 @@ you can't create version 1 LAZ files, while reading version 1 is still possible.
 
 **PROGRAMMERS**
 
-  martin@rapidlasso.com (https://github.com/rapidlasso)
+  Martin Isenburg (https://github.com/rapidlasso)
+
+  Howard Butler (https://github.com/hobu)
 
   shintadono@googlemail.com (https://github.com/shintadono)
 
@@ -42,9 +44,12 @@ you can't create version 1 LAZ files, while reading version 1 is still possible.
 
   Jean-Noël Pioche
 
+  Michael P. Gerlek (https://github.com/mpgerlek)
+
+
 **COPYRIGHT**
 
-  (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+  (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
-  (c) of C# port 2014-2017 by Shinta <shintadono@googlemail.com>
+  (c) of C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 

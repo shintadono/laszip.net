@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -30,13 +30,15 @@ using System.Runtime.InteropServices;
 
 namespace LASzip.Net
 {
-	[StructLayout(LayoutKind.Explicit, Pack=1)]
+	[StructLayout(LayoutKind.Explicit, Pack = 1)]
 	public struct U64I64F64
 	{
 		[FieldOffset(0)]
 		public ulong u64;
+
 		[FieldOffset(0)]
 		public long i64;
+
 		[FieldOffset(0)]
 		public double f64;
 	}
