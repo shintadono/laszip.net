@@ -42,6 +42,6 @@ namespace LASzip.Net
 			item.gps_time = BitConverter.ToDouble(buffer, 0);
 		}
 
-		byte[] buffer = new byte[8];
+		readonly byte[] buffer = new byte[8];
 	}
 }

@@ -93,6 +93,6 @@ namespace LASzip.Net
 			}
 		}
 
-		byte[] buffer = new byte[30];
+		readonly byte[] buffer = new byte[30];
 	}
 }

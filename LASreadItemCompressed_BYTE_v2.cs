@@ -81,8 +81,8 @@ namespace LASzip.Net
 
 		ArithmeticDecoder dec;
 		uint number;
-		byte[] last_item;
+		readonly byte[] last_item;
 
-		ArithmeticModel[] m_byte;
+		readonly ArithmeticModel[] m_byte;
 	}
 }

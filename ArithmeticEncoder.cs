@@ -324,7 +324,7 @@ namespace LASzip.Net
 			Debug.Assert(outbyte < endbuffer);
 		}
 
-		byte[] outbuffer;
+		readonly byte[] outbuffer;
 		int endbuffer;
 		int outbyte;
 		int endbyte;

@@ -152,7 +152,7 @@ namespace LASzip.Net
 		}
 
 		ArithmeticDecoder dec;
-		ushort[] last_item = new ushort[3];
+		readonly ushort[] last_item = new ushort[3];
 
 		ArithmeticModel m_byte_used;
 		ArithmeticModel m_rgb_diff_0;

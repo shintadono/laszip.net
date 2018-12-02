@@ -108,7 +108,7 @@ namespace LASzip.Net
 			num_bytes_allocated = 0;
 		}
 
-		public byte[] buffer = new byte[4 * 9];
+		readonly byte[] buffer = new byte[4 * 9];
 
 		public override bool chunk_sizes()
 		{

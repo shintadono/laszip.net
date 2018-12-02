@@ -72,7 +72,7 @@ namespace LASzip.Net
 			current_context = 0;
 		}
 
-		public byte[] buffer = new byte[4];
+		readonly byte[] buffer = new byte[4];
 
 		public override bool chunk_sizes()
 		{
@@ -216,9 +216,9 @@ namespace LASzip.Net
 
 		ArithmeticDecoder[] dec_Bytes;
 
-		int[] num_bytes_Bytes;
-		bool[] changed_Bytes;
-		bool[] requested_Bytes;
+		readonly int[] num_bytes_Bytes;
+		readonly bool[] changed_Bytes;
+		readonly bool[] requested_Bytes;
 
 		byte[] bytes;
 		int num_bytes_allocated;

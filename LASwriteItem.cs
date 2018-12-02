@@ -12,8 +12,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -30,6 +30,6 @@ namespace LASzip.Net
 {
 	public abstract class LASwriteItem
 	{
-		public abstract bool write(laszip.point item);
+		public abstract bool write(laszip.point item, ref uint context);
 	}
 }

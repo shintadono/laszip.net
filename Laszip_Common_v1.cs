@@ -134,13 +134,19 @@ namespace LASzip.Net
 		public ushort intensity;
 
 		//public byte return_number : 4;
+		public byte return_number { get { return (byte)(returns & 0xF); } set { returns = (byte)((returns & 0xF0) | (value & 0xF)); } }
 		//public byte number_of_returns : 4;
+		public byte number_of_returns { get { return (byte)((returns >> 4) & 0xF); } set { returns = (byte)((returns & 0xF) | ((value & 0xF) << 4)); } }
 		public byte returns;
 
 		//public byte classification_flags : 4;
+		public byte classification_flags { get { return (byte)(flags & 0xF); } set { flags = (byte)((flags & 0xF0) | (value & 0xF)); } }
 		//public byte scanner_channel : 2;
+		public byte scanner_channel { get { return (byte)((flags >> 4) & 3); } set { flags = (byte)((flags & 0xCF) | ((value & 3) << 4)); } }
 		//public byte scan_direction_flag : 1;
+		public byte scan_direction_flag { get { return (byte)((flags >> 6) & 1); } set { flags = (byte)((flags & 0xBF) | ((value & 1) << 6)); } }
 		//public byte edge_of_flight_line : 1;
+		public byte edge_of_flight_line { get { return (byte)((flags >> 7) & 1); } set { flags = (byte)((flags & 0x7F) | ((value & 1) << 7)); } }
 		public byte flags;
 
 		public byte classification;

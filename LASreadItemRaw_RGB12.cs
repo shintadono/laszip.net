@@ -44,6 +44,6 @@ namespace LASzip.Net
 			item.rgb[2] = BitConverter.ToUInt16(buffer, 4);
 		}
 
-		byte[] buffer = new byte[6];
+		readonly byte[] buffer = new byte[6];
 	}
 }

@@ -120,7 +120,7 @@ namespace LASzip.Net
 		int last_diff_32;
 		uint sym_last_offset_diff;
 		ArithmeticModel m_packet_index;
-		ArithmeticModel[] m_offset_diff = new ArithmeticModel[4];
+		readonly ArithmeticModel[] m_offset_diff = new ArithmeticModel[4];
 		IntegerCompressor ic_offset_diff;
 		IntegerCompressor ic_packet_size;
 		IntegerCompressor ic_return_point;

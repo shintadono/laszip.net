@@ -175,7 +175,9 @@ namespace LASzip.Net
 
 		public bool write(laszip.point point)
 		{
-			if(chunk_count==chunk_size)
+			uint context = 0;
+
+			if (chunk_count==chunk_size)
 			{
 				enc.done();
 				add_chunk_to_table();
@@ -188,15 +190,15 @@ namespace LASzip.Net
 			{
 				for(uint i=0; i<num_writers; i++)
 				{
-					writers[i].write(point);
+					writers[i].write(point, ref context);
 				}
 			}
 			else
 			{
 				for(uint i=0; i<num_writers; i++)
 				{
-					writers_raw[i].write(point);
-					((LASwriteItemCompressed)(writers_compressed[i])).init(point);
+					writers_raw[i].write(point, ref context);
+					((LASwriteItemCompressed)(writers_compressed[i])).init(point, ref context);
 				}
 				writers=writers_compressed;
 				enc.init(outstream);

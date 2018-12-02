@@ -12,8 +12,8 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2005-2012, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014 by Shinta <shintadono@googlemail.com>
+//    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
+//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -36,28 +36,28 @@ namespace LASzip.Net
 		public LASwriteItemCompressed_BYTE_v2(ArithmeticEncoder enc, uint number)
 		{
 			// set encoder
-			Debug.Assert(enc!=null);
-			this.enc=enc;
-			Debug.Assert(number>0);
-			this.number=number;
+			Debug.Assert(enc != null);
+			this.enc = enc;
+			Debug.Assert(number > 0);
+			this.number = number;
 
 			// create models and integer compressors
-			m_byte=new ArithmeticModel[number];
-			for(uint i=0; i<number; i++)
+			m_byte = new ArithmeticModel[number];
+			for (uint i = 0; i < number; i++)
 			{
-				m_byte[i]=enc.createSymbolModel(256);
+				m_byte[i] = enc.createSymbolModel(256);
 			}
 
 			// create last item
-			last_item=new byte[number];
+			last_item = new byte[number];
 		}
 
-		public override bool init(laszip.point item)
+		public override bool init(laszip.point item, ref uint context)
 		{
 			// init state
 
 			// init models and integer compressors
-			for(uint i=0; i<number; i++)
+			for (uint i = 0; i < number; i++)
 			{
 				enc.initSymbolModel(m_byte[i]);
 			}
@@ -68,11 +68,11 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override bool write(laszip.point item)
+		public override bool write(laszip.point item, ref uint context)
 		{
-			for(uint i=0; i<number; i++)
+			for (uint i = 0; i < number; i++)
 			{
-				int diff=item.extra_bytes[i]-last_item[i];
+				int diff = item.extra_bytes[i] - last_item[i];
 				enc.encodeSymbol(m_byte[i], (byte)MyDefs.U8_FOLD(diff));
 			}
 
@@ -82,8 +82,8 @@ namespace LASzip.Net
 
 		ArithmeticEncoder enc;
 		uint number;
-		byte[] last_item;
+		readonly byte[] last_item;
 
-		ArithmeticModel[] m_byte;
+		readonly ArithmeticModel[] m_byte;
 	}
 }

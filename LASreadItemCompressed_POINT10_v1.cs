@@ -211,8 +211,8 @@ namespace LASzip.Net
 		ArithmeticDecoder dec;
 		LASpoint10 last = new LASpoint10();
 
-		int[] last_x_diff = new int[3];
-		int[] last_y_diff = new int[3];
+		readonly int[] last_x_diff = new int[3];
+		readonly int[] last_y_diff = new int[3];
 		int last_incr;
 		IntegerCompressor ic_dx;
 		IntegerCompressor ic_dy;
@@ -222,8 +222,8 @@ namespace LASzip.Net
 		IntegerCompressor ic_point_source_ID;
 
 		ArithmeticModel m_changed_values;
-		ArithmeticModel[] m_bit_byte = new ArithmeticModel[256];
-		ArithmeticModel[] m_classification = new ArithmeticModel[256];
-		ArithmeticModel[] m_user_data = new ArithmeticModel[256];
+		readonly ArithmeticModel[] m_bit_byte = new ArithmeticModel[256];
+		readonly ArithmeticModel[] m_classification = new ArithmeticModel[256];
+		readonly ArithmeticModel[] m_user_data = new ArithmeticModel[256];
 	}
 }

@@ -183,9 +183,9 @@ namespace LASzip.Net
 
 		ArithmeticDecoder dec;
 		uint last, next;
-		U64I64F64[] last_gpstime = new U64I64F64[4];
-		int[] last_gpstime_diff = new int[4];
-		int[] multi_extreme_counter = new int[4];
+		readonly U64I64F64[] last_gpstime = new U64I64F64[4];
+		readonly int[] last_gpstime_diff = new int[4];
+		readonly int[] multi_extreme_counter = new int[4];
 
 		ArithmeticModel m_gpstime_multi;
 		ArithmeticModel m_gpstime_0diff;

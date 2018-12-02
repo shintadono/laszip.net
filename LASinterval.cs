@@ -98,14 +98,14 @@ namespace LASzip.Net
 		public int index;
 		public uint start, end, full, total;
 
-		private Dictionary<int, LASintervalStartCell> cells = new Dictionary<int, LASintervalStartCell>();
-		private Dictionary<int, LASintervalStartCell>.Enumerator cellsEnumerator;
-		private HashSet<LASintervalStartCell> cells_to_merge = null;
-		private uint threshold, number_intervals = 0;
-		private int last_index = int.MinValue;
-		private LASintervalStartCell last_cell = null, merged_cells = null;
-		private LASintervalCell current_cell = null;
-		private bool merged_cells_temporary = false;
+		Dictionary<int, LASintervalStartCell> cells = new Dictionary<int, LASintervalStartCell>();
+		Dictionary<int, LASintervalStartCell>.Enumerator cellsEnumerator;
+		HashSet<LASintervalStartCell> cells_to_merge = null;
+		uint threshold, number_intervals = 0;
+		int last_index = int.MinValue;
+		LASintervalStartCell last_cell = null, merged_cells = null;
+		LASintervalCell current_cell = null;
+		bool merged_cells_temporary = false;
 
 		public LASinterval(uint threshold = 1000)
 		{

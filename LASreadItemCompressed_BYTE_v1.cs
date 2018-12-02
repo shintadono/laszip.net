@@ -71,7 +71,7 @@ namespace LASzip.Net
 
 		ArithmeticDecoder dec;
 		uint number;
-		byte[] last_item;
+		readonly byte[] last_item;
 
 		IntegerCompressor ic_byte;
 	}
