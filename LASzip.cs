@@ -53,7 +53,7 @@ namespace LASzip.Net
 		public const int CODER_ARITHMETIC = 0;
 		const int CODER_TOTAL_NUMBER_OF = 1;
 
-		const int CHUNK_SIZE_DEFAULT = 50000;
+		internal const int CHUNK_SIZE_DEFAULT = 50000;
 
 		#region supported version control
 		public bool check_compressor(ushort compressor)

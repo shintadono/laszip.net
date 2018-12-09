@@ -110,6 +110,7 @@
     <Compile Include="LASwriteItemRaw_WAVEPACKET13.cs" />
     <Compile Include="LASwritePoint.cs" />
     <Compile Include="LASzip.cs" />
+    <Compile Include="laszip.Inventory.cs" />
     <Compile Include="Laszip_Common_v1.cs" />
     <Compile Include="Laszip_Common_v2.cs" />
     <Compile Include="Laszip_Common_v3.cs" />
