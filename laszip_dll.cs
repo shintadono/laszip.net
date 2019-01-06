@@ -79,7 +79,7 @@ namespace LASzip.Net
 
 		Inventory inventory = null;
 
-		readonly List<byte[]> buffers = new List<byte[]>();
+		readonly List<byte[]> buffers = new List<byte[]>(); // TODO remove
 
 		static unsafe List<LASattribute> ToLASattributeList(byte[] data)
 		{
@@ -1101,7 +1101,7 @@ namespace LASzip.Net
 				return 1;
 			}
 
-			if ((vlr.record_length_after_header > 0) && (vlr.data == null))
+			if (vlr.record_length_after_header > 0 && vlr.data == null)
 			{
 				error = string.Format("VLR record_length_after_header is {0} but VLR data pointer is zero", vlr.record_length_after_header);
 				return 1;
@@ -1444,8 +1444,267 @@ namespace LASzip.Net
 			return 0;
 		}
 
-		//------- next to check
-		//int prepare_point_for_write(bool compress)
+		unsafe int prepare_point_for_write(bool compress)
+		{
+			if (curHeader.point_data_format > 5)
+			{
+				if (m_request_native_extension)
+				{
+					// we are *not* operating in compatibility mode
+					m_compatibility_mode = false;
+				}
+				else if (m_request_compatibility_mode)
+				{
+					// make sure there are no more than U32_MAX points
+					if (curHeader.extended_number_of_point_records > uint.MaxValue)
+					{
+						error = string.Format("extended_number_of_point_records of {0} is too much for 32-bit counters of compatibility mode", curHeader.extended_number_of_point_records);
+						return 1;
+					}
+
+					// copy 64-bit extended counters back into 32-bit legacy counters
+					curHeader.number_of_point_records = (uint)curHeader.extended_number_of_point_records;
+					for (int i = 0; i < 5; i++)
+					{
+						curHeader.number_of_points_by_return[i] = (uint)curHeader.extended_number_of_points_by_return[i];
+					}
+
+					// are there any "extra bytes" already ... ?
+					int number_of_existing_extrabytes = 0;
+
+					switch (curHeader.point_data_format)
+					{
+						case 6: number_of_existing_extrabytes = curHeader.point_data_record_length - 30; break;
+						case 7: number_of_existing_extrabytes = curHeader.point_data_record_length - 36; break;
+						case 8: number_of_existing_extrabytes = curHeader.point_data_record_length - 38; break;
+						case 9: number_of_existing_extrabytes = curHeader.point_data_record_length - 59; break;
+						case 10: number_of_existing_extrabytes = curHeader.point_data_record_length - 67; break;
+						default: error = string.Format("unknown point_data_format {0}", curHeader.point_data_format); return 1;
+					}
+
+					if (number_of_existing_extrabytes < 0)
+					{
+						error = string.Format("bad point_data_format {0} point_data_record_length {1} combination", curHeader.point_data_format, curHeader.point_data_record_length);
+						return 1;
+					}
+
+					// downgrade to LAS 1.2 or LAS 1.3
+					if (curHeader.point_data_format <= 8)
+					{
+						curHeader.version_minor = 2;
+						// LAS 1.2 header is 148 bytes less than LAS 1.4+ header
+						curHeader.header_size -= 148;
+						curHeader.offset_to_point_data -= 148;
+					}
+					else
+					{
+						curHeader.version_minor = 3;
+						// LAS 1.3 header is 140 bytes less than LAS 1.4+ header
+						curHeader.header_size -= 140;
+						curHeader.offset_to_point_data -= 140;
+					}
+
+					// turn off the bit indicating the presence of the OGC WKT
+					curHeader.global_encoding &= 0xFFEF; // ~(1 << 4)
+
+					// old point type is two bytes shorter
+					curHeader.point_data_record_length -= 2;
+					// but we add 5 bytes of attributes
+					curHeader.point_data_record_length += 5;
+
+					// create 2+2+4+148 bytes payload for compatibility VLR
+					MemoryStream outStream = new MemoryStream();
+
+					// write control info
+					ushort laszip_version = unchecked((ushort)LASzip.VERSION_BUILD_DATE);
+					outStream.Write(BitConverter.GetBytes(laszip_version), 0, 2);
+
+					ushort compatible_version = 3;
+					outStream.Write(BitConverter.GetBytes(compatible_version), 0, 2);
+					uint unused = 0;
+					outStream.Write(BitConverter.GetBytes(unused), 0, 4);
+
+					// write the 148 bytes of the extended LAS 1.4 header
+					ulong start_of_waveform_data_packet_record = curHeader.start_of_waveform_data_packet_record;
+					if (start_of_waveform_data_packet_record != 0)
+					{
+						Console.Error.WriteLine("WARNING: header->start_of_waveform_data_packet_record is {0}. writing 0 instead.", start_of_waveform_data_packet_record);
+						start_of_waveform_data_packet_record = 0;
+					}
+					outStream.Write(BitConverter.GetBytes(start_of_waveform_data_packet_record), 0, 8);
+
+					ulong start_of_first_extended_variable_length_record = curHeader.start_of_first_extended_variable_length_record;
+					if (start_of_first_extended_variable_length_record != 0)
+					{
+						Console.Error.WriteLine("WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is {0}. writing 0 instead.", start_of_first_extended_variable_length_record);
+						start_of_first_extended_variable_length_record = 0;
+					}
+					outStream.Write(BitConverter.GetBytes(start_of_first_extended_variable_length_record), 0, 8);
+
+					uint number_of_extended_variable_length_records = curHeader.number_of_extended_variable_length_records;
+					if (number_of_extended_variable_length_records != 0)
+					{
+						Console.Error.WriteLine("WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is {0}. writing 0 instead.", number_of_extended_variable_length_records);
+						number_of_extended_variable_length_records = 0;
+					}
+					outStream.Write(BitConverter.GetBytes(number_of_extended_variable_length_records), 0, 4);
+
+					ulong extended_number_of_point_records;
+					if (curHeader.number_of_point_records != 0)
+						extended_number_of_point_records = curHeader.number_of_point_records;
+					else
+						extended_number_of_point_records = curHeader.extended_number_of_point_records;
+					outStream.Write(BitConverter.GetBytes(extended_number_of_point_records), 0, 8);
+
+					ulong extended_number_of_points_by_return;
+					for (int i = 0; i < 15; i++)
+					{
+						if (i < 5 && curHeader.number_of_points_by_return[i] != 0)
+							extended_number_of_points_by_return = curHeader.number_of_points_by_return[i];
+						else
+							extended_number_of_points_by_return = curHeader.extended_number_of_points_by_return[i];
+						outStream.Write(BitConverter.GetBytes(extended_number_of_points_by_return), 0, 8);
+					}
+
+					// add the compatibility VLR
+					byte[] user_id = Encoding.ASCII.GetBytes("lascompatible");
+					vlr lascompatible = new vlr() { reserved = 0, record_id = 22204, record_length_after_header = 2 + 2 + 4 + 148, data = outStream.ToArray() };
+					Array.Copy(user_id, lascompatible.user_id, Math.Min(user_id.Length, 16));
+
+					if (add_vlr(lascompatible) != 0)
+					{
+						error = "adding the compatibility VLR";
+						return 1;
+					}
+					outStream.Close();
+
+					// if needed create an attributer to describe the "extra bytes"
+					if (attributer == null)
+					{
+						try
+						{
+							attributer = new LASattributer();
+						}
+						catch
+						{
+							error = "cannot allocate LASattributer";
+							return 1;
+						}
+					}
+
+					// were there any pre-existing extra bytes
+					if (number_of_existing_extrabytes > 0)
+					{
+						// make sure the existing "extra bytes" are documented
+						if (attributer.get_attributes_size() > number_of_existing_extrabytes)
+						{
+							error = string.Format("bad \"extra bytes\" VLR describes {0} bytes more than points actually have", attributer.get_attributes_size() - number_of_existing_extrabytes);
+							return 1;
+						}
+						else if (attributer.get_attributes_size() < number_of_existing_extrabytes)
+						{
+							// maybe the existing "extra bytes" are documented in a VLR
+							if (curHeader.vlrs != null)
+							{
+								for (int i = 0; i < curHeader.number_of_variable_length_records; i++)
+								{
+									if (strcmp(curHeader.vlrs[i].user_id, "LASF_Spec") && curHeader.vlrs[i].record_id == 4)
+									{
+
+										attributer.init_attributes(ToLASattributeList(curHeader.vlrs[i].data));
+									}
+								}
+							}
+
+							// describe any undocumented "extra bytes" as "unknown" U8 attributes
+							for (int i = attributer.get_attributes_size(); i < number_of_existing_extrabytes; i++)
+							{
+								string unknown_name = string.Format("unknown {0}", i);
+								LASattribute lasattribute_unknown = new LASattribute(LAS_ATTRIBUTE.U8, unknown_name, unknown_name);
+								if (attributer.add_attribute(lasattribute_unknown) == -1)
+								{
+									error = string.Format("cannot add unknown U8 attribute '{0}' of {1} to attributer", unknown_name, number_of_existing_extrabytes);
+									return 1;
+								}
+							}
+						}
+					}
+
+					// create the "extra bytes" that store the newer LAS 1.4 point attributes
+
+					// scan_angle (difference or remainder) is stored as a I16
+					LASattribute lasattribute_scan_angle = new LASattribute(LAS_ATTRIBUTE.I16, "LAS 1.4 scan angle", "additional attributes");
+					lasattribute_scan_angle.set_scale(0.006, 0);
+					int index_scan_angle = attributer.add_attribute(lasattribute_scan_angle);
+					start_scan_angle = attributer.get_attribute_start(index_scan_angle);
+					// extended returns stored as a U8
+					LASattribute lasattribute_extended_returns = new LASattribute(LAS_ATTRIBUTE.U8, "LAS 1.4 extended returns", "additional attributes");
+					int index_extended_returns = attributer.add_attribute(lasattribute_extended_returns);
+					start_extended_returns = attributer.get_attribute_start(index_extended_returns);
+					// classification stored as a U8
+					LASattribute lasattribute_classification = new LASattribute(LAS_ATTRIBUTE.U8, "LAS 1.4 classification", "additional attributes");
+					int index_classification = attributer.add_attribute(lasattribute_classification);
+					start_classification = attributer.get_attribute_start(index_classification);
+					// flags and channel stored as a U8
+					LASattribute lasattribute_flags_and_channel = new LASattribute(LAS_ATTRIBUTE.U8, "LAS 1.4 flags and channel", "additional attributes");
+					int index_flags_and_channel = attributer.add_attribute(lasattribute_flags_and_channel);
+					start_flags_and_channel = attributer.get_attribute_start(index_flags_and_channel);
+					// maybe store the NIR band as a U16
+					if (curHeader.point_data_format == 8 || curHeader.point_data_format == 10)
+					{
+						// the NIR band is stored as a U16
+						LASattribute lasattribute_NIR_band = new LASattribute(LAS_ATTRIBUTE.U16, "LAS 1.4 NIR band", "additional attributes");
+						int index_NIR_band = attributer.add_attribute(lasattribute_NIR_band);
+						start_NIR_band = attributer.get_attribute_start(index_NIR_band);
+					}
+					else
+					{
+						start_NIR_band = -1;
+					}
+
+					// add the extra bytes VLR with the additional attributes
+					user_id = Encoding.ASCII.GetBytes("LASF_Spec");
+					vlr attributes = new vlr() { reserved = 0, record_id = 4, record_length_after_header = (ushort)(attributer.number_attributes * sizeof(LASattribute)), data = ToByteArray(attributer.attributes) };
+					Array.Copy(user_id, attributes.user_id, Math.Min(user_id.Length, 16));
+
+					if (add_vlr(attributes) != 0)
+					{
+						error = "adding the extra bytes VLR with the additional attributes";
+						return 1;
+					}
+
+					// update point type
+					if (curHeader.point_data_format == 6)
+					{
+						curHeader.point_data_format = 1;
+					}
+					else if (curHeader.point_data_format <= 8)
+					{
+						curHeader.point_data_format = 3;
+					}
+					else // 9->4 and 10->5
+					{
+						curHeader.point_data_format -= 5;
+					}
+
+					// we are operating in compatibility mode
+					m_compatibility_mode = true;
+				}
+				else if (compress)
+				{
+					error = string.Format("LASzip DLL {0}.{1} r{2} ({3}) cannot compress point data format {4} without requesting 'compatibility mode'",
+						LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE, curHeader.point_data_format);
+					return 1;
+				}
+			}
+			else
+			{
+				// we are *not* operating in compatibility mode
+				m_compatibility_mode = false;
+			}
+
+			return 0;
+		}
 
 		int prepare_vlrs_for_write()
 		{
@@ -1453,7 +1712,7 @@ namespace LASzip.Net
 
 			if (curHeader.number_of_variable_length_records != 0)
 			{
-				if (curHeader.vlrs == null)
+				if (curHeader.vlrs == null || curHeader.vlrs.Count == 0)
 				{
 					error = string.Format("number_of_variable_length_records is {0} but vlrs pointer is zero", curHeader.number_of_variable_length_records);
 					return 1;
@@ -1464,7 +1723,7 @@ namespace LASzip.Net
 					vlrs_size += 54;
 					if (curHeader.vlrs[i].record_length_after_header != 0)
 					{
-						if (curHeader.vlrs == null)
+						if (curHeader.vlrs[i] == null)
 						{
 							error = string.Format("vlrs[{0}].record_length_after_header is {1} but vlrs[{0}].data pointer is zero", i, curHeader.vlrs[i].record_length_after_header);
 							return 1;
@@ -1586,7 +1845,7 @@ namespace LASzip.Net
 			return 0;
 		}
 
-		int laszip_write_header(LASzip laszip, bool compress)
+		int write_header(LASzip laszip, bool compress)
 		{
 			#region write the header variable after variable
 			try
@@ -1857,6 +2116,7 @@ namespace LASzip.Net
 			return 0;
 		}
 
+		//------- next to check
 		//int setup_laszip_items(LASzip laszip, bool compress)
 
 		// TODO move

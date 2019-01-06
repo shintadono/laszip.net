@@ -669,6 +669,7 @@ namespace LASzip.Net
 				b += 2;
 				for (int i = 0; i < num_items; i++)
 				{
+					items[i] = new LASitem();
 					items[i].type = (LASitem.Type)(int)*((ushort*)b);
 					b += 2;
 					items[i].size = *((ushort*)b);
