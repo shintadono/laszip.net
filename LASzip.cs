@@ -741,7 +741,7 @@ namespace LASzip.Net
 		#endregion
 
 		#region setup
-		bool request_compatibility_mode(ushort requested_compatibility_mode = 0) // 0 = none, 1 = LAS 1.4 compatibility mode
+		internal bool request_compatibility_mode(ushort requested_compatibility_mode = 0) // 0 = none, 1 = LAS 1.4 compatibility mode
 		{
 			if (num_items != 0) return return_error("request compatibility mode before calling setup()");
 
