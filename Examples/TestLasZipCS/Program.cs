@@ -26,7 +26,7 @@ namespace TestLasZipCS
 		{
 			var lazReader = new laszip();
 			var compressed = true;
-			lazReader.open_reader(FileName, ref compressed);
+			lazReader.open_reader(FileName, out compressed);
 			var numberOfPoints = lazReader.curHeader.number_of_point_records;
 
 			// Check some header values

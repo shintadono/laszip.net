@@ -38,7 +38,7 @@ namespace LASzip.Net
 		public readonly header curHeader = new header(); // TODO name
 		long p_count = 0;
 		long npoints = 0;
-		public readonly point curPoint = new point();
+		public readonly point curPoint = new point(); // TODO name
 
 		Stream streamin = null;
 		bool leaveStreamInOpen = false;
@@ -78,8 +78,6 @@ namespace LASzip.Net
 		int start_NIR_band = 0;
 
 		Inventory inventory = null;
-
-		readonly List<byte[]> buffers = new List<byte[]>(); // TODO remove
 
 		static unsafe List<LASattribute> ToLASattributeList(byte[] data)
 		{
@@ -277,9 +275,6 @@ namespace LASzip.Net
 
 				// dealloc the inventory although close_writer() call should have done this already
 				inventory = null;
-
-				// dealloc any data fields that were kept around in memory for others
-				buffers.Clear();
 
 				// default everything else of the laszip struct
 				p_count = npoints = 0;
@@ -496,7 +491,7 @@ namespace LASzip.Net
 				{
 					if (header.user_data_after_header == null)
 					{
-						error=string.Format("header->user_data_after_header_size is {0} but header->user_data_after_header is NULL", header.user_data_after_header_size);
+						error = string.Format("header->user_data_after_header_size is {0} but header->user_data_after_header is NULL", header.user_data_after_header_size);
 						return 1;
 					}
 					curHeader.user_data_after_header = new byte[header.user_data_after_header_size];
@@ -1735,7 +1730,7 @@ namespace LASzip.Net
 
 			if ((vlrs_size + curHeader.header_size + curHeader.user_data_after_header_size) != curHeader.offset_to_point_data)
 			{
-				error = string.Format("header_size ({0}) plus vlrs_size ({1}) plus user_data_after_header_size ({2}) does not equal offset_to_point_data ({3})", 
+				error = string.Format("header_size ({0}) plus vlrs_size ({1}) plus user_data_after_header_size ({2}) does not equal offset_to_point_data ({3})",
 					curHeader.header_size, vlrs_size, curHeader.user_data_after_header_size, curHeader.offset_to_point_data);
 				return 1;
 			}
@@ -1748,25 +1743,25 @@ namespace LASzip.Net
 			return 34u + (6u * laszip.num_items);
 		}
 
-		int write_laszip_vlr_header(LASzip laszip)
+		int write_laszip_vlr_header(LASzip laszip, Stream outStream)
 		{
 			// write the LASzip VLR header
 			ushort reserved = 0;
-			try { streamout.Write(BitConverter.GetBytes(reserved), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(reserved), 0, 2); }
 			catch { error = "writing LASzip VLR header.reserved"; return 1; }
 
 			byte[] user_id1 = Encoding.ASCII.GetBytes("laszip encoded");
 			byte[] user_id = new byte[16];
 			Array.Copy(user_id1, user_id, Math.Min(16, user_id1.Length));
-			try { streamout.Write(user_id, 0, 16); }
+			try { outStream.Write(user_id, 0, 16); }
 			catch { error = "writing LASzip VLR header.user_id"; return 1; }
 
 			ushort record_id = 22204;
-			try { streamout.Write(BitConverter.GetBytes(record_id), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(record_id), 0, 2); }
 			catch { error = "writing LASzip VLR header.record_id"; return 1; }
 
 			ushort record_length_after_header = (ushort)vrl_payload_size(laszip);
-			try { streamout.Write(BitConverter.GetBytes(record_length_after_header), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(record_length_after_header), 0, 2); }
 			catch { error = "writing LASzip VLR header.record_length_after_header"; return 1; }
 
 			// description field must be a null-terminate string, so we don't copy more than 31 characters
@@ -1774,13 +1769,13 @@ namespace LASzip.Net
 			byte[] description = new byte[32];
 			Array.Copy(description1, description, Math.Min(31, description1.Length));
 
-			try { streamout.Write(description, 0, 32); }
+			try { outStream.Write(description, 0, 32); }
 			catch { error = "writing LASzip VLR header.description"; return 1; }
 
 			return 0;
 		}
 
-		int write_laszip_vlr_payload(LASzip laszip)
+		int write_laszip_vlr_payload(LASzip laszip, Stream outStream)
 		{
 			// write the LASzip VLR payload
 
@@ -1799,46 +1794,46 @@ namespace LASzip.Net
 			//        U16 version             2 bytes * num_items
 			// which totals 34+6*num_items
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.compressor), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.compressor), 0, 2); }
 			catch { error = string.Format("writing compressor {0}", laszip.compressor); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.coder), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.coder), 0, 2); }
 			catch { error = string.Format("writing coder {0}", laszip.coder); return 1; }
 
-			try { streamout.WriteByte(laszip.version_major); }
+			try { outStream.WriteByte(laszip.version_major); }
 			catch { error = string.Format("writing version_major {0}", laszip.version_major); return 1; }
 
-			try { streamout.WriteByte(laszip.version_minor); }
+			try { outStream.WriteByte(laszip.version_minor); }
 			catch { error = string.Format("writing version_minor {0}", laszip.version_minor); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.version_revision), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.version_revision), 0, 2); }
 			catch { error = string.Format("writing version_revision {0}", laszip.version_revision); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.options), 0, 4); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.options), 0, 4); }
 			catch { error = string.Format("writing options {0}", laszip.options); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.chunk_size), 0, 4); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.chunk_size), 0, 4); }
 			catch { error = string.Format("writing chunk_size {0}", laszip.chunk_size); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.number_of_special_evlrs), 0, 8); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.number_of_special_evlrs), 0, 8); }
 			catch { error = string.Format("writing number_of_special_evlrs {0}", laszip.number_of_special_evlrs); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.offset_to_special_evlrs), 0, 8); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.offset_to_special_evlrs), 0, 8); }
 			catch { error = string.Format("writing offset_to_special_evlrs {0}", laszip.offset_to_special_evlrs); return 1; }
 
-			try { streamout.Write(BitConverter.GetBytes(laszip.num_items), 0, 2); }
+			try { outStream.Write(BitConverter.GetBytes(laszip.num_items), 0, 2); }
 			catch { error = string.Format("writing num_items {0}", laszip.num_items); return 1; }
 
 			for (uint j = 0; j < laszip.num_items; j++)
 			{
 				ushort type = (ushort)laszip.items[j].type;
-				try { streamout.Write(BitConverter.GetBytes(type), 0, 2); }
+				try { outStream.Write(BitConverter.GetBytes(type), 0, 2); }
 				catch { error = string.Format("writing type {0} of item {1}", laszip.items[j].type, j); return 1; }
 
-				try { streamout.Write(BitConverter.GetBytes(laszip.items[j].size), 0, 2); }
+				try { outStream.Write(BitConverter.GetBytes(laszip.items[j].size), 0, 2); }
 				catch { error = string.Format("writing size {0} of item {1}", laszip.items[j].size, j); return 1; }
 
-				try { streamout.Write(BitConverter.GetBytes(laszip.items[j].version), 0, 2); }
+				try { outStream.Write(BitConverter.GetBytes(laszip.items[j].version), 0, 2); }
 				catch { error = string.Format("writing version {0} of item {1}", laszip.items[j].version, j); return 1; }
 			}
 
@@ -1990,7 +1985,7 @@ namespace LASzip.Net
 
 				if (curHeader.start_of_waveform_data_packet_record != 0)
 				{
-					warning=string.Format("header.start_of_waveform_data_packet_record is {0}. writing 0 instead.", curHeader.start_of_waveform_data_packet_record);
+					warning = string.Format("header.start_of_waveform_data_packet_record is {0}. writing 0 instead.", curHeader.start_of_waveform_data_packet_record);
 					curHeader.start_of_waveform_data_packet_record = 0;
 				}
 
@@ -2071,10 +2066,10 @@ namespace LASzip.Net
 			if (compress)
 			{
 				// write the LASzip VLR header
-				if (write_laszip_vlr_header(laszip) != 0) return 1;
+				if (write_laszip_vlr_header(laszip, streamout) != 0) return 1;
 
 				// write the LASzip VLR payload
-				if (write_laszip_vlr_payload(laszip) != 0) return 1;
+				if (write_laszip_vlr_payload(laszip, streamout) != 0) return 1;
 			}
 			#endregion
 
@@ -3586,11 +3581,106 @@ namespace LASzip.Net
 			return 0;
 		}
 
-		//------- next to check
-		// TODO
-		//public int has_spatial_index(bool[]/ref bool is_indexed, bool[]/ref bool is_appended);
+		public int has_spatial_index(out bool is_indexed, out bool is_appended)
+		{
+			is_indexed = is_appended = false;
 
-		//public int inside_rectangle(double min_x, double min_y, double max_x, double max_y, out bool is_empty);
+			try
+			{
+				if (reader == null)
+				{
+					error = "reader is not open";
+					return 1;
+				}
+
+				if (writer != null)
+				{
+
+					error = "writer is already open";
+					return 1;
+				}
+
+				if (lax_exploit == false)
+				{
+
+					error = "exploiting of spatial indexing not enabled before opening reader";
+					return 1;
+				}
+
+				// check if reader found spatial indexing information when opening file
+				is_indexed = lax_index != null;
+
+				// inform whether spatial index is appended to LAZ file or in separate LAX file
+				is_appended = false;
+			}
+			catch
+			{
+				error = "internal error in laszip_have_spatial_index";
+				return 1;
+			}
+
+			error = warning = "";
+			return 0;
+		}
+
+		public int inside_rectangle(double min_x, double min_y, double max_x, double max_y, out bool is_empty)
+		{
+			is_empty = false;
+
+			try
+			{
+				if (reader == null)
+				{
+					error = "reader is not open";
+					return 1;
+				}
+
+				if (lax_exploit == false)
+				{
+					error = "exploiting of spatial indexing not enabled before opening reader";
+					return 1;
+				}
+
+				lax_r_min_x = min_x;
+				lax_r_min_y = min_y;
+				lax_r_max_x = max_x;
+				lax_r_max_y = max_y;
+
+				if (lax_index != null)
+				{
+					if (lax_index.intersect_rectangle(min_x, min_y, max_x, max_y))
+					{
+						// no overlap between spatial indexing cells and query reactangle
+						is_empty = true;
+					}
+					else
+					{
+						is_empty = false;
+					}
+				}
+				else
+				{
+					if (curHeader.min_x > max_x || curHeader.min_y > max_y || curHeader.max_x < min_x || curHeader.max_y < min_y)
+					{
+						// no overlap between header bouding box and query reactangle
+						is_empty = true;
+					}
+					else
+					{
+
+						is_empty = false;
+					}
+				}
+			}
+			catch
+			{
+				error = "internal error in laszip_inside_rectangle";
+				return 1;
+			}
+
+			error = warning = "";
+			return 0;
+		}
 
 		public int seek_point(long index)
 		{
@@ -3610,7 +3700,7 @@ namespace LASzip.Net
 				return 1;
 			}
 
-			error = null;
+			error = warning = "";
 			return 0;
 		}
 
@@ -3631,6 +3721,37 @@ namespace LASzip.Net
 					return 1;
 				}
 
+				// special recoding of points (in compatibility mode only)
+				if (m_compatibility_mode)
+				{
+					// instill extended attributes
+					var point = curPoint;
+
+					// get extended attributes from extra bytes
+					short scan_angle_remainder = BitConverter.ToInt16(point.extra_bytes, start_scan_angle);
+					byte extended_returns = point.extra_bytes[start_extended_returns];
+					byte classification = point.extra_bytes[start_classification];
+					byte flags_and_channel = point.extra_bytes[start_flags_and_channel];
+					if (start_NIR_band != -1)
+					{
+						point.rgb[3] = BitConverter.ToUInt16(point.extra_bytes, start_NIR_band);
+					}
+
+					// decompose into individual attributes
+					int return_number_increment = (extended_returns >> 4) & 0x0F;
+					int number_of_returns_increment = extended_returns & 0x0F;
+					int scanner_channel = (flags_and_channel >> 1) & 0x03;
+					int overlap_bit = flags_and_channel & 0x01;
+
+					// instill into point
+					point.extended_scan_angle = (short)(scan_angle_remainder + MyDefs.I16_QUANTIZE(point.scan_angle_rank / 0.006));
+					point.extended_return_number = (byte)(return_number_increment + point.return_number);
+					point.extended_number_of_returns = (byte)(number_of_returns_increment + point.number_of_returns);
+					point.extended_classification = (byte)(classification + point.classification);
+					point.extended_scanner_channel = (byte)scanner_channel;
+					point.extended_classification_flags = (byte)((overlap_bit << 3) | (point.classification >> 5));
+				}
+
 				p_count++;
 			}
 			catch
@@ -3639,12 +3760,64 @@ namespace LASzip.Net
 				return 1;
 			}
 
-			error = null;
+			error = warning = "";
 			return 0;
 		}
 
-		// TODO
-		//public int read_inside_point(out bool is_done);
+		public int read_inside_point(out bool is_done)
+		{
+			is_done = true;
+
+			try
+			{
+				if (lax_index != null)
+				{
+					while (lax_index.seek_next(reader, ref p_count))
+					{
+						if (reader.read(curPoint))
+						{
+							p_count++;
+							double xy = curHeader.x_scale_factor * curPoint.X + curHeader.x_offset;
+							if (xy < lax_r_min_x || xy >= lax_r_max_x) continue;
+							xy = curHeader.y_scale_factor * curPoint.Y + curHeader.y_offset;
+							if (xy < lax_r_min_y || xy >= lax_r_max_y) continue;
+							is_done = false;
+							break;
+						}
+					}
+				}
+				else
+				{
+					while (reader.read(curPoint))
+					{
+						p_count++;
+						double xy = curHeader.x_scale_factor * curPoint.X + curHeader.x_offset;
+						if (xy < lax_r_min_x || xy >= lax_r_max_x) continue;
+						xy = curHeader.y_scale_factor * curPoint.Y + curHeader.y_offset;
+						if (xy < lax_r_min_y || xy >= lax_r_max_y) continue;
+						is_done = false;
+						break;
+					}
+
+					if (is_done)
+					{
+						if (p_count < npoints)
+						{
+							error = string.Format("reading point {0} of {1} total points", p_count, npoints);
+							return 1;
+						}
+					}
+				}
+			}
+			catch
+			{
+				error = "internal error in laszip_read_inside_point";
+				return 1;
+			}
+
+			error = warning = "";
+			return 0;
+		}
 
 		public int close_reader()
 		{
@@ -3665,6 +3838,7 @@ namespace LASzip.Net
 				reader = null;
 				if (!leaveStreamInOpen) streamin.Close();
 				streamin = null;
+				lax_index = null;
 			}
 			catch
 			{
@@ -3672,11 +3846,47 @@ namespace LASzip.Net
 				return 1;
 			}
 
-			error = null;
+			error = warning = "";
 			return 0;
 		}
 
 		// make LASzip VLR for point type and point size already specified earlier
-		//public int create_laszip_vlr(byte** vlr, uint* vlr_size);
+		public int create_laszip_vlr(out byte[] vlr)
+		{
+			vlr = null;
+
+			LASzip laszip = new LASzip();
+			if (setup_laszip_items(laszip, true) != 0)
+			{
+				return 1;
+			}
+
+			MemoryStream outStream;
+
+			try
+			{
+				outStream = new MemoryStream();
+			}
+			catch
+			{
+				error = "could not alloc ByteStreamOutArray";
+				return 1;
+			}
+
+			if (write_laszip_vlr_header(laszip, outStream) != 0)
+			{
+				return 1;
+			}
+
+			if (write_laszip_vlr_payload(laszip, outStream) != 0)
+			{
+				return 1;
+			}
+
+			vlr = outStream.ToArray();
+
+			error = warning = "";
+			return 0;
+		}
 	}
 }
