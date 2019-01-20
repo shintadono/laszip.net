@@ -95,11 +95,16 @@
     <Compile Include="LASreadPoint.cs" />
     <Compile Include="LASwriteItem.cs" />
     <Compile Include="LASwriteItemCompressed.cs" />
+    <Compile Include="LASwriteItemCompressed_BYTE14_v4.cs" />
     <Compile Include="LASwriteItemCompressed_BYTE_v2.cs" />
     <Compile Include="LASwriteItemCompressed_GPSTIME11_v2.cs" />
     <Compile Include="LASwriteItemCompressed_POINT10_v2.cs" />
+    <Compile Include="LASwriteItemCompressed_POINT14_v4.cs" />
     <Compile Include="LASwriteItemCompressed_RGB12_v2.cs" />
+    <Compile Include="LASwriteItemCompressed_RGB14_v4.cs" />
+    <Compile Include="LASwriteItemCompressed_RGBNIR14_v4.cs" />
     <Compile Include="LASwriteItemCompressed_WAVEPACKET13_v1.cs" />
+    <Compile Include="LASwriteItemCompressed_WAVEPACKET14_v4.cs" />
     <Compile Include="LASwriteItemRaw.cs" />
     <Compile Include="LASwriteItemRaw_BYTE.cs" />
     <Compile Include="LASwriteItemRaw_GPSTIME11.cs" />

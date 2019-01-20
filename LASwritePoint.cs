@@ -134,26 +134,22 @@ namespace LASzip.Net
 							break;
 						case LASitem.Type.POINT14:
 							if (items[i].version == 3) throw new NotSupportedException("Version 3 POINT14 is no longer supported, use version 4.");
-							//else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_POINT14_v4(enc);
-							else if (items[i].version == 4) throw new NotImplementedException();
+							else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_POINT14_v4(enc);
 							else return false;
 							break;
 						case LASitem.Type.RGB14:
 							if (items[i].version == 3) throw new NotSupportedException("Version 3 RGB14 is no longer supported, use version 4.");
-							//else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_RGB14_v4(enc);
-							else if (items[i].version == 4) throw new NotImplementedException();
+							else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_RGB14_v4(enc);
 							else return false;
 							break;
 						case LASitem.Type.RGBNIR14:
 							if (items[i].version == 3) throw new NotSupportedException("Version 3 RGBNIR14 is no longer supported, use version 4.");
-							//else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_RGBNIR14_v4(enc);
-							else if (items[i].version == 4) throw new NotImplementedException();
+							else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_RGBNIR14_v4(enc);
 							else return false;
 							break;
 						case LASitem.Type.BYTE14:
 							if (items[i].version == 3) throw new NotSupportedException("Version 3 BYTE14 is no longer supported, use version 4.");
-							//else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_BYTE14_v4(enc, items[i].size);
-							else if (items[i].version == 4) throw new NotImplementedException();
+							else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_BYTE14_v4(enc, items[i].size);
 							else return false;
 							break;
 						case LASitem.Type.WAVEPACKET13:
@@ -162,8 +158,7 @@ namespace LASzip.Net
 							break;
 						case LASitem.Type.WAVEPACKET14:
 							if (items[i].version == 3) throw new NotSupportedException("Version 3 WAVEPACKET14 is no longer supported, use version 4.");
-							//else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_WAVEPACKET14_v4(enc);
-							else if (items[i].version == 4) throw new NotImplementedException();
+							else if (items[i].version == 4) writers_compressed[i] = new LASwriteItemCompressed_WAVEPACKET14_v4(enc);
 							else return false;
 							break;
 						default: return false;
