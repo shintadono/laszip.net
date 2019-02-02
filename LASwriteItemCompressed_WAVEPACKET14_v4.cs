@@ -45,8 +45,13 @@ namespace LASzip.Net
 		{
 		}
 
-		public override bool chunk_sizes();
-		public override bool chunk_bytes();
+		public override bool chunk_sizes()
+		{
+		}
+
+		public override bool chunk_bytes()
+		{
+		}
 
 		// not used as a encoder. just gives access to outstream
 		ArithmeticEncoder enc;
@@ -60,15 +65,16 @@ namespace LASzip.Net
 		uint num_bytes_wavepacket;
 
 		uint current_context;
-		readonly LAScontextPOINT14[] contexts =
+		readonly LAScontextWAVEPACKET14[] contexts =
 		{
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14()
+			new LAScontextWAVEPACKET14(),
+			new LAScontextWAVEPACKET14(),
+			new LAScontextWAVEPACKET14(),
+			new LAScontextWAVEPACKET14()
 		};
 
-		bool createAndInitModelsAndCompressors(uint context, laszip.point item);
-
+		bool createAndInitModelsAndCompressors(uint context, laszip.point item)
+		{
+		}
 	}
 }

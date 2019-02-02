@@ -89,7 +89,7 @@ namespace LASzip.Net
 			current_context = context; // all other items use context set by POINT14 writer
 
 			// create and init entropy models and integer compressors (and init contect from item)
-			createAndInitModelsAndCompressors(current_context, item);
+			createAndInitModelsAndCompressors(current_context, item.rgb);
 
 			return true;
 		}
@@ -206,7 +206,6 @@ namespace LASzip.Net
 			Stream outstream = enc.getByteStreamOut();
 
 			// output the bytes of all layers
-
 			if (changed_RGB)
 			{
 				outstream.Write(outstream_RGB.GetBuffer(), 0, (int)outstream_RGB.Position);

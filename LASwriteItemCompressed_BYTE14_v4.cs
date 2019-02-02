@@ -33,7 +33,7 @@ namespace LASzip.Net
 {
 	class LASwriteItemCompressed_BYTE14_v4 : LASwriteItemCompressed
 	{
-		public LASwriteItemCompressed_BYTE14_v4(ArithmeticEncoder enc)
+		public LASwriteItemCompressed_BYTE14_v4(ArithmeticEncoder enc, uint number)
 		{
 		}
 
@@ -45,8 +45,13 @@ namespace LASzip.Net
 		{
 		}
 
-		public override bool chunk_sizes();
-		public override bool chunk_bytes();
+		public override bool chunk_sizes()
+		{
+		}
+
+		public override bool chunk_bytes()
+		{
+		}
 
 		// not used as a encoder. just gives access to outstream
 		ArithmeticEncoder enc;
@@ -60,15 +65,17 @@ namespace LASzip.Net
 		bool[] changed_Bytes;
 
 		uint current_context;
-		readonly LAScontextPOINT14[] contexts =
+		readonly LAScontextBYTE14[] contexts =
 		{
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14(),
-			new LAScontextPOINT14()
+			new LAScontextBYTE14(),
+			new LAScontextBYTE14(),
+			new LAScontextBYTE14(),
+			new LAScontextBYTE14()
 		};
 
 		uint number;
-		bool createAndInitModelsAndCompressors(uint context, laszip.point item);
+		bool createAndInitModelsAndCompressors(uint context, laszip.point item)
+		{
+		}
 	}
 }
