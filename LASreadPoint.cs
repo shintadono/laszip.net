@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -127,7 +127,7 @@ namespace LASzip.Net
 				readers_compressed = new LASreadItem[num_readers];
 
 				// seeks with compressed data need a seek point
-				seek_point = new laszip.point();
+				seek_point = new laszip_point();
 
 				if (layered_las14_compression)
 				{
@@ -311,7 +311,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public bool read(laszip.point point)
+		public bool read(laszip_point point)
 		{
 			uint context = 0;
 
@@ -658,7 +658,7 @@ namespace LASzip.Net
 		// used for seeking
 		long point_start;
 		uint point_size;
-		laszip.point seek_point = new laszip.point();
+		laszip_point seek_point = new laszip_point();
 
 		// used for error and warning reporting
 		string last_error;

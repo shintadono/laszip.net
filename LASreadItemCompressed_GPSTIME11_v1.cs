@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -46,7 +46,7 @@ namespace LASzip.Net
 			ic_gpstime = new IntegerCompressor(dec, 32, 6); // 32 bits, 6 contexts
 		}
 
-		public override bool init(laszip.point item, ref uint context) // context is unused
+		public override bool init(laszip_point item, ref uint context) // context is unused
 		{
 			// init state
 			last_gpstime_diff = 0;
@@ -63,7 +63,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override void read(laszip.point item, ref uint context) // context is unused
+		public override void read(laszip_point item, ref uint context) // context is unused
 		{
 			if (last_gpstime_diff == 0) // if the last integer difference was zero
 			{

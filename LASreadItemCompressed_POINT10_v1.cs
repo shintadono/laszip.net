@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -54,7 +54,7 @@ namespace LASzip.Net
 			}
 		}
 
-		public override bool init(laszip.point item, ref uint context) // context is unused
+		public override bool init(laszip_point item, ref uint context) // context is unused
 		{
 			// init state
 			last_x_diff[0] = last_x_diff[1] = last_x_diff[2] = 0;
@@ -90,7 +90,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override void read(laszip.point item, ref uint context) // context is unused
+		public override void read(laszip_point item, ref uint context) // context is unused
 		{
 			// find median difference for x and y from 3 preceding differences
 			int median_x;

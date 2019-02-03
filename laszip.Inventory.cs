@@ -37,7 +37,7 @@ namespace LASzip.Net
 			public readonly uint[] number_of_points_by_return = new uint[16];
 			public int max_X, min_X, max_Y, min_Y, max_Z, min_Z;
 
-			public void add(point point)
+			public void add(laszip_point point)
 			{
 				number_of_point_records++;
 				if (point.extended_point_type != 0)

@@ -204,7 +204,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public bool write(laszip.point point)
+		public bool write(laszip_point point)
 		{
 			uint context = 0;
 

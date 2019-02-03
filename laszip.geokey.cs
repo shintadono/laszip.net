@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -30,15 +30,12 @@ using System.Runtime.InteropServices;
 
 namespace LASzip.Net
 {
-	public partial class laszip
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
+	public struct laszip_geokey
 	{
-		[StructLayout(LayoutKind.Sequential, Pack = 1)]
-		public struct geokey
-		{
-			public ushort key_id;
-			public ushort tiff_tag_location;
-			public ushort count;
-			public ushort value_offset;
-		}
+		public ushort key_id;
+		public ushort tiff_tag_location;
+		public ushort count;
+		public ushort value_offset;
 	}
 }

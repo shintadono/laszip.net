@@ -86,7 +86,7 @@ namespace LASzip.Net
 			num_bytes_gps_time = 0;
 		}
 
-		public override bool init(laszip.point item, ref uint context)
+		public override bool init(laszip_point item, ref uint context)
 		{
 			// on the first init create outstreams and encoders
 			if (outstream_channel_returns_XY == null)
@@ -162,10 +162,10 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override bool write(laszip.point item, ref uint context)
+		public override bool write(laszip_point item, ref uint context)
 		{
 			// get last
-			laszip.point last_item = contexts[current_context].last_item;
+			laszip_point last_item = contexts[current_context].last_item;
 
 			////////////////////////////////////////
 			// compress returns_XY layer
@@ -670,7 +670,7 @@ namespace LASzip.Net
 			new LAScontextPOINT14()
 		};
 
-		bool createAndInitModelsAndCompressors(uint context, laszip.point item)
+		bool createAndInitModelsAndCompressors(uint context, laszip_point item)
 		{
 			// should only be called when context is unused
 			Debug.Assert(contexts[context].unused);

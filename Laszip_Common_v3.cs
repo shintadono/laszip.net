@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2018-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2018-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,7 +33,7 @@ namespace LASzip.Net
 	{
 		public bool unused = false;
 
-		public laszip.point last_item = new laszip.point();
+		public laszip_point last_item = new laszip_point();
 		public bool last_item_gps_time_change = false;
 		public readonly ushort[] last_intensity = new ushort[8];
 		public readonly StreamingMedian5[] last_X_diff_median5 = new StreamingMedian5[12];

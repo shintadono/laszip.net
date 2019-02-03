@@ -56,7 +56,7 @@ namespace LASzip.Net
 			current_context = 0;
 		}
 
-		public override bool init(laszip.point item, ref uint context)
+		public override bool init(laszip_point item, ref uint context)
 		{
 			// on the first init create outstreams and encoders
 			if (outstream_wavepacket == null)
@@ -94,7 +94,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override bool write(laszip.point item, ref uint context)
+		public override bool write(laszip_point item, ref uint context)
 		{
 			// get last
 			byte[] last_item = contexts[current_context].last_item;

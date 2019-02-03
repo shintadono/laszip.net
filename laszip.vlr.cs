@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2014-2017 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -28,16 +28,13 @@
 
 namespace LASzip.Net
 {
-	public partial class laszip
+	public class laszip_vlr
 	{
-		public class vlr
-		{
-			public ushort reserved;
-			public readonly byte[] user_id = new byte[16];
-			public ushort record_id;
-			public ushort record_length_after_header;
-			public readonly byte[] description = new byte[32];
-			public byte[] data;
-		}
+		public ushort reserved;
+		public readonly byte[] user_id = new byte[16];
+		public ushort record_id;
+		public ushort record_length_after_header;
+		public readonly byte[] description = new byte[32];
+		public byte[] data;
 	}
 }

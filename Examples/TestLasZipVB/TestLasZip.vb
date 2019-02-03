@@ -19,14 +19,14 @@ Module TestLasZip
 		Dim LazCls As New LASzip.Net.laszip
 		Dim IsCompressed As Boolean = True
 		LazCls.open_reader(FileName, IsCompressed)
-		Dim NumPts As Int32 = LazCls.curHeader.number_of_point_records
+		Dim NumPts As Int32 = LazCls.header.number_of_point_records
 		' Check some header values
-		Debug.Print(LazCls.curHeader.min_x)
-		Debug.Print(LazCls.curHeader.min_y)
-		Debug.Print(LazCls.curHeader.min_z)
-		Debug.Print(LazCls.curHeader.max_x)
-		Debug.Print(LazCls.curHeader.max_y)
-		Debug.Print(LazCls.curHeader.max_z)
+		Debug.Print(LazCls.header.min_x)
+		Debug.Print(LazCls.header.min_y)
+		Debug.Print(LazCls.header.min_z)
+		Debug.Print(LazCls.header.max_x)
+		Debug.Print(LazCls.header.max_y)
+		Debug.Print(LazCls.header.max_z)
 		'
 		Dim ClaVal As Integer
 		Dim PntObj As New Point3D
@@ -41,7 +41,7 @@ Module TestLasZip
 			PntObj.Y = CrdArr(1)
 			PntObj.Z = CrdArr(2)
 			' Get classification value
-			ClaVal = LazCls.curPoint.classification
+			ClaVal = LazCls.point.classification
 		Next
 		' Close the reader
 		LazCls.close_reader()
@@ -58,14 +58,14 @@ Module TestLasZip
 		Dim LazErr As Integer = LazCls.clean
 		If LazErr = 0 Then
 			' Number of point records needs to be set
-			LazCls.curHeader.number_of_point_records = PntLst.Count
+			LazCls.header.number_of_point_records = PntLst.Count
 			' Header Min/Max needs to be set to extents of points
-			LazCls.curHeader.min_x = PntLst(0).X ' LL Point
-			LazCls.curHeader.min_y = PntLst(0).Y
-			LazCls.curHeader.min_z = PntLst(0).Z
-			LazCls.curHeader.max_x = PntLst(1).X ' UR Point
-			LazCls.curHeader.max_y = PntLst(1).Y
-			LazCls.curHeader.max_z = PntLst(1).Z
+			LazCls.header.min_x = PntLst(0).X ' LL Point
+			LazCls.header.min_y = PntLst(0).Y
+			LazCls.header.min_z = PntLst(0).Z
+			LazCls.header.max_x = PntLst(1).X ' UR Point
+			LazCls.header.max_y = PntLst(1).Y
+			LazCls.header.max_z = PntLst(1).Z
 			' Open the writer and test for errors
 			LazErr = LazCls.open_writer(FileName, True)
 			If LazErr = 0 Then
@@ -77,7 +77,7 @@ Module TestLasZip
 					' Set the coordinates in the LazCls object
 					LazCls.set_coordinates(CrdArr)
 					' Set the classification to ground
-					LazCls.curPoint.classification = 2
+					LazCls.point.classification = 2
 					' Write the point to the file
 					LazErr = LazCls.write_point()
 					If LazErr <> 0 Then

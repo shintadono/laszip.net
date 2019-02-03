@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -50,7 +50,7 @@ namespace LASzip.Net
 			ic_xyz = new IntegerCompressor(enc, 32, 3);
 		}
 
-		public unsafe override bool init(laszip.point item, ref uint context)
+		public unsafe override bool init(laszip_point item, ref uint context)
 		{
 			// init state
 			last_diff_32 = 0;
@@ -76,7 +76,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public unsafe override bool write(laszip.point item, ref uint context)
+		public unsafe override bool write(laszip_point item, ref uint context)
 		{
 			enc.encodeSymbol(m_packet_index, item.wave_packet[0]);
 

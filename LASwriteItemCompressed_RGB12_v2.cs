@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -48,7 +48,7 @@ namespace LASzip.Net
 			m_rgb_diff_5 = enc.createSymbolModel(256);
 		}
 
-		public override bool init(laszip.point item, ref uint context)
+		public override bool init(laszip_point item, ref uint context)
 		{
 			// init state
 
@@ -69,7 +69,7 @@ namespace LASzip.Net
 			return true;
 		}
 
-		public override bool write(laszip.point item, ref uint context)
+		public override bool write(laszip_point item, ref uint context)
 		{
 			int diff_l = 0;
 			int diff_h = 0;

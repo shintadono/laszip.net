@@ -27,15 +27,15 @@ namespace TestLasZipCS
 			var lazReader = new laszip();
 			var compressed = true;
 			lazReader.open_reader(FileName, out compressed);
-			var numberOfPoints = lazReader.curHeader.number_of_point_records;
+			var numberOfPoints = lazReader.header.number_of_point_records;
 
 			// Check some header values
-			Debug.WriteLine(lazReader.curHeader.min_x);
-			Debug.WriteLine(lazReader.curHeader.min_y);
-			Debug.WriteLine(lazReader.curHeader.min_z);
-			Debug.WriteLine(lazReader.curHeader.max_x);
-			Debug.WriteLine(lazReader.curHeader.max_y);
-			Debug.WriteLine(lazReader.curHeader.max_z);
+			Debug.WriteLine(lazReader.header.min_x);
+			Debug.WriteLine(lazReader.header.min_y);
+			Debug.WriteLine(lazReader.header.min_z);
+			Debug.WriteLine(lazReader.header.max_x);
+			Debug.WriteLine(lazReader.header.max_y);
+			Debug.WriteLine(lazReader.header.max_z);
 
 			int classification = 0;
 			var point = new Point3D();
@@ -54,7 +54,7 @@ namespace TestLasZipCS
 				point.Z = coordArray[2];
 
 				// Get classification value
-				classification = lazReader.curPoint.classification;
+				classification = lazReader.point.classification;
 			}
 
 			// Close the reader
@@ -82,15 +82,15 @@ namespace TestLasZipCS
 			if (err == 0)
 			{
 				// Number of point records needs to be set
-				lazWriter.curHeader.number_of_point_records = (uint)points.Count;
+				lazWriter.header.number_of_point_records = (uint)points.Count;
 
 				// Header Min/Max needs to be set to extents of points
-				lazWriter.curHeader.min_x = points[0].X; // LL Point
-				lazWriter.curHeader.min_y = points[0].Y;
-				lazWriter.curHeader.min_z = points[0].Z;
-				lazWriter.curHeader.max_x = points[1].X; // UR Point
-				lazWriter.curHeader.max_y = points[1].Y;
-				lazWriter.curHeader.max_z = points[1].Z;
+				lazWriter.header.min_x = points[0].X; // LL Point
+				lazWriter.header.min_y = points[0].Y;
+				lazWriter.header.min_z = points[0].Z;
+				lazWriter.header.max_x = points[1].X; // UR Point
+				lazWriter.header.max_y = points[1].Y;
+				lazWriter.header.max_z = points[1].Z;
 
 				// Open the writer and test for errors
 				err = lazWriter.open_writer(FileName, true);
@@ -107,7 +107,7 @@ namespace TestLasZipCS
 						lazWriter.set_coordinates(coordArray);
 
 						// Set the classification to ground
-						lazWriter.curPoint.classification = 2;
+						lazWriter.point.classification = 2;
 
 						// Write the point to the file
 						err = lazWriter.write_point();
