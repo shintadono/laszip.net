@@ -161,7 +161,7 @@ namespace LASzip.Net
 			bool have_wavepacket = false;
 			int extra_bytes_number = 0;
 
-			// turns on LAS 1.4 compatibility mode 
+			// turns on LAS 1.4 compatibility mode
 			if ((options & 1) != 0) compatible = true;
 
 			// switch over the point types we know
@@ -237,8 +237,7 @@ namespace LASzip.Net
 			// maybe represent new LAS 1.4 as corresponding LAS 1.3 points plus extra bytes for compatibility
 			if (have_point14 && compatible)
 			{
-				// TODO 4 vs 5?
-				// we need 4 extra bytes for the new point attributes
+				// we need 5 extra bytes for the new point attributes
 				extra_bytes_number += 5;
 				// we store the GPS time separately
 				have_gps_time = true;
@@ -504,7 +503,7 @@ namespace LASzip.Net
 				}
 				else
 				{
-					if (items[1].is_type(LASitem.Type.RGB14)) // TODO What about items[1].is_type(LASitem.Type.RGB12)?
+					if (items[1].is_type(LASitem.Type.RGB14) || items[1].is_type(LASitem.Type.RGB12))
 					{
 						if (num_items == 2)
 						{

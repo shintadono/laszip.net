@@ -336,7 +336,6 @@ namespace LASzip.Net
 			return 0;
 		}
 
-		// TODO remove?
 		public int get_number_of_point(out long npoints)
 		{
 			npoints = 0;
@@ -348,7 +347,7 @@ namespace LASzip.Net
 
 			npoints = this.npoints;
 
-			error = null;
+			error = warning = "";
 			return 0;
 		}
 

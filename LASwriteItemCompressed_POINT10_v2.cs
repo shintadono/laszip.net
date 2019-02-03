@@ -86,7 +86,7 @@ namespace LASzip.Net
 			last.X = item.X;
 			last.Y = item.Y;
 			last.Z = item.Z;
-			last.intensity = 0; // but set intensity to zero // TODO why?
+			last.intensity = item.intensity;
 			last.flags = item.flags;
 			last.classification_and_classification_flags = item.classification_and_classification_flags;
 			last.scan_angle_rank = item.scan_angle_rank;
