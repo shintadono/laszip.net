@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("LASzip.Net")]
-[assembly: AssemblyCopyright("Copyright of C# port © 2014-2017 by Shinta <shintadono@googlemail.com>\r\nCopyright © 2005-2014, martin isenburg <martin.isenburg@rapidlasso.com>, rapidlasso - tools to catch reality <http:\\rapidlasso.com>")]
+[assembly: AssemblyCopyright("Copyright of C# port © 2014-2019 by Shinta <shintadono@googlemail.com>\r\nCopyright © 2007-2018, martin isenburg <martin.isenburg@rapidlasso.com>, rapidlasso - tools to catch reality <http:\\rapidlasso.com>")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Minor Version
 //      Build Number
 //      Revision
-[assembly: AssemblyVersion("2.2.0.0")]
-[assembly: AssemblyFileVersion("2.2.0.0")]
+[assembly: AssemblyVersion("3.2.9.0")]
+[assembly: AssemblyFileVersion("3.2.9.0")]
