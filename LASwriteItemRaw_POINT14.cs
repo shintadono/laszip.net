@@ -12,7 +12,7 @@
 //
 //  COPYRIGHT:
 //
-//    (c) 2007-2017, martin isenburg, rapidlasso - tools to catch reality
+//    (c) 2007-2018, martin isenburg, rapidlasso - tools to catch reality
 //    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
@@ -51,7 +51,7 @@ namespace LASzip.Net
 				if (item.extended_point_type != 0)
 				{
 					p14->classification_flags = (byte)((item.extended_classification_flags & 8) | (item.classification_and_classification_flags >> 5));
-					if (item.extended_classification > 31) p14->classification = item.extended_classification;
+					if (item.classification == 0) p14->classification = item.extended_classification;
 					p14->scanner_channel = item.extended_scanner_channel;
 					p14->return_number = item.extended_return_number;
 					p14->number_of_returns = item.extended_number_of_returns;

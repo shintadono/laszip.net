@@ -13,7 +13,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2018-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -53,7 +53,7 @@ namespace LASzip.Net
 		BYTE5 = 0x00200000,
 		BYTE6 = 0x00400000,
 		BYTE7 = 0x00800000,
-		EXTRA_BYTES = 0xFFF00000,
+		EXTRA_BYTES = 0xFFFF0000,
 
 		ALL = Z | CLASSIFICATION | FLAGS | INTENSITY | SCAN_ANGLE | USER_DATA | POINT_SOURCE | GPS_TIME |
 			RGB | NIR | WAVEPACKET | BYTE0 | BYTE1 | BYTE2 | BYTE3 | BYTE4 | BYTE5 | BYTE6 | BYTE7 | EXTRA_BYTES

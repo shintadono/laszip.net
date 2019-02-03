@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -235,20 +235,23 @@ namespace LASzip.Net
 				}
 			}
 
-			// get the first entry, if there is one, and get the interval gap
-			foreach (var map_element in map)
-			{
-				diff = map_element.Key;
-				break;
-			}
-
 			// maybe nothing to do
 			if (mapSize <= maximum_intervals)
 			{
 				if (verbose)
 				{
 					if (mapSize == 0) Console.Error.WriteLine("maximum_intervals: {0} number of interval gaps: 0", maximum_intervals);
-					else Console.Error.WriteLine("maximum_intervals: {0} number of interval gaps: {1} next largest interval gap {2}", maximum_intervals, mapSize, diff);
+					else
+					{
+						// get the first entry, if there is one, and get the interval gap
+						foreach (var map_element in map)
+						{
+							diff = map_element.Key;
+							break;
+						}
+
+						Console.Error.WriteLine("maximum_intervals: {0} number of interval gaps: {1} next largest interval gap {2}", maximum_intervals, mapSize, diff);
+					}
 				}
 
 				return;

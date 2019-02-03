@@ -20,7 +20,8 @@ https://github.com/shintadono/laszip.net
 
 ATTENTION: This port is not a complete port of the LASzip library. It does not
 contain the example provided in it (but has some examples off it's own), and
-you can't create version 1 LAZ files, while reading version 1 is still possible.
+you can't create version 1 and 3 LAZ files, while reading version 1 and 3 is
+still possible.
 
 
 **LICENSE AGREEMENT (for LASzip.Net LiDAR compression)**
@@ -51,5 +52,5 @@ you can't create version 1 LAZ files, while reading version 1 is still possible.
 
   (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
-  (c) of C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+  (c) of C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 

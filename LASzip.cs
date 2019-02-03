@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2005-2018, martin isenburg, rapidlasso - tools to catch reality
-//    (c) of the C# port 2014-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -36,8 +36,8 @@ namespace LASzip.Net
 	{
 		public const int VERSION_MAJOR = 3;
 		public const int VERSION_MINOR = 2;
-		public const int VERSION_REVISION = 3;
-		public const int VERSION_BUILD_DATE = 180406;
+		public const int VERSION_REVISION = 9;
+		public const int VERSION_BUILD_DATE = 181227;
 
 		public const int COMPRESSOR_NONE = 0;
 		public const int COMPRESSOR_POINTWISE = 1;

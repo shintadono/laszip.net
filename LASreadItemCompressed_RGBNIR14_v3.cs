@@ -314,11 +314,11 @@ namespace LASzip.Net
 					item.rgb[3] |= (ushort)(last_item[3] & 0xFF00);
 				}
 
-				contexts[current_context].last_item[3] = item.rgb[3];
+				last_item[3] = item.rgb[3];
 			}
 			else
 			{
-				item.rgb[3] = contexts[current_context].last_item[3];
+				item.rgb[3] = last_item[3];
 			}
 		}
 

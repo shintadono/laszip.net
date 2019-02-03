@@ -14,7 +14,7 @@
 //  COPYRIGHT:
 //
 //    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
-//    (c) of the C# port 2017-2018 by Shinta <shintadono@googlemail.com>
+//    (c) of the C# port 2017-2019 by Shinta <shintadono@googlemail.com>
 //
 //    This is free software; you can redistribute and/or modify it under the
 //    terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,6 +33,7 @@ namespace LASzip.Net
 {
 	public class LASattributer
 	{
+		public bool attributes_linked = true;
 		public int number_attributes;
 		public List<LASattribute> attributes;
 		public List<int> attribute_starts;
@@ -40,10 +41,13 @@ namespace LASzip.Net
 
 		public void clean_attributes()
 		{
-			number_attributes = 0;
-			attributes = null;
-			attribute_starts = null;
-			attribute_sizes = null;
+			if (attributes_linked)
+			{
+				number_attributes = 0;
+				attributes = null;
+				attribute_starts = null;
+				attribute_sizes = null;
+			}
 		}
 
 		public bool init_attributes(IEnumerable<LASattribute> attributes)

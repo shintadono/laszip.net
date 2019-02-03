@@ -1038,8 +1038,8 @@ namespace LASzip.Net
 			try
 			{
 				LASattribute lasattribute = new LASattribute(type, name, description);
-				lasattribute.set_scale(scale, 0);
-				lasattribute.set_offset(offset, 0);
+				lasattribute.set_scale(scale);
+				lasattribute.set_offset(offset);
 
 				if (attributer == null)
 				{
@@ -1359,6 +1359,11 @@ namespace LASzip.Net
 
 			m_request_compatibility_mode = request;
 
+			if (request) // only one should be on
+			{
+				m_request_native_extension = false;
+			}
+
 			error = warning = "";
 			return 0;
 		}
@@ -1442,6 +1447,9 @@ namespace LASzip.Net
 		{
 			if (header.point_data_format > 5)
 			{
+				// must be set for the new point types 6 or higher ...
+				point.extended_point_type = 1;
+
 				if (m_request_native_extension)
 				{
 					// we are *not* operating in compatibility mode
@@ -1449,6 +1457,9 @@ namespace LASzip.Net
 				}
 				else if (m_request_compatibility_mode)
 				{
+					// we are *not* using the native extension
+					m_request_native_extension = false;
+
 					// make sure there are no more than U32_MAX points
 					if (header.extended_number_of_point_records > uint.MaxValue)
 					{
@@ -1628,7 +1639,7 @@ namespace LASzip.Net
 
 					// scan_angle (difference or remainder) is stored as a I16
 					LASattribute lasattribute_scan_angle = new LASattribute(LAS_ATTRIBUTE.I16, "LAS 1.4 scan angle", "additional attributes");
-					lasattribute_scan_angle.set_scale(0.006, 0);
+					lasattribute_scan_angle.set_scale(0.006);
 					int index_scan_angle = attributer.add_attribute(lasattribute_scan_angle);
 					start_scan_angle = attributer.get_attribute_start(index_scan_angle);
 					// extended returns stored as a U8
@@ -1693,6 +1704,9 @@ namespace LASzip.Net
 			}
 			else
 			{
+				// must *not* be set for the old point type 5 or lower
+				point.extended_point_type = 0;
+
 				// we are *not* operating in compatibility mode
 				m_compatibility_mode = false;
 			}
@@ -2341,6 +2355,17 @@ namespace LASzip.Net
 
 			try
 			{
+				// temporary fix to avoid corrupt LAZ files
+				if (point.extended_point_type != 0)
+				{
+					// make sure legacy flags and extended flags are identical
+					if ((point.extended_classification_flags & 0x7) != (point.classification_and_classification_flags >> 5))
+					{
+						error = "legacy flags and extended flags are not identical";
+						return 1;
+					}
+				}
+
 				// special recoding of points (in compatibility mode only)
 				if (m_compatibility_mode)
 				{
@@ -2451,7 +2476,7 @@ namespace LASzip.Net
 			}
 			catch
 			{
-				error = "internal error in laszip_write_point";
+				error = "internal error in laszip_write_indexed_point";
 				return 1;
 			}
 
@@ -3649,12 +3674,12 @@ namespace LASzip.Net
 				{
 					if (lax_index.intersect_rectangle(min_x, min_y, max_x, max_y))
 					{
-						// no overlap between spatial indexing cells and query reactangle
-						is_empty = true;
+						is_empty = false;
 					}
 					else
 					{
-						is_empty = false;
+						// no overlap between spatial indexing cells and query reactangle
+						is_empty = true;
 					}
 				}
 				else
@@ -3666,7 +3691,6 @@ namespace LASzip.Net
 					}
 					else
 					{
-
 						is_empty = false;
 					}
 				}
@@ -3748,7 +3772,7 @@ namespace LASzip.Net
 					point.extended_number_of_returns = (byte)(number_of_returns_increment + point.number_of_returns);
 					point.extended_classification = (byte)(classification + point.classification);
 					point.extended_scanner_channel = (byte)scanner_channel;
-					point.extended_classification_flags = (byte)((overlap_bit << 3) | (point.classification >> 5));
+					point.extended_classification_flags = (byte)((overlap_bit << 3) | ((point.withheld_flag) << 2) | ((point.keypoint_flag) << 1) | (point.synthetic_flag));
 				}
 
 				p_count++;
