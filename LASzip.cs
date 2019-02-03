@@ -892,7 +892,7 @@ namespace LASzip.Net
 					case LASitem.Type.RGB14:
 					case LASitem.Type.RGBNIR14:
 					case LASitem.Type.WAVEPACKET14:
-					case LASitem.Type.BYTE14: items[i].version = 3; break; // no version 1 or 2
+					case LASitem.Type.BYTE14: items[i].version = 4; break; // no version 1 or 2, version 3 not supported anymore
 					default: return return_error("item type not supported");
 				}
 			}

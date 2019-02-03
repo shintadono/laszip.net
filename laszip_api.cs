@@ -79,6 +79,8 @@ namespace LASzip.Net
 
 		Inventory inventory = null;
 
+		public List<laszip_evlr> evlrs = null;
+
 		static unsafe List<LASattribute> ToLASattributeList(byte[] data)
 		{
 			int count = data.Length / sizeof(LASattribute);
@@ -3907,6 +3909,126 @@ namespace LASzip.Net
 			}
 
 			vlr = outStream.ToArray();
+
+			error = warning = "";
+			return 0;
+		}
+
+		public int read_evlrs()
+		{
+			if (reader == null)
+			{
+				error = "reading EVLRs before reader was opened";
+				return 1;
+			}
+
+			if (!streamin.CanSeek)
+			{
+				error = "stream unable to seek";
+				return 1;
+			}
+
+			if (header.number_of_extended_variable_length_records == 0)
+			{
+				error = "";
+				warning = "not EVLRs in file";
+				return 0;
+			}
+
+			byte[] buffer = new byte[32];
+
+			try
+			{
+				long previousPosition = streamin.Position;
+
+				streamin.Position = (long)header.start_of_first_extended_variable_length_record;
+
+				try { evlrs = new List<laszip_evlr>((int)header.number_of_extended_variable_length_records); }
+				catch { error = string.Format("allocating {0} EVLRs", header.number_of_extended_variable_length_records); return 1; }
+
+				for (int i = 0; i < header.number_of_extended_variable_length_records; i++)
+				{
+					try { evlrs.Add(new laszip_evlr()); }
+					catch { error = string.Format("allocating EVLR #{0}", i); return 1; }
+
+					// make sure there are enough bytes left to read a extended variable length record before the end of the stream
+					if ((streamin.Length - streamin.Position) < 60)
+					{
+						warning = string.Format("only {0} bytes until end of stream reading {1} of {2} EVLRs. skipping remaining EVLRs ...", streamin.Length - streamin.Position, i, header.number_of_extended_variable_length_records);
+						header.number_of_extended_variable_length_records = (uint)i;
+						break;
+					}
+
+					// read extended variable length records variable after variable (to avoid alignment issues)
+					if (streamin.Read(buffer, 0, 2) != 2)
+					{
+						error = string.Format("reading EVLRs[{0}].reserved", i);
+						return 1;
+					}
+					evlrs[i].reserved = BitConverter.ToUInt16(buffer, 0);
+
+					if (streamin.Read(evlrs[i].user_id, 0, 16) != 16)
+					{
+						error = string.Format("reading EVLRs[{0}].user_id", i);
+						return 1;
+					}
+
+					if (streamin.Read(buffer, 0, 2) != 2)
+					{
+						error = string.Format("reading EVLRs[{0}].record_id", i);
+						return 1;
+					}
+					evlrs[i].record_id = BitConverter.ToUInt16(buffer, 0);
+
+					if (streamin.Read(buffer, 0, 8) != 8)
+					{
+						error = string.Format("reading EVLRs[{0}].record_length_after_header", i);
+						return 1;
+					}
+					evlrs[i].record_length_after_header = BitConverter.ToUInt64(buffer, 0);
+
+					if (streamin.Read(evlrs[i].description, 0, 32) != 32)
+					{
+						error = string.Format("reading EVLRs[{0}].description", i);
+						return 1;
+					}
+
+					// check extended variable length record contents
+					if (evlrs[i].reserved != 0xAABB && evlrs[i].reserved != 0x0)
+					{
+						warning = string.Format("wrong EVLRs[{0}].reserved: {1} != 0xAABB and {1} != 0x0", i, evlrs[i].reserved);
+					}
+
+					// make sure there are enough bytes left to read the data of the extended variable length record before the point block starts
+					if ((streamin.Length - streamin.Position) < (long)evlrs[i].record_length_after_header)
+					{
+						warning = string.Format("only {0} bytes until end of stream when trying to read {1} bytes into EVLRs[{2}].data", streamin.Length - streamin.Position, evlrs[i].record_length_after_header, i);
+						evlrs[i].record_length_after_header = (ulong)(streamin.Length - streamin.Position);
+					}
+
+					// load data following the header of the extended variable length record
+					if (evlrs[i].record_length_after_header != 0)
+					{
+						evlrs[i].data = new byte[(int)evlrs[i].record_length_after_header];
+						if (streamin.Read(evlrs[i].data, 0, (int)evlrs[i].record_length_after_header) != (int)evlrs[i].record_length_after_header)
+						{
+							error = string.Format("reading {0} bytes of data into EVLRs[{1}].data", evlrs[i].record_length_after_header, i);
+							return 1;
+						}
+					}
+					else
+					{
+						evlrs[i].data = null;
+					}
+				}
+
+				streamin.Position = previousPosition;
+			}
+			catch
+			{
+				error = "internal error in read_evlrs";
+				return 1;
+			}
 
 			error = warning = "";
 			return 0;

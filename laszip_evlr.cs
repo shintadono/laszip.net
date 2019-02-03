@@ -1,6 +1,6 @@
 ﻿//===============================================================================
 //
-//  FILE:  laszip_vlr.cs
+//  FILE:  laszip_evlr.cs
 //
 //  CONTENTS:
 //
@@ -28,12 +28,12 @@
 
 namespace LASzip.Net
 {
-	public class laszip_vlr
+	public class laszip_evlr
 	{
 		public ushort reserved;
 		public readonly byte[] user_id = new byte[16];
 		public ushort record_id;
-		public ushort record_length_after_header;
+		public ulong record_length_after_header;
 		public readonly byte[] description = new byte[32];
 		public byte[] data;
 	}
