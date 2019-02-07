@@ -26,7 +26,9 @@
 //
 //===============================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LASzip.Net
 {
@@ -83,5 +85,25 @@ namespace LASzip.Net
 		// optional
 		public uint user_data_after_header_size;
 		public byte[] user_data_after_header;
+
+		public laszip_header()
+		{
+			setDefault();
+		}
+
+		public void setDefault()
+		{
+			byte[] generatingSoftware = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
+			Array.Copy(generatingSoftware, generating_software, Math.Min(generatingSoftware.Length, 32));
+			version_major = 1;
+			version_minor = 2;
+			header_size = 227;
+			offset_to_point_data = 227;
+			point_data_format = 1;
+			point_data_record_length = 28;
+			x_scale_factor = 0.01;
+			y_scale_factor = 0.01;
+			z_scale_factor = 0.01;
+		}
 	}
 }

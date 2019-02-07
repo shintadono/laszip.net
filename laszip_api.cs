@@ -63,13 +63,13 @@ namespace LASzip.Net
 		bool lax_append = false;
 		bool lax_exploit = false;
 
-		LASZIP_DECOMPRESS_SELECTIVE las14_decompress_selective = LASZIP_DECOMPRESS_SELECTIVE.CHANNEL_RETURNS_XY;
+		LASZIP_DECOMPRESS_SELECTIVE las14_decompress_selective = LASZIP_DECOMPRESS_SELECTIVE.ALL;
 		bool m_preserve_generating_software = false;
-		bool m_request_native_extension = false;
+		bool m_request_native_extension = true;
 		bool m_request_compatibility_mode = false;
 		bool m_compatibility_mode = false;
 
-		uint m_set_chunk_size = 0;
+		uint m_set_chunk_size = LASzip.CHUNK_SIZE_DEFAULT;
 
 		int start_scan_angle = 0;
 		int start_extended_returns = 0;
@@ -290,17 +290,7 @@ namespace LASzip.Net
 				start_scan_angle = start_extended_returns = start_classification = start_flags_and_channel = start_NIR_band = 0;
 
 				// create default header
-				byte[] generatingSoftware = Encoding.ASCII.GetBytes(string.Format("LASzip.net DLL {0}.{1} r{2} ({3})", LASzip.VERSION_MAJOR, LASzip.VERSION_MINOR, LASzip.VERSION_REVISION, LASzip.VERSION_BUILD_DATE));
-				Array.Copy(generatingSoftware, header.generating_software, Math.Min(generatingSoftware.Length, 32));
-				header.version_major = 1;
-				header.version_minor = 2;
-				header.header_size = 227;
-				header.offset_to_point_data = 227;
-				header.point_data_format = 1;
-				header.point_data_record_length = 28;
-				header.x_scale_factor = 0.01;
-				header.y_scale_factor = 0.01;
-				header.z_scale_factor = 0.01;
+				header.setDefault();
 			}
 			catch
 			{

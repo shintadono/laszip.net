@@ -404,7 +404,7 @@ namespace LASzip.Net
 			var last_item = contexts[current_context].last_item;
 
 			////////////////////////////////////////
-			// decompress returns_XY layer 
+			// decompress returns_XY layer
 			////////////////////////////////////////
 
 			// create single (3) / first (1) / last (2) / intermediate (0) context from last point return
