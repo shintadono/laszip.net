@@ -47,6 +47,8 @@ still possible.
 
   Michael P. Gerlek (https://github.com/mpgerlek)
 
+  Jimmy (https://github.com/jimmyfishbean)
+
 
 **COPYRIGHT**
 

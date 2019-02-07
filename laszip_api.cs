@@ -3258,11 +3258,14 @@ namespace LASzip.Net
 						case LASitem.Type.POINT14:
 						case LASitem.Type.POINT10:
 						case LASitem.Type.GPSTIME11:
-						case LASitem.Type.RGBNIR14:
 						case LASitem.Type.RGB12:
+						case LASitem.Type.RGB14:
+						case LASitem.Type.RGBNIR14:
 						case LASitem.Type.WAVEPACKET13:
+						case LASitem.Type.WAVEPACKET14:
 							break;
 						case LASitem.Type.BYTE:
+						case LASitem.Type.BYTE14:
 							point.num_extra_bytes = laszip.items[i].size;
 							point.extra_bytes = new byte[point.num_extra_bytes];
 							break;
