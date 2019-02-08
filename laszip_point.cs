@@ -44,7 +44,7 @@ namespace LASzip.Net
 		public byte edge_of_flight_line { get { return (byte)((flags >> 7) & 1); } set { flags = (byte)((flags & 0x7F) | ((value & 1) << 7)); } }
 		internal byte flags;
 		//public byte classification : 5;
-		public byte classification { get { return (byte)(classification_and_classification_flags & 31); } set { classification_and_classification_flags = (byte)((classification_and_classification_flags & 0xF8) | (value & 7)); } }
+		public byte classification { get { return (byte)(classification_and_classification_flags & 31); } set { classification_and_classification_flags = (byte)((classification_and_classification_flags & 0xE0) | (value & 31)); } }
 		//public byte synthetic_flag : 1;
 		public byte synthetic_flag { get { return (byte)((classification_and_classification_flags >> 5) & 1); } set { flags = (byte)((classification_and_classification_flags & 0xDF) | ((value & 1) << 5)); } }
 		//public byte keypoint_flag  : 1;
