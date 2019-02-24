@@ -26,7 +26,6 @@
 //
 //===============================================================================
 
-using System;
 using System.IO;
 
 namespace LASzip.Net
@@ -37,11 +36,7 @@ namespace LASzip.Net
 
 		public override void read(laszip_point item, ref uint context) // context is unused
 		{
-			if (instream.Read(buffer, 0, 8) != 8) throw new EndOfStreamException();
-
-			item.gps_time = BitConverter.ToDouble(buffer, 0);
+			if (!instream.get64bits(out item.gps_time)) throw new EndOfStreamException();
 		}
-
-		readonly byte[] buffer = new byte[8];
 	}
 }

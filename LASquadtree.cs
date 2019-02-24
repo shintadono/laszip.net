@@ -76,109 +76,94 @@ namespace LASzip.Net
 			//     F32  max_y           4 bytes
 			// which totals 28 bytes
 
-			byte[] tmp = new byte[4];
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			byte[] signature = new byte[4];
+			if (!stream.getBytes(signature, 4))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading LASspatial signature");
 				return false;
 			}
-			if (tmp[0] != 'L' || tmp[1] != 'A' || tmp[2] != 'S' || tmp[3] != 'S')
+			if (signature[0] != 'L' || signature[1] != 'A' || signature[2] != 'S' || signature[3] != 'S')
 			{
-				Console.Error.WriteLine("ERROR (LASquadtree): wrong LASspatial signature '{0}{1}{3}{4}' instead of 'LASS'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
+				Console.Error.WriteLine("ERROR (LASquadtree): wrong LASspatial signature '{0}{1}{3}{4}' instead of 'LASS'", (char)signature[0], (char)signature[1], (char)signature[2], (char)signature[3]);
 				return false;
 			}
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			uint type;
+			if (!stream.get32bits(out type))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading LASspatial type");
 				return false;
 			}
-			uint type = BitConverter.ToUInt32(tmp, 0);
 			if (type != LAS_SPATIAL_QUAD_TREE)
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): unknown LASspatial type {0}", type);
 				return false;
 			}
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			if (!stream.getBytes(signature, 4))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading signature");
 				return false;
 			}
-			if (tmp[0] != 'L' || tmp[1] != 'A' || tmp[2] != 'S' || tmp[3] != 'Q')
+			if (signature[0] != 'L' || signature[1] != 'A' || signature[2] != 'S' || signature[3] != 'Q')
 			{
-				//Console.Error.WriteLine("ERROR (LASquadtree): wrong signature '{0}{1}{3}{4}' instead of 'LASQ'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
+				//Console.Error.WriteLine("ERROR (LASquadtree): wrong signature '{0}{1}{3}{4}' instead of 'LASQ'", (char)signature[0], (char)signature[1], (char)signature[2], (char)signature[3]);
 				//return false;
-				levels = tmp[0];
+				levels = BitConverter.ToUInt32(signature, 0);
 			}
 			else
 			{
-				try { stream.Read(tmp, 0, 4); }
-				catch
+				uint version;
+				if (!stream.get32bits(out version))
 				{
 					Console.Error.WriteLine("ERROR (LASquadtree): reading version");
 					return false;
 				}
-				uint version = BitConverter.ToUInt32(tmp, 0);
-				try { stream.Read(tmp, 0, 4); }
-				catch
+
+				if (!stream.get32bits(out levels))
 				{
 					Console.Error.WriteLine("ERROR (LASquadtree): reading levels");
 					return false;
 				}
-				levels = BitConverter.ToUInt32(tmp, 0);
 			}
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			uint level_index;
+			if (!stream.get32bits(out level_index))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading level_index");
 				return false;
 			}
-			uint level_index = BitConverter.ToUInt32(tmp, 0);
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			uint implicit_levels;
+			if (!stream.get32bits(out implicit_levels))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading implicit_levels");
 				return false;
 			}
-			uint implicit_levels = BitConverter.ToUInt32(tmp, 0);
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			if (!stream.get32bits(out min_x))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading min_x");
 				return false;
 			}
-			min_x = BitConverter.ToSingle(tmp, 0);
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			if (!stream.get32bits(out max_x))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading max_x");
 				return false;
 			}
-			max_x = BitConverter.ToSingle(tmp, 0);
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			if (!stream.get32bits(out min_y))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading min_y");
 				return false;
 			}
-			min_y = BitConverter.ToSingle(tmp, 0);
 
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			if (!stream.get32bits(out max_y))
 			{
 				Console.Error.WriteLine("ERROR (LASquadtree): reading max_y");
 				return false;
 			}
-			max_y = BitConverter.ToSingle(tmp, 0);
 
 			return true;
 		}

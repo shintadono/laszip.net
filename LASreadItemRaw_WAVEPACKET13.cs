@@ -36,7 +36,7 @@ namespace LASzip.Net
 
 		public override void read(laszip_point item, ref uint context) // context is unused
 		{
-			if (instream.Read(item.wave_packet, 0, 29) != 29) throw new EndOfStreamException();
+			if (!instream.getBytes(item.wave_packet, 29)) throw new EndOfStreamException();
 		}
 	}
 }

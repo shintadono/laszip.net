@@ -36,7 +36,7 @@ namespace LASzip.Net
 
 		public override void read(laszip_point item, ref uint context) // context is unused
 		{
-			if (instream.Read(item.extra_bytes, 0, (int)number) != (int)number) throw new EndOfStreamException();
+			if (!instream.getBytes(item.extra_bytes, (int)number)) throw new EndOfStreamException();
 		}
 
 		uint number = 0;

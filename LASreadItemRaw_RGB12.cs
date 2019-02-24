@@ -26,7 +26,6 @@
 //
 //===============================================================================
 
-using System;
 using System.IO;
 
 namespace LASzip.Net
@@ -37,13 +36,7 @@ namespace LASzip.Net
 
 		public override void read(laszip_point item, ref uint context) // context is unused
 		{
-			if (instream.Read(buffer, 0, 6) != 6) throw new EndOfStreamException();
-
-			item.rgb[0] = BitConverter.ToUInt16(buffer, 0);
-			item.rgb[1] = BitConverter.ToUInt16(buffer, 2);
-			item.rgb[2] = BitConverter.ToUInt16(buffer, 4);
+			if (!instream.get16bits(item.rgb, 3)) throw new EndOfStreamException();
 		}
-
-		readonly byte[] buffer = new byte[6];
 	}
 }

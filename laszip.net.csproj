@@ -54,6 +54,7 @@
     <Compile Include="ArithmeticDecoder.cs" />
     <Compile Include="ArithmeticEncoder.cs" />
     <Compile Include="ArithmeticModel.cs" />
+    <Compile Include="ByteStreamIn.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="IntegerCompressor.cs" />
     <Compile Include="LASattribute.cs" />

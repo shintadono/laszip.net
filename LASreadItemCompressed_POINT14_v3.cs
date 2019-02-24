@@ -26,9 +26,8 @@
 //
 //===============================================================================
 
-using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 
 namespace LASzip.Net
 {
@@ -108,24 +107,21 @@ namespace LASzip.Net
 			num_bytes_allocated = 0;
 		}
 
-		readonly byte[] buffer = new byte[4 * 9];
-
 		public override bool chunk_sizes()
 		{
 			// for layered compression 'dec' only hands over the stream
 			var instream = dec.getByteStreamIn();
 
 			// read bytes per layer
-			if (instream.Read(buffer, 0, 4 * 9) != 4 * 9) throw new EndOfStreamException();
-			num_bytes_channel_returns_XY = (int)BitConverter.ToUInt32(buffer, 0);
-			num_bytes_Z = (int)BitConverter.ToUInt32(buffer, 4);
-			num_bytes_classification = (int)BitConverter.ToUInt32(buffer, 8);
-			num_bytes_flags = (int)BitConverter.ToUInt32(buffer, 12);
-			num_bytes_intensity = (int)BitConverter.ToUInt32(buffer, 16);
-			num_bytes_scan_angle = (int)BitConverter.ToUInt32(buffer, 20);
-			num_bytes_user_data = (int)BitConverter.ToUInt32(buffer, 24);
-			num_bytes_point_source = (int)BitConverter.ToUInt32(buffer, 28);
-			num_bytes_gps_time = (int)BitConverter.ToUInt32(buffer, 32);
+			if (!instream.get32bits(out num_bytes_channel_returns_XY)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_Z)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_classification)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_flags)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_intensity)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_scan_angle)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_user_data)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_point_source)) throw new EndOfStreamException();
+			if (!instream.get32bits(out num_bytes_gps_time)) throw new EndOfStreamException();
 
 			return true;
 		}
@@ -177,7 +173,7 @@ namespace LASzip.Net
 
 			// load the requested bytes and init the corresponding instreams and decoders
 			num_bytes = 0;
-			if (instream.Read(bytes, 0, num_bytes_channel_returns_XY) != num_bytes_channel_returns_XY) throw new EndOfStreamException();
+			if (!instream.getBytes(bytes, 0, num_bytes_channel_returns_XY)) throw new EndOfStreamException();
 			instream_channel_returns_XY = new MemoryStream(bytes, 0, num_bytes_channel_returns_XY);
 			dec_channel_returns_XY.init(instream_channel_returns_XY);
 			num_bytes += num_bytes_channel_returns_XY;
@@ -186,7 +182,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_Z != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_Z) != num_bytes_Z) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_Z)) throw new EndOfStreamException();
 					instream_Z = new MemoryStream(bytes, num_bytes, num_bytes_Z);
 					dec_Z.init(instream_Z);
 					num_bytes += num_bytes_Z;
@@ -211,7 +207,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_classification != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_classification) != num_bytes_classification) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_classification)) throw new EndOfStreamException();
 					instream_classification = new MemoryStream(bytes, num_bytes, num_bytes_classification);
 					dec_classification.init(instream_classification);
 					num_bytes += num_bytes_classification;
@@ -236,7 +232,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_flags != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_flags) != num_bytes_flags) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_flags)) throw new EndOfStreamException();
 					instream_flags = new MemoryStream(bytes, num_bytes, num_bytes_flags);
 					dec_flags.init(instream_flags);
 					num_bytes += num_bytes_flags;
@@ -261,7 +257,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_intensity != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_intensity) != num_bytes_intensity) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_intensity)) throw new EndOfStreamException();
 					instream_intensity = new MemoryStream(bytes, num_bytes, num_bytes_intensity);
 					dec_intensity.init(instream_intensity);
 					num_bytes += num_bytes_intensity;
@@ -286,7 +282,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_scan_angle != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_scan_angle) != num_bytes_scan_angle) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_scan_angle)) throw new EndOfStreamException();
 					instream_scan_angle = new MemoryStream(bytes, num_bytes, num_bytes_scan_angle);
 					dec_scan_angle.init(instream_scan_angle);
 					num_bytes += num_bytes_scan_angle;
@@ -311,7 +307,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_user_data != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_user_data) != num_bytes_user_data) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_user_data)) throw new EndOfStreamException();
 					instream_user_data = new MemoryStream(bytes, num_bytes, num_bytes_user_data);
 					dec_user_data.init(instream_user_data);
 					num_bytes += num_bytes_user_data;
@@ -336,7 +332,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_point_source != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_point_source) != num_bytes_point_source) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_point_source)) throw new EndOfStreamException();
 					instream_point_source = new MemoryStream(bytes, num_bytes, num_bytes_point_source);
 					dec_point_source.init(instream_point_source);
 					num_bytes += num_bytes_point_source;
@@ -361,7 +357,7 @@ namespace LASzip.Net
 			{
 				if (num_bytes_gps_time != 0)
 				{
-					if (instream.Read(bytes, num_bytes, num_bytes_gps_time) != num_bytes_gps_time) throw new EndOfStreamException();
+					if (!instream.getBytes(bytes, num_bytes, num_bytes_gps_time)) throw new EndOfStreamException();
 					instream_gps_time = new MemoryStream(bytes, num_bytes, num_bytes_gps_time);
 					dec_gps_time.init(instream_gps_time);
 					num_bytes += num_bytes_gps_time;

@@ -26,9 +26,8 @@
 //
 //===============================================================================
 
-using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 
 namespace LASzip.Net
 {
@@ -72,8 +71,6 @@ namespace LASzip.Net
 			current_context = 0;
 		}
 
-		readonly byte[] buffer = new byte[4];
-
 		public override bool chunk_sizes()
 		{
 			// for layered compression 'dec' only hands over the stream
@@ -82,8 +79,7 @@ namespace LASzip.Net
 			for (uint i = 0; i < number; i++)
 			{
 				// read bytes per layer
-				if (instream.Read(buffer, 0, 4) != 4) throw new EndOfStreamException();
-				num_bytes_Bytes[i] = (int)BitConverter.ToUInt32(buffer, 0);
+				if (!instream.get32bits(out num_bytes_Bytes[i])) throw new EndOfStreamException();
 			}
 
 			return true;
@@ -140,7 +136,7 @@ namespace LASzip.Net
 				{
 					if (num_bytes_Bytes[i] != 0)
 					{
-						if (instream.Read(bytes, num_bytes, num_bytes_Bytes[i]) != num_bytes_Bytes[i]) throw new EndOfStreamException();
+						if (!instream.getBytes(bytes, num_bytes, num_bytes_Bytes[i])) throw new EndOfStreamException();
 						instream_Bytes[i] = new MemoryStream(bytes, num_bytes, num_bytes_Bytes[i]);
 						dec_Bytes[i].init(instream_Bytes[i]);
 						num_bytes += num_bytes_Bytes[i];

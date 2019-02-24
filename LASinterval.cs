@@ -527,47 +527,43 @@ namespace LASzip.Net
 		// read from file
 		public bool read(Stream stream)
 		{
-			byte[] tmp = new byte[4];
-
-			if (stream.Read(tmp, 0, 4) != 4)
+			byte[] signature = new byte[4];
+			if (!stream.getBytes(signature, 4))
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading signature");
 				return false;
 			}
-
-			if (tmp[0] != 'L' && tmp[1] != 'A' && tmp[2] != 'S' && tmp[3] != 'V')
+			if (signature[0] != 'L' && signature[1] != 'A' && signature[2] != 'S' && signature[3] != 'V')
 			{
-				Console.Error.WriteLine("ERROR (LASinterval): wrong signature '{0}{1}{3}{4}' instead of 'LASV'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
+				Console.Error.WriteLine("ERROR (LASinterval): wrong signature '{0}{1}{3}{4}' instead of 'LASV'", (char)signature[0], (char)signature[1], (char)signature[2], (char)signature[3]);
 				return false;
 			}
 
-			if (stream.Read(tmp, 0, 4) != 4)
+			uint version;
+			if (!stream.get32bits(out version))
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading version");
 				return false;
 			}
 
-			uint version = BitConverter.ToUInt32(tmp, 0);
-
 			// read number of cells
-			if (stream.Read(tmp, 0, 4) != 4)
+			uint number_cells;
+			if (!stream.get32bits(out number_cells))
 			{
 				Console.Error.WriteLine("ERROR (LASinterval): reading number of cells");
 				return false;
 			}
 
-			uint number_cells = BitConverter.ToUInt32(tmp, 0);
-
 			// loop over all cells
 			while (number_cells > 0)
 			{
 				// read index of cell
-				if (stream.Read(tmp, 0, 4) != 4)
+				int cell_index;
+				if (!stream.get32bits(out cell_index))
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading cell index");
 					return false;
 				}
-				int cell_index = BitConverter.ToInt32(tmp, 0);
 
 				// create cell and insert into hash
 				LASintervalStartCell start_cell = new LASintervalStartCell();
@@ -575,40 +571,38 @@ namespace LASzip.Net
 				LASintervalCell cell = start_cell;
 
 				// read number of intervals in cell
-				if (stream.Read(tmp, 0, 4) != 4)
+				uint number_intervals;
+				if (!stream.get32bits(out number_intervals))
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading number of intervals in cell");
 					return false;
 				}
-				uint number_intervals = BitConverter.ToUInt32(tmp, 0);
 
 				// read number of points in cell
-				if (stream.Read(tmp, 0, 4) != 4)
+				uint number_points;
+				if (!stream.get32bits(out number_points))
 				{
 					Console.Error.WriteLine("ERROR (LASinterval): reading number of points in cell");
 					return false;
 				}
-				uint number_points = BitConverter.ToUInt32(tmp, 0);
 
 				start_cell.full = number_points;
 				start_cell.total = 0;
 				while (number_intervals > 0)
 				{
 					// read start of interval
-					if (stream.Read(tmp, 0, 4) != 4)
+					if (!stream.get32bits(out cell.start))
 					{
 						Console.Error.WriteLine("ERROR (LASinterval): reading start of interval");
 						return false;
 					}
-					cell.start = BitConverter.ToUInt32(tmp, 0);
 
 					// read end of interval
-					if (stream.Read(tmp, 0, 4) != 4)
+					if (!stream.get32bits(out cell.end))
 					{
 						Console.Error.WriteLine("ERROR (LASinterval): reading end of interval");
 						return false;
 					}
-					cell.end = BitConverter.ToUInt32(tmp, 0);
 
 					start_cell.total += cell.end - cell.start + 1;
 

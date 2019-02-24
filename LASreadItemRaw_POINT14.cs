@@ -36,7 +36,7 @@ namespace LASzip.Net
 
 		public unsafe override void read(laszip_point item, ref uint context) // context is unused
 		{
-			if (instream.Read(buffer, 0, 30) != 30) throw new EndOfStreamException();
+			if (!instream.getBytes(buffer, 30)) throw new EndOfStreamException();
 
 			fixed (byte* pBuffer = buffer)
 			{

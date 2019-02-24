@@ -375,9 +375,8 @@ namespace LASzip.Net
 							dec.init(instream, false);
 
 							// read how many points are in the chunk
-							byte[] buffer = new byte[4];
-							if (instream.Read(buffer, 0, 4) != 4) throw new EndOfStreamException();
-							uint count = BitConverter.ToUInt32(buffer, 0);
+							uint count;
+							if (!instream.get32bits(out count)) throw new EndOfStreamException();
 
 							// read the sizes of all layers
 							for (int i = 0; i < num_readers; i++)
@@ -505,14 +504,11 @@ namespace LASzip.Net
 
 		bool read_chunk_table()
 		{
-			byte[] buffer = new byte[8];
-
 			// read the 8 bytes that store the location of the chunk table
 			long chunk_table_start_position;
 			try
 			{
-				if (instream.Read(buffer, 0, 8) != 8) throw new EndOfStreamException();
-				chunk_table_start_position = BitConverter.ToInt64(buffer, 0);
+				if (!instream.get64bits(out chunk_table_start_position)) throw new EndOfStreamException();
 			}
 			catch
 			{
@@ -556,8 +552,7 @@ namespace LASzip.Net
 
 				try
 				{
-					if (instream.Read(buffer, 0, 8) != 8) throw new EndOfStreamException();
-					chunk_table_start_position = BitConverter.ToInt64(buffer, 0);
+					if (!instream.get64bits(out chunk_table_start_position)) throw new EndOfStreamException();
 				}
 				catch
 				{
@@ -570,11 +565,11 @@ namespace LASzip.Net
 			{
 				instream.Seek(chunk_table_start_position, SeekOrigin.Begin);
 
-				if (instream.Read(buffer, 0, 8) != 8) throw new EndOfStreamException();
-				uint version = BitConverter.ToUInt32(buffer, 0);
+				uint version;
+				if (!instream.get32bits(out version)) throw new EndOfStreamException();
 				if (version != 0) throw new Exception();
 
-				number_chunks = BitConverter.ToUInt32(buffer, 4);
+				if (!instream.get32bits(out number_chunks)) throw new EndOfStreamException();
 				chunk_totals = null;
 				chunk_starts = null;
 				if (chunk_size == uint.MaxValue)

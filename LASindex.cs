@@ -271,27 +271,24 @@ namespace LASzip.Net
 		{
 			if (interval != null) interval.Dispose();
 
-			byte[] tmp = new byte[4];
-
-			try { stream.Read(tmp, 0, 4); }
-			catch
+			byte[] signature = new byte[4];
+			if(!stream.getBytes(signature, 4))
 			{
 				Console.Error.WriteLine("ERROR (LASindex): reading signature");
 				return false;
 			}
-			if (tmp[0] != 'L' || tmp[1] != 'A' || tmp[2] != 'S' || tmp[3] != 'S')
+			if (signature[0] != 'L' || signature[1] != 'A' || signature[2] != 'S' || signature[3] != 'S')
 			{
-				Console.Error.WriteLine("ERROR (LASindex): wrong signature '{0}{1}{3}{4}' instead of 'LASX'", (char)tmp[0], (char)tmp[1], (char)tmp[2], (char)tmp[3]);
+				Console.Error.WriteLine("ERROR (LASindex): wrong signature '{0}{1}{3}{4}' instead of 'LASX'", (char)signature[0], (char)signature[1], (char)signature[2], (char)signature[3]);
 				return false;
 			}
 
-			if (stream.Read(tmp, 0, 4) != 4)
+			uint version;
+			if (!stream.get32bits(out version))
 			{
 				Console.Error.WriteLine("ERROR (LASindex): reading version");
 				return false;
 			}
-
-			uint version = BitConverter.ToUInt32(tmp, 0);
 
 			// read spatial quadtree
 			spatial = new LASquadtree();
