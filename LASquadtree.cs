@@ -109,7 +109,7 @@ namespace LASzip.Net
 			{
 				//Console.Error.WriteLine("ERROR (LASquadtree): wrong signature '{0}{1}{3}{4}' instead of 'LASQ'", (char)signature[0], (char)signature[1], (char)signature[2], (char)signature[3]);
 				//return false;
-				levels = BitConverter.ToUInt32(signature, 0);
+				levels = (uint)(signature[3] << 24 | signature[2] << 16 | signature[1] << 8 | signature[0]);
 			}
 			else
 			{

@@ -2650,237 +2650,209 @@ namespace LASzip.Net
 
 			try
 			{
-				byte[] buffer = new byte[32];
+				byte[] signature = new byte[32];
 
 				#region read the header variable after variable
-				if (streamin.Read(buffer, 0, 4) != 4)
+				if (!streamin.getBytes(signature, 4))
 				{
 					error = "reading header.file_signature";
 					return 1;
 				}
 
-				if (buffer[0] != 'L' && buffer[1] != 'A' && buffer[2] != 'S' && buffer[3] != 'F')
+				if (signature[0] != 'L' && signature[1] != 'A' && signature[2] != 'S' && signature[3] != 'F')
 				{
 					error = "wrong file_signature. not a LAS/LAZ file.";
 					return 1;
 				}
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.file_source_ID))
 				{
 					error = "reading header.file_source_ID";
 					return 1;
 				}
-				header.file_source_ID = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.global_encoding))
 				{
 					error = "reading header.global_encoding";
 					return 1;
 				}
-				header.global_encoding = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 4) != 4)
+				if (!streamin.get32bits(out header.project_ID_GUID_data_1))
 				{
 					error = "reading header.project_ID_GUID_data_1";
 					return 1;
 				}
-				header.project_ID_GUID_data_1 = BitConverter.ToUInt32(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.project_ID_GUID_data_2))
 				{
 					error = "reading header.project_ID_GUID_data_2";
 					return 1;
 				}
-				header.project_ID_GUID_data_2 = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.project_ID_GUID_data_3))
 				{
 					error = "reading header.project_ID_GUID_data_3";
 					return 1;
 				}
-				header.project_ID_GUID_data_3 = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(header.project_ID_GUID_data_4, 0, 8) != 8)
+				if (!streamin.getBytes(header.project_ID_GUID_data_4, 8))
 				{
 					error = "reading header.project_ID_GUID_data_4";
 					return 1;
 				}
 
-				if (streamin.Read(buffer, 0, 1) != 1)
+				if (!streamin.get8bits(out header.version_major))
 				{
 					error = "reading header.version_major";
 					return 1;
 				}
-				header.version_major = buffer[0];
 
-				if (streamin.Read(buffer, 0, 1) != 1)
+				if (!streamin.get8bits(out header.version_minor))
 				{
 					error = "reading header.version_minor";
 					return 1;
 				}
-				header.version_minor = buffer[0];
 
-				if (streamin.Read(header.system_identifier, 0, 32) != 32)
+				if (!streamin.getBytes(header.system_identifier, 32))
 				{
 					error = "reading header.system_identifier";
 					return 1;
 				}
 
-				if (streamin.Read(header.generating_software, 0, 32) != 32)
+				if (!streamin.getBytes(header.generating_software, 32))
 				{
 					error = "reading header.generating_software";
 					return 1;
 				}
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.file_creation_day))
 				{
 					error = "reading header.file_creation_day";
 					return 1;
 				}
-				header.file_creation_day = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.file_creation_year))
 				{
 					error = "reading header.file_creation_year";
 					return 1;
 				}
-				header.file_creation_year = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.header_size))
 				{
 					error = "reading header.header_size";
 					return 1;
 				}
-				header.header_size = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 4) != 4)
+				if (!streamin.get32bits(out header.offset_to_point_data))
 				{
 					error = "reading header.offset_to_point_data";
 					return 1;
 				}
-				header.offset_to_point_data = BitConverter.ToUInt32(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 4) != 4)
+				if (!streamin.get32bits(out header.number_of_variable_length_records))
 				{
 					error = "reading header.number_of_variable_length_records";
 					return 1;
 				}
-				header.number_of_variable_length_records = BitConverter.ToUInt32(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 1) != 1)
+				if (!streamin.get8bits(out header.point_data_format))
 				{
 					error = "reading header.point_data_format";
 					return 1;
 				}
-				header.point_data_format = buffer[0];
 
-				if (streamin.Read(buffer, 0, 2) != 2)
+				if (!streamin.get16bits(out header.point_data_record_length))
 				{
 					error = "reading header.point_data_record_length";
 					return 1;
 				}
-				header.point_data_record_length = BitConverter.ToUInt16(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 4) != 4)
+				if (!streamin.get32bits(out header.number_of_point_records))
 				{
 					error = "reading header.number_of_point_records";
 					return 1;
 				}
-				header.number_of_point_records = BitConverter.ToUInt32(buffer, 0);
 
 				for (int i = 0; i < 5; i++)
 				{
-					if (streamin.Read(buffer, 0, 4) != 4)
+					if (!streamin.get32bits(out header.number_of_points_by_return[i]))
 					{
 						error = string.Format("reading header.number_of_points_by_return {0}", i);
 						return 1;
 					}
-					header.number_of_points_by_return[i] = BitConverter.ToUInt32(buffer, 0);
 				}
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.x_scale_factor))
 				{
 					error = "reading header.x_scale_factor";
 					return 1;
 				}
-				header.x_scale_factor = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.y_scale_factor))
 				{
 					error = "reading header.y_scale_factor";
 					return 1;
 				}
-				header.y_scale_factor = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.z_scale_factor))
 				{
 					error = "reading header.z_scale_factor";
 					return 1;
 				}
-				header.z_scale_factor = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.x_offset))
 				{
 					error = "reading header.x_offset";
 					return 1;
 				}
-				header.x_offset = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.y_offset))
 				{
 					error = "reading header.y_offset";
 					return 1;
 				}
-				header.y_offset = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.z_offset))
 				{
 					error = "reading header.z_offset";
 					return 1;
 				}
-				header.z_offset = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.max_x))
 				{
 					error = "reading header.max_x";
 					return 1;
 				}
-				header.max_x = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.min_x))
 				{
 					error = "reading header.min_x";
 					return 1;
 				}
-				header.min_x = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.max_y))
 				{
 					error = "reading header.max_y";
 					return 1;
 				}
-				header.max_y = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.min_y))
 				{
 					error = "reading header.min_y";
 					return 1;
 				}
-				header.min_y = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.max_z))
 				{
 					error = "reading header.max_z";
 					return 1;
 				}
-				header.max_z = BitConverter.ToDouble(buffer, 0);
 
-				if (streamin.Read(buffer, 0, 8) != 8)
+				if (!streamin.get64bits(out header.min_z))
 				{
 					error = "reading header.min_z";
 					return 1;
 				}
-				header.min_z = BitConverter.ToDouble(buffer, 0);
 
 				// special handling for LAS 1.3
 				if (header.version_major == 1 && header.version_minor >= 3)
@@ -2892,12 +2864,11 @@ namespace LASzip.Net
 					}
 					else
 					{
-						if (streamin.Read(buffer, 0, 8) != 8)
+						if (!streamin.get64bits(out header.start_of_waveform_data_packet_record))
 						{
 							error = "reading header.start_of_waveform_data_packet_record";
 							return 1;
 						}
-						header.start_of_waveform_data_packet_record = BitConverter.ToUInt64(buffer, 0);
 						header.user_data_in_header_size = (uint)header.header_size - 235;
 					}
 				}
@@ -2916,35 +2887,31 @@ namespace LASzip.Net
 					}
 					else
 					{
-						if (streamin.Read(buffer, 0, 8) != 8)
+						if (!streamin.get64bits(out header.start_of_first_extended_variable_length_record))
 						{
 							error = "reading header.start_of_first_extended_variable_length_record";
 							return 1;
 						}
-						header.start_of_first_extended_variable_length_record = BitConverter.ToUInt64(buffer, 0);
 
-						if (streamin.Read(buffer, 0, 4) != 4)
+						if (!streamin.get32bits(out header.number_of_extended_variable_length_records))
 						{
 							error = "reading header.number_of_extended_variable_length_records";
 							return 1;
 						}
-						header.number_of_extended_variable_length_records = BitConverter.ToUInt32(buffer, 0);
 
-						if (streamin.Read(buffer, 0, 8) != 8)
+						if (!streamin.get64bits(out header.extended_number_of_point_records))
 						{
 							error = "reading header.extended_number_of_point_records";
 							return 1;
 						}
-						header.extended_number_of_point_records = BitConverter.ToUInt64(buffer, 0);
 
 						for (int i = 0; i < 15; i++)
 						{
-							if (streamin.Read(buffer, 0, 8) != 8)
+							if (!streamin.get64bits(out header.extended_number_of_points_by_return[i]))
 							{
 								error = string.Format("reading header.extended_number_of_points_by_return[{0}]", i);
 								return 1;
 							}
-							header.extended_number_of_points_by_return[i] = BitConverter.ToUInt64(buffer, 0);
 						}
 						header.user_data_in_header_size = (uint)header.header_size - 375;
 					}
@@ -2955,7 +2922,7 @@ namespace LASzip.Net
 				{
 					header.user_data_in_header = new byte[header.user_data_in_header_size];
 
-					if (streamin.Read(header.user_data_in_header, 0, (int)header.user_data_in_header_size) != header.user_data_in_header_size)
+					if (!streamin.getBytes(header.user_data_in_header, (int)header.user_data_in_header_size))
 					{
 						error = string.Format("reading {0} bytes of data into header.user_data_in_header", header.user_data_in_header_size);
 						return 1;
@@ -2986,34 +2953,31 @@ namespace LASzip.Net
 						}
 
 						// read variable length records variable after variable (to avoid alignment issues)
-						if (streamin.Read(buffer, 0, 2) != 2)
+						if (!streamin.get16bits(out header.vlrs[i].reserved))
 						{
 							error = string.Format("reading header.vlrs[{0}].reserved", i);
 							return 1;
 						}
-						header.vlrs[i].reserved = BitConverter.ToUInt16(buffer, 0);
 
-						if (streamin.Read(header.vlrs[i].user_id, 0, 16) != 16)
+						if (!streamin.getBytes(header.vlrs[i].user_id, 16))
 						{
 							error = string.Format("reading header.vlrs[{0}].user_id", i);
 							return 1;
 						}
 
-						if (streamin.Read(buffer, 0, 2) != 2)
+						if (!streamin.get16bits(out header.vlrs[i].record_id))
 						{
 							error = string.Format("reading header.vlrs[{0}].record_id", i);
 							return 1;
 						}
-						header.vlrs[i].record_id = BitConverter.ToUInt16(buffer, 0);
 
-						if (streamin.Read(buffer, 0, 2) != 2)
+						if (!streamin.get16bits(out header.vlrs[i].record_length_after_header))
 						{
 							error = string.Format("reading header.vlrs[{0}].record_length_after_header", i);
 							return 1;
 						}
-						header.vlrs[i].record_length_after_header = BitConverter.ToUInt16(buffer, 0);
 
-						if (streamin.Read(header.vlrs[i].description, 0, 32) != 32)
+						if (!streamin.getBytes(header.vlrs[i].description, 32))
 						{
 							error = string.Format("reading header.vlrs[{0}].description", i);
 							return 1;
@@ -3060,107 +3024,96 @@ namespace LASzip.Net
 								//        U16 version             2 bytes * num_items
 								// which totals 34+6*num_items
 
-								if (streamin.Read(buffer, 0, 2) != 2)
+								if (!streamin.get16bits(out laszip.compressor))
 								{
 									error = "reading compressor";
 									return 1;
 								}
-								laszip.compressor = BitConverter.ToUInt16(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 2) != 2)
+								if (!streamin.get16bits(out laszip.coder))
 								{
 									error = "reading coder";
 									return 1;
 								}
-								laszip.coder = BitConverter.ToUInt16(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 1) != 1)
+								if (!streamin.get8bits(out laszip.version_major))
 								{
 									error = "reading version_major";
 									return 1;
 								}
-								laszip.version_major = buffer[0];
 
-								if (streamin.Read(buffer, 0, 1) != 1)
+								if (!streamin.get8bits(out laszip.version_minor))
 								{
 									error = "reading version_minor";
 									return 1;
 								}
-								laszip.version_minor = buffer[0];
 
-								if (streamin.Read(buffer, 0, 2) != 2)
+								if (!streamin.get16bits(out laszip.version_revision))
 								{
 									error = "reading version_revision";
 									return 1;
 								}
-								laszip.version_revision = BitConverter.ToUInt16(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 4) != 4)
+								if (!streamin.get32bits(out laszip.options))
 								{
 									error = "reading options";
 									return 1;
 								}
-								laszip.options = BitConverter.ToUInt32(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 4) != 4)
+								if (!streamin.get32bits(out laszip.chunk_size))
 								{
 									error = "reading chunk_size";
 									return 1;
 								}
-								laszip.chunk_size = BitConverter.ToUInt32(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 8) != 8)
+								if (!streamin.get64bits(out laszip.number_of_special_evlrs))
 								{
 									error = "reading number_of_special_evlrs";
 									return 1;
 								}
-								laszip.number_of_special_evlrs = BitConverter.ToInt64(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 8) != 8)
+								if (!streamin.get64bits(out laszip.offset_to_special_evlrs))
 								{
 									error = "reading offset_to_special_evlrs";
 									return 1;
 								}
-								laszip.offset_to_special_evlrs = BitConverter.ToInt64(buffer, 0);
 
-								if (streamin.Read(buffer, 0, 2) != 2)
+								if (!streamin.get16bits(out laszip.num_items))
 								{
 									error = "reading num_items";
 									return 1;
 								}
-								laszip.num_items = BitConverter.ToUInt16(buffer, 0);
 
 								laszip.items = new LASitem[laszip.num_items];
 								for (int j = 0; j < laszip.num_items; j++)
 								{
 									laszip.items[j] = new LASitem();
 
-									if (streamin.Read(buffer, 0, 2) != 2)
+									ushort type;
+									if (!streamin.get16bits(out type))
 									{
 										error = string.Format("reading type of item {0}", j);
 										return 1;
 									}
-									laszip.items[j].type = (LASitem.Type)BitConverter.ToUInt16(buffer, 0);
+									laszip.items[j].type = (LASitem.Type)type;
 
-									if (streamin.Read(buffer, 0, 2) != 2)
+									if (!streamin.get16bits(out laszip.items[j].size))
 									{
 										error = string.Format("reading size of item {0}", j);
 										return 1;
 									}
-									laszip.items[j].size = BitConverter.ToUInt16(buffer, 0);
 
-									if (streamin.Read(buffer, 0, 2) != 2)
+									if (!streamin.get16bits(out laszip.items[j].version))
 									{
 										error = string.Format("reading version of item {0}", j);
 										return 1;
 									}
-									laszip.items[j].version = BitConverter.ToUInt16(buffer, 0);
 								}
 							}
 							else
 							{
 								header.vlrs[i].data = new byte[header.vlrs[i].record_length_after_header];
-								if (streamin.Read(header.vlrs[i].data, 0, header.vlrs[i].record_length_after_header) != header.vlrs[i].record_length_after_header)
+								if (!streamin.getBytes(header.vlrs[i].data, header.vlrs[i].record_length_after_header))
 								{
 									error = string.Format("reading {0} bytes of data into header.vlrs[{1}].data", header.vlrs[i].record_length_after_header, i);
 									return 1;
@@ -3195,7 +3148,7 @@ namespace LASzip.Net
 				{
 					header.user_data_after_header = new byte[header.user_data_after_header_size];
 
-					if (streamin.Read(header.user_data_after_header, 0, (int)header.user_data_after_header_size) != header.user_data_after_header_size)
+					if (!streamin.getBytes(header.user_data_after_header, (int)header.user_data_after_header_size))
 					{
 						error = string.Format("reading {0} bytes of data into header.user_data_after_header", header.user_data_after_header_size);
 						return 1;
@@ -3314,35 +3267,40 @@ namespace LASzip.Net
 								MemoryStream inStream = new MemoryStream(compatibility_VLR.data, 0, compatibility_VLR.record_length_after_header);
 
 								// read control info
-								streamin.Read(buffer, 0, 24);
-								ushort laszip_version = BitConverter.ToUInt16(buffer, 0);
-								ushort compatible_version = BitConverter.ToUInt16(buffer, 2);
-								uint unused = BitConverter.ToUInt32(buffer, 4);
+								ushort laszip_version;
+								inStream.get16bits(out laszip_version);
+								ushort compatible_version;
+								inStream.get16bits(out compatible_version);
+								uint unused;
+								inStream.get32bits(out unused);
 
 								// read the 148 bytes of the extended LAS 1.4 header
-								ulong start_of_waveform_data_packet_record = BitConverter.ToUInt64(buffer, 8);
+								ulong start_of_waveform_data_packet_record;
+								inStream.get64bits(out start_of_waveform_data_packet_record);
 								if (start_of_waveform_data_packet_record != 0)
 								{
 									Console.Error.WriteLine("WARNING: start_of_waveform_data_packet_record is {0}. reading 0 instead.", start_of_waveform_data_packet_record);
 								}
 								header.start_of_waveform_data_packet_record = 0;
 
-								ulong start_of_first_extended_variable_length_record = BitConverter.ToUInt64(buffer, 16);
+								ulong start_of_first_extended_variable_length_record;
+								inStream.get64bits(out start_of_first_extended_variable_length_record);
 								if (start_of_first_extended_variable_length_record != 0)
 								{
 									Console.Error.WriteLine("WARNING: EVLRs not supported. start_of_first_extended_variable_length_record is {0}. reading 0 instead.", start_of_first_extended_variable_length_record);
 								}
 								header.start_of_first_extended_variable_length_record = 0;
 
-								streamin.Read(buffer, 0, 12); // need more bytes
-								uint number_of_extended_variable_length_records = BitConverter.ToUInt32(buffer, 0);
+								uint number_of_extended_variable_length_records;
+								inStream.get32bits(out number_of_extended_variable_length_records);
 								if (number_of_extended_variable_length_records != 0)
 								{
 									Console.Error.WriteLine("WARNING: EVLRs not supported. number_of_extended_variable_length_records is {0}. reading 0 instead.", number_of_extended_variable_length_records);
 								}
 								header.number_of_extended_variable_length_records = 0;
 
-								ulong extended_number_of_point_records = BitConverter.ToUInt64(buffer, 4);
+								ulong extended_number_of_point_records;
+								inStream.get64bits(out extended_number_of_point_records);
 								if (header.number_of_point_records != 0 && header.number_of_point_records != extended_number_of_point_records)
 								{
 									Console.Error.WriteLine("WARNING: number_of_point_records is {0}. but extended_number_of_point_records is {1}.", header.number_of_point_records, extended_number_of_point_records);
@@ -3352,8 +3310,7 @@ namespace LASzip.Net
 								ulong extended_number_of_points_by_return;
 								for (int r = 0; r < 15; r++)
 								{
-									streamin.Read(buffer, 0, 8);
-									extended_number_of_points_by_return = BitConverter.ToUInt64(buffer, 0);
+									inStream.get64bits(out extended_number_of_points_by_return);
 									if (r < 5 && header.number_of_points_by_return[r] != 0 && header.number_of_points_by_return[r] != extended_number_of_points_by_return)
 									{
 										Console.Error.WriteLine("WARNING: number_of_points_by_return[{0}] is {1}. but extended_number_of_points_by_return[{0}] is {2}.", r, header.number_of_points_by_return[r], extended_number_of_points_by_return);
@@ -3746,13 +3703,13 @@ namespace LASzip.Net
 					var point = this.point;
 
 					// get extended attributes from extra bytes
-					short scan_angle_remainder = BitConverter.ToInt16(point.extra_bytes, start_scan_angle);
+					short scan_angle_remainder = (short)((point.extra_bytes[start_scan_angle + 1] << 8) | point.extra_bytes[start_scan_angle]);
 					byte extended_returns = point.extra_bytes[start_extended_returns];
 					byte classification = point.extra_bytes[start_classification];
 					byte flags_and_channel = point.extra_bytes[start_flags_and_channel];
 					if (start_NIR_band != -1)
 					{
-						point.rgb[3] = BitConverter.ToUInt16(point.extra_bytes, start_NIR_band);
+						point.rgb[3] = (ushort)((point.extra_bytes[start_NIR_band + 1] << 8) | point.extra_bytes[start_NIR_band]);
 					}
 
 					// decompose into individual attributes
@@ -3928,8 +3885,6 @@ namespace LASzip.Net
 				return 0;
 			}
 
-			byte[] buffer = new byte[32];
-
 			try
 			{
 				long previousPosition = streamin.Position;
@@ -3953,34 +3908,31 @@ namespace LASzip.Net
 					}
 
 					// read extended variable length records variable after variable (to avoid alignment issues)
-					if (streamin.Read(buffer, 0, 2) != 2)
+					if (!streamin.get16bits(out evlrs[i].reserved))
 					{
 						error = string.Format("reading EVLRs[{0}].reserved", i);
 						return 1;
 					}
-					evlrs[i].reserved = BitConverter.ToUInt16(buffer, 0);
 
-					if (streamin.Read(evlrs[i].user_id, 0, 16) != 16)
+					if (!streamin.getBytes(evlrs[i].user_id, 16))
 					{
 						error = string.Format("reading EVLRs[{0}].user_id", i);
 						return 1;
 					}
 
-					if (streamin.Read(buffer, 0, 2) != 2)
+					if (!streamin.get16bits(out evlrs[i].record_id))
 					{
 						error = string.Format("reading EVLRs[{0}].record_id", i);
 						return 1;
 					}
-					evlrs[i].record_id = BitConverter.ToUInt16(buffer, 0);
 
-					if (streamin.Read(buffer, 0, 8) != 8)
+					if (!streamin.get64bits(out evlrs[i].record_length_after_header))
 					{
 						error = string.Format("reading EVLRs[{0}].record_length_after_header", i);
 						return 1;
 					}
-					evlrs[i].record_length_after_header = BitConverter.ToUInt64(buffer, 0);
 
-					if (streamin.Read(evlrs[i].description, 0, 32) != 32)
+					if (!streamin.getBytes(evlrs[i].description, 32))
 					{
 						error = string.Format("reading EVLRs[{0}].description", i);
 						return 1;
@@ -4003,7 +3955,7 @@ namespace LASzip.Net
 					if (evlrs[i].record_length_after_header != 0)
 					{
 						evlrs[i].data = new byte[(int)evlrs[i].record_length_after_header];
-						if (streamin.Read(evlrs[i].data, 0, (int)evlrs[i].record_length_after_header) != (int)evlrs[i].record_length_after_header)
+						if (!streamin.getBytes(evlrs[i].data, (int)evlrs[i].record_length_after_header))
 						{
 							error = string.Format("reading {0} bytes of data into EVLRs[{1}].data", evlrs[i].record_length_after_header, i);
 							return 1;

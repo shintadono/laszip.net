@@ -56,6 +56,16 @@ namespace LASzip.Net
 			return stream.Read(bytes, offset, num_bytes) == num_bytes;
 		}
 
+		// read 8 bit field
+		public static bool get8bits(this Stream stream, out byte val)
+		{
+			val = 0;
+			int ret = stream.ReadByte();
+			if (ret < 0) return false;
+			val = (byte)ret;
+			return true;
+		}
+
 		// read 16 bit field
 		public static bool get16bits(this Stream stream, out ushort val)
 		{
