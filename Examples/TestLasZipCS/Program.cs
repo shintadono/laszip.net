@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using LASzip.Net;
 
 namespace TestLasZipCS
@@ -81,8 +83,20 @@ namespace TestLasZipCS
 			var err = lazWriter.clean();
 			if (err == 0)
 			{
-				// Number of point records needs to be set
-				lazWriter.header.number_of_point_records = (uint)points.Count;
+				// Set version, point record type, global encoding for WKT, create date and year and other stuff.
+				lazWriter.header.version_major = 1;
+				lazWriter.header.version_minor = 4;
+				lazWriter.header.offset_to_point_data = lazWriter.header.header_size = 375;
+				lazWriter.header.global_encoding |= 1 << 4; // Set WKT bit.
+				lazWriter.header.file_creation_year = 2019;
+				lazWriter.header.file_creation_day = 200;
+				byte[] system_identifier = Encoding.ASCII.GetBytes("LASzip.net example");
+				Array.Copy(system_identifier, lazWriter.header.system_identifier, Math.Min(system_identifier.Length, 32));
+				lazWriter.set_point_type_and_size(6, 30);
+
+				// Number of point records needs to be set. Extended numbers that is, since 1.4.
+				lazWriter.header.extended_number_of_point_records = (ulong)points.Count;
+				lazWriter.header.extended_number_of_points_by_return[0] = (ulong)points.Count;
 
 				// Header Min/Max needs to be set to extents of points
 				lazWriter.header.min_x = points[0].X; // LL Point
@@ -92,31 +106,50 @@ namespace TestLasZipCS
 				lazWriter.header.max_y = points[1].Y;
 				lazWriter.header.max_z = points[1].Z;
 
-				// Open the writer and test for errors
-				err = lazWriter.open_writer(FileName, true);
+				// Set up some WKT string as spatial reference system definition. (Even if it doesn't make sense with the coordinates in this example.)
+				string wkt = "PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]";
+
+				laszip_vlr wktVLR = new laszip_vlr();
+				wktVLR.reserved = 0;
+				byte[] user_id = Encoding.ASCII.GetBytes("LASF_Projection");
+				Array.Copy(user_id, wktVLR.user_id, Math.Min(user_id.Length, 16));
+				wktVLR.record_id = 2112;
+				wktVLR.description[0] = 0; // add_vlr will fill the description.
+				wktVLR.data = Encoding.ASCII.GetBytes(wkt);
+				wktVLR.record_length_after_header = (ushort)wktVLR.data.Length;
+
+				err = lazWriter.add_vlr(wktVLR);
 				if (err == 0)
 				{
-					double[] coordArray = new double[3];
-					foreach (var p in points)
+					// Open the writer and test for errors
+					err = lazWriter.open_writer(FileName, true);
+					if (err == 0)
 					{
-						coordArray[0] = p.X;
-						coordArray[1] = p.Y;
-						coordArray[2] = p.Z;
+						double[] coordArray = new double[3];
+						foreach (var p in points)
+						{
+							coordArray[0] = p.X;
+							coordArray[1] = p.Y;
+							coordArray[2] = p.Z;
 
-						// Set the coordinates in the lazWriter object
-						lazWriter.set_coordinates(coordArray);
+							// Set the coordinates in the lazWriter object
+							lazWriter.set_coordinates(coordArray);
 
-						// Set the classification to ground
-						lazWriter.point.classification = 2;
+							// Set the classification to ground
+							lazWriter.point.classification = 2;
 
-						// Write the point to the file
-						err = lazWriter.write_point();
-						if (err != 0) break;
+							lazWriter.point.extended_return_number = 1;
+							lazWriter.point.extended_number_of_returns = 1;
+
+							// Write the point to the file
+							err = lazWriter.write_point();
+							if (err != 0) break;
+						}
+
+						// Close the writer to release the file (OS lock)
+						err = lazWriter.close_writer();
+						lazWriter = null;
 					}
-
-					// Close the writer to release the file (OS lock)
-					err = lazWriter.close_writer();
-					lazWriter = null;
 				}
 			}
 

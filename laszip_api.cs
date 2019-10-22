@@ -232,7 +232,7 @@ namespace LASzip.Net
 				Array.Clear(header.extended_number_of_points_by_return, 0, header.extended_number_of_points_by_return.Length);
 				header.user_data_in_header_size = 0;
 				header.user_data_in_header = null;
-				header.vlrs = null;
+				header.vlrs.Clear();
 				header.user_data_after_header_size = 0;
 				header.user_data_after_header = null;
 
