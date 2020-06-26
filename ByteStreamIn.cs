@@ -34,7 +34,18 @@ namespace LASzip.Net
 	static class ByteStreamIn
 	{
 		[ThreadStatic]
-		static byte[] buffer = new byte[8];
+		static byte[] _buffer;
+		static byte[] buffer
+		{
+			get
+			{
+				if (_buffer == null)
+				{
+					_buffer = new byte[8];
+				}
+				return _buffer;
+			}
+		}
 
 		//// read a single byte
 		//public static uint getByte(this Stream stream)
