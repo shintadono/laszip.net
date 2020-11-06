@@ -19,7 +19,7 @@ To get the newest version of the C# port of the LASzip library, goto:
 https://github.com/shintadono/laszip.net
 
 ATTENTION: This port is not a complete port of the LASzip library. It does not
-contain the example provided in it (but has some examples off it's own), and
+contain the example provided in it (but has some examples of it's own), and
 you can't create version 1 LAZ files, while reading version 1 is still possible.
 
 
