@@ -49,6 +49,10 @@ still possible.
 
   Jimmy (https://github.com/jimmyfishbean)
 
+  Raynor Vliegendhart (https://github.com/ShinNoNoir)
+
+  JaskaRoman (https://github.com/JaskaRoman)
+
 
 **COPYRIGHT**
 
@@ -56,4 +60,6 @@ still possible.
 
   (c) of C# port 2014-2019 by Shinta <shintadono@googlemail.com>
 
-  (c) for bug fixes to the C+ port 2023-2025 by Raynor Vliegendhart (https://github.com/ShinNoNoir)
+  (c) for bug fixes to the C+ port 2020-2025 by Raynor Vliegendhart (https://github.com/ShinNoNoir)
+
+  (c) for bug fixes to the C+ port 2020 by JaskaRoman (https://github.com/JaskaRoman)
